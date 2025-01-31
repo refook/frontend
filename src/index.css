@@ -1,64 +1,228 @@
+/* RESET */
+
+/* Reset and base styles  */
+* {
+	padding: 0px;
+	margin: 0px;
+	border: none;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+/* Links */
+
+a, a:link, a:visited  {
+    text-decoration: none;
+}
+
+a:hover  {
+    text-decoration: none;
+}
+
+/* Common */
+
+aside, nav, footer, header, section, main {
+	display: block;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    font-size: inherit;
+	font-weight: inherit;
+}
+
+ul, ul li {
+	list-style: none;
+}
+
+img {
+	vertical-align: top;
+}
+
+img, svg {
+	max-width: 100%;
+	height: auto;
+}
+
+address {
+  font-style: normal;
+}
+
+/* Form */
+
+input, textarea, button, select {
+	font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background-color: transparent;
+}
+
+input::-ms-clear {
+	display: none;
+}
+
+button, input[type="submit"] {
+    display: inline-block;
+    box-shadow: none;
+    background-color: transparent;
+    background: none;
+    cursor: pointer;
+}
+
+input:focus, input:active,
+button:focus, button:active {
+    outline: none;
+}
+
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0;
+}
+
+label {
+	cursor: pointer;
+}
+
+legend {
+	display: block;
+}
+
+
+
+/* VARS */
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+	--container-width: 1160px;
+	--container-padding: 15px;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+	--font-main: 'Rubik', sans-serif;
+	--font-accent: 'DaysOne', sans-serif;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	--black: #070707;
+	--purple: #3D348B;
+	--purpleLight: #7678ED;
+	--orange: #F35B04;
+	--orangeLight: #F18701;
+	--yellow: #F7B801;
+	--white: #FAFAFA;
+	--whites: #FFFFFF;
+	--whiteUltra: #F2F2F2;
+	--grey70: #999999;
+	--grey90: #E6E6E6;
+	
+	
+
+    --laptop-size: 1199px;
+	--tablet-size: 959px;
+	--mobile-size: 599px;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.dark {
+    --page-bg: #e0541c;
+    --text-color: #fff;
 }
-a:hover {
-  color: #535bf2;
+
+
+
+
+
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Days+One&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+Mono+TC:wght@300;400;700&display=swap');
+
+
+
+
+@font-face {
+    font-family: 'DaysOne';
+    src: url(../fonts/DaysOne.ttf) format('ttf');
+}
+
+
+.html {
+    scroll-behavior: smooth;
+}
+
+.visually-hidden {
+    height: 1px;
+    overflow: hidden;
+    width: 1px;
+    position: absolute;
+    clip: rect(1px 1px 1px 1px);
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
 body {
-  
+    font-family: var(--font-main);
+    background-color: var(--page-bg);
+    color: var(--text-color);
+}
+.main {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+a {
+    
+    cursor: pointer;
+
+
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+h4 {
+    font-family: 'DaysOne';
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+h2 {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+
+/* CONTAINER */
+
+.container {
+	padding: 0 var(--container-padding);
+	max-width: var(--container-width);
+	margin: 0 auto;
+}
+
+.container-right {
+	/* overflow-x: hidden; */
+	padding-left: calc(
+		(100% - var(--container-width)) / 2 + var(--container-padding)
+	);
+
+	@media (max-width: var(--laptop-size)) {
+		padding-left: var(--container-padding);
+	}
+}
+
+.container-left {
+	/* overflow-x: hidden; */
+	padding-right: calc(
+		(100% - var(--container-width)) / 2 + var(--container-padding)
+	);
+
+	@media (max-width: var(--laptop-size)) {
+		padding-right: var(--container-padding);
+	}
+}
+
+html, body {
+  min-height: 100vh;
+
 }
