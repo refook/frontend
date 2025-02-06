@@ -36,25 +36,58 @@
         height: 250px;
         border-radius: 10px;
         background-color: var(--whites);
-
-        top: 255px;
+        cursor: pointer;
+        top: 245px;
         z-index: 15;
+
+        &::before {
+            content: "";
+
+            position: absolute;
+            left: 50%;
+            top: 5px;
+            width: 60px;
+            height: 3px;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: var(--grey90);
+            
+            transition: all .3s ease;
+            
+        }
+
+        &:hover::before {
+            content: "";
+
+            position: absolute;
+            left: 50%;
+            top: 5px;
+            width: 70px;
+            height: 3px;
+            transform: translate(-50%, -50%);
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: var(--grey70);
+            transition: all .3s ease;
+            
+        }
     }
 
     &__rating {
         position: absolute;
         width: 75px;
-        height: 25px;
+        height: 30px;
         background-color: var(--whites);
-        border-radius: 6px;
+        border-radius: 10px;
         left: 15px;
-        top: -12px;
+        top: -17px;
 
         &_text {
             position: relative;
-            margin: 3px 8px 0 0; 
+            margin: 6px 9px 0 0; 
             text-align: right;
-            font-size: 12px;
+            font-size: 15px;
             font-weight: bold; 
             color: black;
 
@@ -63,11 +96,11 @@
     
                 position: absolute;
                 left: 9px;
-                top: 0;
-                width: 13px;
-                height: 13px;
+                top: -2px;
+                width: 20px;
+                height: 20px;
     
-                background-image: url('../img/rating_star.svg');
+                background-image: url('./rating_star.svg');
                 background-repeat: no-repeat;
                 background-size: contain;
             }
@@ -79,19 +112,25 @@
     &__author {
         position: absolute;
         
-        width: 30px;
-        height: 30px;
+        width: 35px;
+        height: 35px;
         border-radius: 100%;
         border: 2px solid var(--whites);
 
-        top: -15px;
-        right: 15px;
+        top: -17px;
+        right: 17px;
         
-        background-image: url('../img/profile_card.png');
+        background-image: url('./profile_card.png');
         background-size: 110%;
         background-repeat: no-repeat;
         //background-size: contain;
     }
+
+    &__container_info{
+        margin: 15px 15px;
+    }
+
+    
 
     &__name {
         display: -webkit-box;
@@ -99,16 +138,37 @@
         -webkit-line-clamp: 2;
         overflow: hidden;
 
-        font-size: 17px;
+        font-size: 20px;
         line-height: 19px;
         font-weight: bold;
         color: black;
 
         width:  245px;
         height: 40px;
-        margin: 15px 15px;
+        
 
         //border: 1px solid red;
+    }
+
+    &__info_extend {
+        font-size: 15px;
+        color: var(--grey70);
+        margin-bottom: 10px;
+    }
+
+    &__extend_info {
+
+    }
+
+    &__temp {
+
+        height: 50px;
+        box-shadow: 0px 0px 15px rgb(0, 0, 0, 0.05);
+        margin-bottom: 10px;
+        border-radius: 10px;
+        background-image: url('./card_recipe-temp.svg');
+        background-size: 100%;
+        background-repeat: no-repeat;
     }
 
     &__hashtags {
@@ -116,10 +176,11 @@
         display: flex;
         gap: 10px;
         width: 245px;
-        height: 23px;
+        height: 30px;
+        z-index: 99;
         
 
-        top: 63px;
+        bottom: 10px;
         right: 15px;
 
         //border: 1px solid red;
@@ -129,7 +190,7 @@
         display: inline-block;
         font-size: 13px;
         color: var(--whites);
-        border-radius: 10px;
+        border-radius: 15px;
         padding: 0 8px;
         background-color: lightcoral;
     }
@@ -139,7 +200,7 @@
         font-size: 13px;
         font-weight: bold;
         color: var(--whites);
-        border-radius: 10px;
+        border-radius: 15px;
         padding: 0 8px;
         background-color: var(--orange);
     }

@@ -1,0 +1,234 @@
+// SSECTION_TOP
+
+
+
+.intro_top {
+
+    &__inner {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-bottom: 50px;
+    }
+
+    &__titles {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        gap: 30px;
+        max-width: 470px;
+        margin-top: 100px;
+    }
+    
+    &__title {
+        font-size: 50px;
+        font-weight: bold;
+    }
+    
+    &__subtitle { 
+        font-size: 40px;
+    }
+    
+   
+
+    &__btns {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    &__btn1 {
+        display: flex;
+	    align-items: center;
+	    gap: 20px;
+	    color: var(--whites);
+	    font-weight: 600;
+	    padding: 10px 15px;
+	    border-radius: 10px;
+	    background-color: var(--orange);
+    }
+
+    &__btn2 {
+        display: flex;
+	    align-items: center;
+	    gap: 20px;
+	    color: var(--whites);
+	    font-weight: 600;
+	    padding: 10px 15px;
+	    border-radius: 10px;
+	    background-color: var(--purple);
+    }
+
+    // CARDS
+
+    &__cards {
+        position: relative;
+        
+    }
+
+    &__card1 {
+        position: absolute;
+        scale: 0.8;
+        right: 90%;
+        top: 20%;
+    }
+
+    &__card2 {
+        //position: absolute;
+        scale: 0.8;
+        right: 10%;
+        top: 0%;
+    }
+
+    &__stars {
+        position: absolute;
+        top: 190px;
+        right: 150px;
+        scale: 2.5;
+        z-index: -1;
+        width: 300px;
+        height: 300px;
+
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-image: url("./intro_stars.svg");
+    }
+    
+}
+
+// SECTION_1
+.intro_section1__inner {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+   
+}
+
+.intro_section1 {
+    padding-top: 30px;
+    padding-bottom: 120px;
+
+    &__titles {
+        display: flex;
+        flex: row;
+        justify-content: center;
+        padding-bottom: 90px;
+    }
+
+    &__title {
+        font-family: "LXGW WenKai Mono TC", monospace;
+        font-weight: 700;
+        font-size: 60px;
+        transform: rotate(-10deg);
+    }
+
+    &__arrow {
+        scale: 3;
+        width: 50px;
+        margin-top: 60px;   
+        margin-left: 60px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-image: url("./intro_arrow_1.svg");
+    }
+
+    &__cards {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &__btn {
+        margin-left: 50px;
+        min-width: 130px;
+        height: 160px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-image: url("./btn_to_klad.svg");
+    }
+}
+
+.intro_card__content {
+    display: flex;
+    position: relative;
+}
+
+.intro_card__item--add {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    min-width: 220px;
+    height: 320px;
+    background-color: var(--white);
+    border: 5px solid var(--orange);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    z-index: 10;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.intro_card__item--add_2 {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    min-width: 220px;
+    height: 320px;
+    background-color: var(--white);
+    border: 5px solid var(--orange);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    top: -6%;
+    right: -9%;
+    transform: rotate(7deg);
+    z-index: 9;
+    opacity: 0.7;
+
+    &:hover {
+        opacity: 1.0;
+    }
+}
+
+.intro_card__item--add_3 {
+    
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    min-width: 220px;
+    height: 320px;
+    background-color: var(--white);
+    border: 5px solid var(--orange);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+
+    top: -10%;
+    right: -17%;
+    transform: rotate(15deg);
+    opacity: 0.7;
+    z-index: 8;
+    
+
+    &:hover {
+        opacity: 1.0;
+    }
+}
+
+.intro_card__txt {
+    font-size: 30px;
+    font-weight: bold;
+    color: var(--orange);
+}
