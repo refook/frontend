@@ -1,0 +1,82 @@
+.container {
+    display: flex;
+    // align-items: flex-start;
+    align-items: stretch;
+    /* Размеры/отступы/фон окна — на вкус */
+    background-color: var(--whiteUltra);
+    border-radius: 12px;
+    max-width: 600px;
+    padding: 20px;
+    position: relative;
+  }
+  
+  /* Левая часть */
+  .leftBlock {
+    flex: 0 0 200px;
+    // height: 260px; /* примерная высота */
+    border-radius: 10px;
+    background-color: #4A3FAE; /* фоновый цвет по умолчанию (если ничего не выбрано) */
+    position: relative;
+  }
+  
+  /* Пример, когда показываем разные «картинки» */
+  .imageOne,
+  .imageTwo,
+  .imageThree {
+    position: absolute;
+    inset: 0; /* равнозначно top:0; right:0; bottom:0; left:0 */
+    border-radius: 10px;
+    /* Чтобы при появлении не накладывались друг на друга, 
+       используем какой-то фон или реальный <img> внутри */
+  }
+  
+  /* Для наглядности зададим разные цвета */
+  .imageOne {
+    background-color: #FE7F2D; 
+  }
+  .imageTwo {
+    background-color: #FCCA46;
+  }
+  .imageThree {
+    background-color: #A1C181;
+  }
+  
+  /* Правая часть */
+  .rightBlock {
+    display: flex;
+    flex-direction: column;
+   justify-content: space-between;
+    margin-left: 20px;
+    min-height: 270px;
+    gap: 15px;
+    /* При необходимости — задать ширину */
+  }
+  
+  /* Пункт меню */
+  .menuItem {
+    font-size: 18px;
+    font-weight: 600;
+    min-height: 80px;
+    //margin-bottom: 16px;
+    cursor: pointer;
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background-color: var(--whites);
+    
+  
+    &:hover {
+      color: #EA580C;
+      background-color: var(--white);
+    }
+  
+    /* Текст помельче под названием пункта */
+    .subText {
+      font-family: 'Rubik', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      color: #777;
+      margin-top: 4px;
+    }
+  }
+  

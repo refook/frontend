@@ -1,0 +1,26 @@
+/* Начальное состояние при входе */
+.fade-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  
+  /* Активное состояние при входе */
+  .fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  /* Начальное состояние при выходе */
+  .fade-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Активное состояние при выходе */
+  .fade-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  

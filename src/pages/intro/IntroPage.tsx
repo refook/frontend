@@ -63,6 +63,30 @@ function IntroPage() {
                 </div>
             </section>
 
+            <section className={styles.intro_section2}>
+                <div className={styles.intro_section2__inner}>
+                    <div className={styles.intro_section2__titles}>
+                        <div className={styles.intro_section2__title}>И <span>получайте</span> рекомендации <br></br> на основе предпочтений</div>
+                    </div>
+                    <div className={styles.intro_section2__checkboxes}>
+                        <div className={styles.intro_section2__checkbox_inner}>
+                            <div className={styles.intro_section2__checkbox_title}>Скоро испортится</div>
+                            <div className={styles.intro_section2__checkbox}></div>
+                        </div>
+                        <div className={styles.intro_section2__checkbox_inner}>
+                            <div className={styles.intro_section2__checkbox_title}>Без глютена</div>
+                            <div className={styles.intro_section2__checkbox}></div>
+                        </div>
+                        <div className={styles.intro_section2__checkbox_inner}>
+                            <div className={styles.intro_section2__checkbox_title}>Низкокаллорийно</div>
+                            <div className={styles.intro_section2__checkbox}></div>
+                        </div>
+
+                    </div>
+                    <div className={styles.intro_section2__oldcard}></div>
+                </div>
+            </section>
+
         </>
     );
 }
