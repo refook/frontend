@@ -8,6 +8,8 @@
     max-width: 600px;
     padding: 20px;
     position: relative;
+    border: solid 1px var(--orangeOpacity);
+
   }
   
   /* Левая часть */
@@ -52,8 +54,11 @@
     /* При необходимости — задать ширину */
   }
   
+
+
   /* Пункт меню */
   .menuItem {
+    font-family: 'DaysOne';
     font-size: 18px;
     font-weight: 600;
     min-height: 80px;
@@ -75,7 +80,7 @@
       font-family: 'Rubik', sans-serif;
       font-size: 14px;
       font-weight: 400;
-      color: #777;
+      color: var(--grey70);
       margin-top: 4px;
     }
   }

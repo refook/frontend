@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')!).render(
     <Header />
     <div className="container">
 
-      {/* <IntroPage /> */}
+      <IntroPage />
       {/* <NavInfoBtn/> */}
     </div>
 

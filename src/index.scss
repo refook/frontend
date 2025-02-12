@@ -105,6 +105,7 @@ legend {
 	--purple: #3D348B;
 	--purpleLight: #7678ED;
 	--orange: #F35B04;
+	--orangeOpacity: #f35c0440;
 	--orangeLight: #F18701;
 	--yellow: #F7B801;
 	--white: #FAFAFA;
@@ -146,8 +147,11 @@ legend {
 
 @font-face {
     font-family: 'DaysOne';
-    src: url(../fonts/DaysOne.ttf) format('ttf');
+    src: url('./DaysOne.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
 }
+
 
 
 .html {
@@ -165,8 +169,8 @@ legend {
 }
 
 body {
-    font-family: var(--font-main);
-    background-color: var(--page-bg);
+    font-family: var(--font-accent);
+    background-color: var(--whites);
     color: var(--text-color);
 }
 .main {

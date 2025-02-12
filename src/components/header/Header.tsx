@@ -77,7 +77,8 @@ function Header() {
                                     position: 'absolute',
                                     left: '-500px',
                                     marginTop: '420px',
-                                    width: '600px'
+                                    width: '600px',
+                                    zIndex:999
                                 }}
                                 onMouseEnter={handleTestMouseEnter}
                                 onMouseLeave={handleTestMouseLeave}

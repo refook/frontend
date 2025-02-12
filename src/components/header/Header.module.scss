@@ -2,6 +2,7 @@
 	background-color: var(--white);
 	padding: 10px 0;
 	border-bottom: 1px solid var(--grey70);
+	z-index: 999;
 
 }
 
@@ -54,6 +55,7 @@
 	
 	border-radius: 10px;
 	background-color: var(--orange);
+	transition: background-color 0.3s ease;
 
 	&_img1 {
 		width: 21px;
@@ -67,5 +69,10 @@
 		height: 10px;
 		background-repeat: no-repeat;
 		background-image: url("./arrow_btn.svg");
+	}
+
+	&:hover {
+		background-color: var(--orangeLight);
+		
 	}
 }
