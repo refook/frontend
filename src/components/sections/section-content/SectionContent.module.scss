@@ -1,0 +1,14 @@
+.content__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.content__content {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    row-gap: 30px;
+}

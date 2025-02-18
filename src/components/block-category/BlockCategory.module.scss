@@ -1,0 +1,22 @@
+.category {
+    position: relative;
+    min-width: 210px;
+    height: 110px;
+    background-color: var(--grey90);
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+
+    &__title {
+        position: absolute;
+        padding: 10px 20px;
+        font-size: 20px;
+        font-weight: 500;
+        z-index: 999;
+        
+    }
+
+    &__img {
+        position: absolute;
+    }
+}

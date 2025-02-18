@@ -1,0 +1,27 @@
+.populary__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.populary__title {
+    font-size: 30px;
+    font-family: "Rubik";
+    font-weight: 600;
+}
+
+.populary__subtitle {
+    font-size: 15px;
+    font-family: "Rubik";
+    font-weight: 400;
+    margin-bottom: 20px;
+}
+
+.populary__content {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 10px;
+    row-gap: 20px;
+}

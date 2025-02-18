@@ -11,9 +11,9 @@ function IntroPage() {
                     <div className={styles.intro_top__titles}>
                         <h1 className={styles.intro_top__title}>Готовим вместе <br></br>с вами</h1>
                         <span className={styles.intro_top__subtitle}>
-                            <span>Находим</span> рецепты по вашим предпочтениям, интерактивно <span>готовим</span>
-                            в нашем тренажере
-                            <br></br>и <span>делимся</span> эмоциями
+                            <span style={{color: 'var(--orange)'}}>Находим</span> рецепты по вашим предпочтениям, интерактивно <span style={{color: 'var(--orange)'}}>готовим</span>
+                            <br></br>в нашем тренажере
+                            <br></br>и <span style={{color: 'var(--orange)'}}>делимся</span> эмоциями
                             <br></br>во время готовки!</span>
                         <div className={styles.intro_top__btns}>
                             <button className={styles.intro_top__btn1}>ГОТОВЯТ СЕЙЧАС</button>
