@@ -174,8 +174,22 @@ export interface CreateRecipeForm {
   difficulty: Recipe['difficulty'];
   cuisine?: string;
   tags: string[];
-  ingredients: Omit<RecipeIngredient, 'id'>[];
-  steps: Omit<RecipeStep, 'id'>[];
+  ingredients: FormIngredient[];
+  steps: FormStep[];
+}
+
+export interface FormIngredient {
+  id: string;
+  name: string;
+  amount: string;
+  unit: string;
+}
+
+export interface FormStep {
+  id: string;
+  description: string;
+  order: number;
+  image?: File;
 }
 
 export interface AddFridgeItemForm {

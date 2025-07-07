@@ -1,0 +1,273 @@
+.ingredientPicker {
+  width: 100%;
+}
+
+.ingredientsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xl);
+}
+
+.ingredientItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+  transition: all var(--transition-fast);
+}
+
+.ingredientItem:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.ingredientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ingredientName {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.ingredientAmount {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.removeButton:hover {
+  color: var(--color-danger);
+  background-color: var(--color-danger-light);
+}
+
+.removeIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.showFormButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-lg);
+  background-color: var(--bg-secondary);
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.showFormButton:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.plusIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.addForm {
+  padding: var(--spacing-xl);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.nameGroup,
+.amountGroup,
+.unitGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.inputContainer {
+  position: relative;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: all var(--transition-fast);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  appearance: none;
+}
+
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+
+.suggestion {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.suggestion:hover {
+  background-color: var(--bg-secondary);
+}
+
+.suggestion:first-child {
+  border-top-left-radius: var(--radius-md);
+  border-top-right-radius: var(--radius-md);
+}
+
+.suggestion:last-child {
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+.formActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+.cancelButton,
+.addButton {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cancelButton {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.cancelButton:hover {
+  background-color: var(--bg-secondary);
+}
+
+.addButton {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.addButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.addButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .addForm {
+    padding: var(--spacing-lg);
+  }
+
+  .ingredientItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .ingredientInfo {
+    width: 100%;
+  }
+
+  .removeButton {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .formActions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .addButton {
+    width: 100%;
+  }
+} 

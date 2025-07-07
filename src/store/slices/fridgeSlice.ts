@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FridgeItem } from '../../types';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { FridgeItem } from '../../types';
 
 interface FridgeState {
   items: FridgeItem[];

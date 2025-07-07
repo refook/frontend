@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Recipe, RecipeFilters, RecipeSort } from '../../types';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { Recipe, RecipeFilters, RecipeSort } from '../../types';
 
 interface RecipesState {
   items: Recipe[];

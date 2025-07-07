@@ -1,0 +1,77 @@
+.detailPage {
+  padding: var(--spacing-3xl) 0;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.description {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+}
+
+.imageWrapper {
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+.image {
+  max-width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+.meta {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-3xl);
+  font-weight: var(--font-weight-medium);
+}
+
+.section {
+  margin-bottom: var(--spacing-3xl);
+}
+
+.ingredientsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stepsList {
+  padding: 0;
+  margin: 0;
+}
+
+.step {
+  margin-bottom: var(--spacing-xl);
+}
+
+.stepImg {
+  max-width: 200px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.notFound {
+  text-align: center;
+  padding: var(--spacing-4xl) 0;
+} 

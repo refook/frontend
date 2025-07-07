@@ -1,0 +1,316 @@
+.stepsEditor {
+  width: 100%;
+}
+
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.stepItem {
+  display: flex;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-primary);
+  transition: all var(--transition-fast);
+}
+
+.stepItem:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.stepNumber {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.stepContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepDescription {
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  line-height: var(--line-height-relaxed);
+  cursor: pointer;
+  padding: var(--spacing-sm) 0;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.stepDescription:hover {
+  background-color: var(--bg-tertiary);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.emptyText {
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  resize: vertical;
+  font-family: inherit;
+  line-height: var(--line-height-relaxed);
+  transition: all var(--transition-fast);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.editActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+.cancelButton,
+.saveButton {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.cancelButton {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.cancelButton:hover {
+  background-color: var(--bg-secondary);
+}
+
+.saveButton {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.stepImage {
+  margin-top: var(--spacing-md);
+}
+
+.image {
+  width: 100%;
+  max-width: 300px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
+}
+
+.stepActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.editButton,
+.imageButton,
+.moveButton,
+.removeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.editButton {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.editButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.imageButton {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.imageButton:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.moveButton {
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-primary);
+}
+
+.moveButton:hover:not(:disabled) {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.moveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.removeButton {
+  background-color: var(--bg-primary);
+  color: var(--color-danger);
+  border: 1px solid var(--border-primary);
+}
+
+.removeButton:hover {
+  background-color: var(--color-danger);
+  color: var(--text-inverse);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-xl);
+  background-color: var(--bg-secondary);
+  border: 2px dashed var(--border-primary);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.addButton:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.plusIcon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .stepItem {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .stepNumber {
+    align-self: flex-start;
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-base);
+  }
+
+  .stepActions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .editButton,
+  .imageButton,
+  .moveButton,
+  .removeButton {
+    min-width: 60px;
+    font-size: var(--font-size-xs);
+  }
+
+  .image {
+    max-width: 200px;
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stepItem {
+    padding: var(--spacing-lg);
+  }
+
+  .stepActions {
+    justify-content: center;
+  }
+
+  .editButton,
+  .imageButton,
+  .moveButton,
+  .removeButton {
+    padding: var(--spacing-xs);
+    min-width: 50px;
+  }
+
+  .editButton {
+    order: -1;
+    width: 100%;
+  }
+
+  .image {
+    max-width: 150px;
+    height: 120px;
+  }
+} 

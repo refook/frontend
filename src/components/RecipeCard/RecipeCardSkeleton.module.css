@@ -1,0 +1,155 @@
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeletonCard {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.skeletonImage {
+  height: 200px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 200px;
+  animation: shimmer 2s infinite linear;
+}
+
+.skeletonContent {
+  padding: var(--spacing-lg);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.skeletonTitle {
+  height: 24px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 24px;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-md);
+  width: 80%;
+}
+
+.skeletonDescription {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
+}
+
+.skeletonLine {
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 14px;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+.skeletonLineShort {
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 14px;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-sm);
+  width: 60%;
+}
+
+.skeletonMeta {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-top: auto;
+}
+
+.skeletonMetaItem {
+  height: 16px;
+  width: 60px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 16px;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+.skeletonAuthor {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid var(--border-primary);
+}
+
+.skeletonAvatar {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 24px;
+  animation: shimmer 2s infinite linear;
+}
+
+.skeletonAuthorName {
+  height: 12px;
+  width: 80px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0px,
+    var(--bg-tertiary) 40px,
+    var(--bg-secondary) 80px
+  );
+  background-size: 200px 12px;
+  animation: shimmer 2s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .skeletonMeta {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  
+  .skeletonContent {
+    padding: var(--spacing-md);
+  }
+} 

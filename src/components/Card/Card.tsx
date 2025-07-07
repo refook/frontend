@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentWithChildren, ComponentWithClassName } from '../../types';
+import type { ComponentWithChildren, ComponentWithClassName } from '../../types';
 import styles from './Card.module.css';
 
 interface CardProps extends ComponentWithChildren, ComponentWithClassName {

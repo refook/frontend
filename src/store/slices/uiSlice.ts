@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ThemeMode } from '../../types';
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { ThemeMode } from '../../types';
 
 interface UiState {
   theme: ThemeMode;

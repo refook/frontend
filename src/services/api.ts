@@ -1,5 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
-import { ApiResponse, ApiError } from '../types';
+import axios from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
+import type { ApiResponse, ApiError } from '../types';
 
 // Base API configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';

@@ -1,0 +1,125 @@
+.createRecipePage {
+  padding: var(--spacing-3xl) 0;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-4xl);
+}
+
+.title {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: var(--line-height-relaxed);
+}
+
+.tabs {
+  display: flex;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xs);
+  margin-bottom: var(--spacing-3xl);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tab:hover:not(:disabled) {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab.active {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.tabIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.content {
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  min-height: 600px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .createRecipePage {
+    padding: var(--spacing-2xl) 0;
+  }
+
+  .header {
+    margin-bottom: var(--spacing-3xl);
+  }
+
+  .title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .subtitle {
+    font-size: var(--font-size-base);
+  }
+
+  .tabs {
+    max-width: none;
+    margin-bottom: var(--spacing-2xl);
+  }
+
+  .tab {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+  }
+
+  .tabIcon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tabs {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .tab {
+    width: 100%;
+  }
+} 

@@ -1,0 +1,212 @@
+.recipeForm {
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.formContainer {
+  padding: var(--spacing-3xl);
+}
+
+.section {
+  margin-bottom: var(--spacing-4xl);
+  padding-bottom: var(--spacing-3xl);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.section:last-of-type {
+  border-bottom: none;
+  margin-bottom: var(--spacing-2xl);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-2xl) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.sectionIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary);
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  transition: all var(--transition-fast);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input.error,
+.select.error,
+.textarea.error {
+  border-color: var(--color-danger);
+}
+
+.input.error:focus,
+.select.error:focus,
+.textarea.error:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+  appearance: none;
+}
+
+.errorText {
+  display: block;
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--spacing-2xl);
+  border-top: 1px solid var(--border-primary);
+}
+
+.submitButton {
+  padding: var(--spacing-lg) var(--spacing-4xl);
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 200px;
+}
+
+.submitButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.submitButton.disabled {
+  background-color: var(--color-gray-400);
+}
+
+/* Scrollbar styles */
+.recipeForm::-webkit-scrollbar {
+  width: 8px;
+}
+
+.recipeForm::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-full);
+}
+
+.recipeForm::-webkit-scrollbar-thumb {
+  background: var(--color-gray-400);
+  border-radius: var(--radius-full);
+}
+
+.recipeForm::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-500);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .formContainer {
+    padding: var(--spacing-2xl);
+  }
+
+  .section {
+    margin-bottom: var(--spacing-3xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xl);
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .submitButton {
+    width: 100%;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .formContainer {
+    padding: var(--spacing-lg);
+  }
+
+  .input,
+  .select,
+  .textarea {
+    font-size: var(--font-size-sm);
+  }
+
+  .sectionIcon {
+    width: 20px;
+    height: 20px;
+  }
+} 

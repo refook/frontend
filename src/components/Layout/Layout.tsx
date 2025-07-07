@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComponentWithChildren } from '../../types';
+import type { ComponentWithChildren } from '../../types';
 import Header from '../Header/Header';
 import styles from './Layout.module.css';
 
