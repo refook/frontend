@@ -5,15 +5,15 @@
 }
 
 .populary__title {
-    font-size: 30px;
-    font-family: "Rubik";
-    font-weight: 600;
+    font-size: var(--font-size-l);
+    font-family: var(--font-accent);
+    font-weight: var(--font-weight-l);
 }
 
 .populary__subtitle {
-    font-size: 15px;
-    font-family: "Rubik";
-    font-weight: 400;
+    font-size: var(--font-size-s);
+    font-family: var(--font-main);
+    font-weight: var(--font-weight-m);
     margin-bottom: 20px;
 }
 

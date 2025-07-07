@@ -16,6 +16,7 @@
 }
 
 .top__hashtag {
+    font-family: var(--font-accent);
     padding: 5px 15px;
     border-radius: 5px;
     background-color: var(--black);
@@ -27,6 +28,7 @@
 }
 
 .top__title {
+    font-family: var(--font-accent);
     color: var(--black);
     font-size: 40px;
     font-weight: 600;
@@ -34,6 +36,7 @@
 }
 
 .top__btn {
+    font-family: var(--font-accent);
     padding: 10px 15px;
     border-radius: 10px;
     background-color: var(--black);

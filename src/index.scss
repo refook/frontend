@@ -99,7 +99,16 @@ legend {
 	--container-padding: 15px;
 
 	--font-main: 'Rubik', sans-serif;
-	--font-accent: 'DaysOne', sans-serif;
+	--font-accent: 'Rubik', sans-serif;
+
+	--font-weight-s: 300;
+	--font-weight-m: 400;
+	--font-weight-l: 600;
+
+	--font-size-s: 15px;
+	--font-size-m: 20px;
+	--font-size-l: 30px;
+	--font-size-xl: 40px;
 
 	--black: #070707;
 	--purple: #3D348B;
@@ -169,9 +178,10 @@ legend {
 }
 
 body {
-    font-family: var(--font-accent);
+
+
     background-color: var(--whites);
-    color: var(--text-color);
+    color: var(--text-color);	
 }
 .main {
     display: flex;
