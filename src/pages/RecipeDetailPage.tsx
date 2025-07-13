@@ -1,15 +1,50 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAppSelector } from '../store';
-import type { Recipe } from '../types';
+import { useAppDispatch, useAppSelector } from '../store';
+import { fetchRecipe } from '../store/thunks';
+import { RecipesService } from '../services/recipesService';
+import { PencilIcon } from '@heroicons/react/24/outline';
+import RecipePreview from '../components/RecipePreview';
 import styles from './RecipeDetailPage.module.css';
 
 const RecipeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const recipe = useAppSelector(state => state.recipes.items.find(r => r.id === id));
+  const dispatch = useAppDispatch();
+  const { currentRecipe, loading, error } = useAppSelector(state => state.recipes);
+  
+  // Загружаем рецепт при изменении ID
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchRecipe(id));
+    }
+  }, [dispatch, id]);
 
-  if (!recipe) {
+  if (loading) {
+    return (
+      <div className="container">
+        <div className={styles.loading}>
+          <p>Загрузка рецепта...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container">
+        <div className={styles.error}>
+          <h1>Ошибка загрузки рецепта</h1>
+          <p>{error}</p>
+          <button onClick={() => navigate('/recipes')} className={styles.backBtn}>
+            ← Назад к списку
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentRecipe) {
     return (
       <div className="container">
         <div className={styles.notFound}>
@@ -22,64 +57,29 @@ const RecipeDetailPage: React.FC = () => {
     );
   }
 
-  const totalTime = recipe.prepTime + recipe.cookTime;
+  const recipe = currentRecipe;
+
+  const handleEdit = () => {
+    navigate(`/recipe/${recipe.id}/edit`);
+  };
 
   return (
     <div className={styles.detailPage}>
       <div className="container">
-        <button onClick={() => navigate(-1)} className={styles.backBtn}>
-          ← Назад
-        </button>
-        <div className={styles.header}>
-          <h1 className={styles.title}>{recipe.title}</h1>
-          <p className={styles.description}>{recipe.description}</p>
+        <div className={styles.topBar}>
+          <button onClick={() => navigate(-1)} className={styles.backBtn}>
+            ← Назад
+          </button>
+          <button onClick={handleEdit} className={styles.editBtn}>
+            <PencilIcon className={styles.editIcon} />
+            Редактировать
+          </button>
         </div>
-
-        {recipe.image && (
-          <div className={styles.imageWrapper}>
-            <img src={recipe.image} alt={recipe.title} className={styles.image} />
-          </div>
-        )}
-
-        <div className={styles.meta}>
-          <span>⏱️ {totalTime} мин</span>
-          <span>🍽️ {recipe.servings} порции</span>
-          <span>⭐ {recipe.difficulty === 'easy' ? 'Легко' : recipe.difficulty === 'medium' ? 'Средне' : 'Сложно'}</span>
-          {recipe.cuisine && <span>🌎 {recipe.cuisine}</span>}
-        </div>
-
-        <section className={styles.section}>
-          <h2>Ингредиенты</h2>
-          {recipe.ingredients.length > 0 ? (
-            <ul className={styles.ingredientsList}>
-              {recipe.ingredients.map(ing => (
-                <li key={ing.id}>
-                  {ing.ingredient?.name ?? 'Ингредиент'} — {ing.amount} {ing.unit}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Нет ингредиентов</p>
-          )}
-        </section>
-
-        <section className={styles.section}>
-          <h2>Шаги приготовления</h2>
-          {recipe.steps.length > 0 ? (
-            <ol className={styles.stepsList}>
-              {recipe.steps.map(step => (
-                <li key={step.id} className={styles.step}>
-                  {step.image && (
-                    <img src={step.image} alt={`Шаг ${step.order}`} className={styles.stepImg}/>
-                  )}
-                  <p>{step.description}</p>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p>Нет шагов</p>
-          )}
-        </section>
+        
+        <RecipePreview 
+          recipe={recipe}
+          showActions={false}
+        />
       </div>
     </div>
   );

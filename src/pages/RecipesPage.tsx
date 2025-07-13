@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store';
-import { fetchRecipesStart, fetchRecipesSuccess, setPage } from '../store/slices/recipesSlice';
+import { setPage } from '../store/slices/recipesSlice';
+import { fetchRecipes } from '../store/thunks';
 import FiltersPanel from '../components/FiltersPanel/FiltersPanel';
 import RecipesList from '../components/RecipesList/RecipesList';
 import LoadMoreButton from '../components/LoadMoreButton/LoadMoreButton';
@@ -11,17 +12,19 @@ const RecipesPage: React.FC = () => {
   const { items, loading, error, filters, sort, pagination } = useAppSelector(state => state.recipes);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Временно отключаем автоматическую генерацию мок-данных.
-  // Реальные рецепты добавляются через конструктор и уже находятся в Redux-хранилище.
-
-  // Пример будущей загрузки из API:
-  // useEffect(() => {
-  //   dispatch(fetchRecipesStart());
-  //   api.get('/recipes').then(res => dispatch(fetchRecipesSuccess(res.data)));  
-  // }, [filters, sort]);
+  // Загружаем рецепты при изменении фильтров или сортировки
+  useEffect(() => {
+    dispatch(fetchRecipes({
+      page: pagination.page,
+      limit: pagination.limit,
+      filters,
+      sort
+    }));
+  }, [dispatch, filters, sort, pagination.page]);
 
   const loadMoreRecipes = () => {
-    // Здесь будет пагинация при подключении к API
+    const nextPage = pagination.page + 1;
+    dispatch(setPage(nextPage));
   };
 
   const toggleFilters = () => {
@@ -66,7 +69,10 @@ const RecipesPage: React.FC = () => {
             {error && (
               <div className={styles.error}>
                 <p>Ошибка загрузки рецептов: {error}</p>
-                <button onClick={loadMoreRecipes} className={styles.retryButton}>
+                <button 
+                  onClick={() => dispatch(fetchRecipes({ page: 1, limit: pagination.limit, filters, sort }))} 
+                  className={styles.retryButton}
+                >
                   Попробовать снова
                 </button>
               </div>
@@ -77,11 +83,12 @@ const RecipesPage: React.FC = () => {
               loading={loading}
             />
 
-            {/* Пока пагинация не используется, убираем кнопку «Показать ещё», если рецептов меньше лимита */}
-            <LoadMoreButton 
-              onClick={loadMoreRecipes}
-              loading={loading}
-            />
+            {pagination.hasMore && (
+              <LoadMoreButton 
+                onClick={loadMoreRecipes}
+                loading={loading}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -1,0 +1,258 @@
+import { mockApi } from './mockApi';
+import type { 
+  Recipe, 
+  CreateRecipeForm, 
+  RecipeFilters, 
+  RecipeSort, 
+  PaginatedResponse,
+  ApiError 
+} from '../types';
+
+export class RecipesService {
+  // Получение списка рецептов с пагинацией и фильтрами
+  static async getRecipes(
+    page: number = 1, 
+    limit: number = 12, 
+    filters?: RecipeFilters, 
+    sort?: RecipeSort
+  ): Promise<PaginatedResponse<Recipe>> {
+    try {
+      return await mockApi.getRecipes(page, limit, filters, sort);
+    } catch (error: any) {
+      console.error('Ошибка при получении рецептов:', error);
+      throw error;
+    }
+  }
+
+  // Получение одного рецепта по ID
+  static async getRecipe(id: string): Promise<Recipe> {
+    try {
+      return await mockApi.getRecipe(id);
+    } catch (error: any) {
+      console.error('Ошибка при получении рецепта:', error);
+      throw error;
+    }
+  }
+
+  // Создание нового рецепта
+  static async createRecipe(formData: CreateRecipeForm): Promise<Recipe> {
+    try {
+      return await mockApi.createRecipe(formData);
+    } catch (error: any) {
+      console.error('Ошибка при создании рецепта:', error);
+      throw error;
+    }
+  }
+
+  // Обновление рецепта
+  static async updateRecipe(id: string, updates: Partial<Recipe>): Promise<Recipe> {
+    try {
+      return await mockApi.updateRecipe(id, updates);
+    } catch (error: any) {
+      console.error('Ошибка при обновлении рецепта:', error);
+      throw error;
+    }
+  }
+
+  // Удаление рецепта
+  static async deleteRecipe(id: string): Promise<void> {
+    try {
+      await mockApi.deleteRecipe(id);
+    } catch (error: any) {
+      console.error('Ошибка при удалении рецепта:', error);
+      throw error;
+    }
+  }
+
+  // Поиск рецептов
+  static async searchRecipes(query: string, page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
+    try {
+      const filters: RecipeFilters = { search: query };
+      return await mockApi.getRecipes(page, limit, filters);
+    } catch (error: any) {
+      console.error('Ошибка при поиске рецептов:', error);
+      throw error;
+    }
+  }
+
+  // Получение рецептов по сложности
+  static async getRecipesByDifficulty(
+    difficulty: Recipe['difficulty'], 
+    page: number = 1, 
+    limit: number = 12
+  ): Promise<PaginatedResponse<Recipe>> {
+    try {
+      const filters: RecipeFilters = { difficulty: [difficulty] };
+      return await mockApi.getRecipes(page, limit, filters);
+    } catch (error: any) {
+      console.error('Ошибка при получении рецептов по сложности:', error);
+      throw error;
+    }
+  }
+
+  // Получение рецептов по кухне
+  static async getRecipesByCuisine(
+    cuisine: string, 
+    page: number = 1, 
+    limit: number = 12
+  ): Promise<PaginatedResponse<Recipe>> {
+    try {
+      const filters: RecipeFilters = { cuisine: [cuisine] };
+      return await mockApi.getRecipes(page, limit, filters);
+    } catch (error: any) {
+      console.error('Ошибка при получении рецептов по кухне:', error);
+      throw error;
+    }
+  }
+
+  // Получение быстрых рецептов (время приготовления < 30 минут)
+  static async getQuickRecipes(page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
+    try {
+      const filters: RecipeFilters = { 
+        prepTime: { max: 30 } 
+      };
+      const sort: RecipeSort = { field: 'prepTime', order: 'asc' };
+      return await mockApi.getRecipes(page, limit, filters, sort);
+    } catch (error: any) {
+      console.error('Ошибка при получении быстрых рецептов:', error);
+      throw error;
+    }
+  }
+
+  // Получение популярных рецептов
+  static async getPopularRecipes(page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
+    try {
+      const sort: RecipeSort = { field: 'rating', order: 'desc' };
+      return await mockApi.getRecipes(page, limit, undefined, sort);
+    } catch (error: any) {
+      console.error('Ошибка при получении популярных рецептов:', error);
+      throw error;
+    }
+  }
+
+  // Получение новых рецептов
+  static async getNewRecipes(page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
+    try {
+      const sort: RecipeSort = { field: 'createdAt', order: 'desc' };
+      return await mockApi.getRecipes(page, limit, undefined, sort);
+    } catch (error: any) {
+      console.error('Ошибка при получении новых рецептов:', error);
+      throw error;
+    }
+  }
+
+  // Проверка валидности формы рецепта
+  static validateRecipeForm(formData: CreateRecipeForm): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    if (!formData.title.trim()) {
+      errors.push('Название рецепта обязательно');
+    }
+
+    if (!formData.description.trim()) {
+      errors.push('Описание рецепта обязательно');
+    }
+
+    if (formData.prepTime < 0) {
+      errors.push('Время подготовки не может быть отрицательным');
+    }
+
+    if (formData.cookTime < 0) {
+      errors.push('Время приготовления не может быть отрицательным');
+    }
+
+    if (formData.servings < 1) {
+      errors.push('Количество порций должно быть больше 0');
+    }
+
+    if (formData.ingredients.length === 0) {
+      errors.push('Добавьте хотя бы один ингредиент');
+    }
+
+    if (formData.steps.length === 0) {
+      errors.push('Добавьте хотя бы один шаг приготовления');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  // Форматирование времени приготовления
+  static formatCookingTime(prepTime: number, cookTime: number): string {
+    const totalMinutes = prepTime + cookTime;
+    
+    if (totalMinutes < 60) {
+      return `${totalMinutes} мин`;
+    }
+    
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    
+    if (minutes === 0) {
+      return `${hours} ч`;
+    }
+    
+    return `${hours} ч ${minutes} мин`;
+  }
+
+  // Форматирование сложности
+  static formatDifficulty(difficulty: Recipe['difficulty']): string {
+    const difficultyMap = {
+      easy: 'Легко',
+      medium: 'Средне',
+      hard: 'Сложно'
+    };
+    
+    return difficultyMap[difficulty];
+  }
+
+  // Получение цвета сложности
+  static getDifficultyColor(difficulty: Recipe['difficulty']): string {
+    const colorMap = {
+      easy: '#51cf66',
+      medium: '#ffd43b',
+      hard: '#ff6b6b'
+    };
+    
+    return colorMap[difficulty];
+  }
+
+  // Подсчет общего времени приготовления
+  static getTotalCookingTime(recipe: Recipe): number {
+    return recipe.prepTime + recipe.cookTime;
+  }
+
+  // Проверка, является ли рецепт быстрым (менее 30 минут)
+  static isQuickRecipe(recipe: Recipe): boolean {
+    return this.getTotalCookingTime(recipe) <= 30;
+  }
+
+  // Проверка, является ли рецепт популярным (рейтинг > 4.5)
+  static isPopularRecipe(recipe: Recipe): boolean {
+    return recipe.stats.rating > 4.5;
+  }
+
+  // Получение количества отзывов в текстовом формате
+  static getReviewsText(reviewsCount: number): string {
+    if (reviewsCount === 0) {
+      return 'Нет отзывов';
+    }
+    
+    if (reviewsCount === 1) {
+      return '1 отзыв';
+    }
+    
+    if (reviewsCount < 5) {
+      return `${reviewsCount} отзыва`;
+    }
+    
+    return `${reviewsCount} отзывов`;
+  }
+
+  // Сброс данных (для тестирования)
+  static resetData(): void {
+    mockApi.resetData();
+  }
+} 

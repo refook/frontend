@@ -112,8 +112,8 @@
 }
 
 .contentGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: var(--spacing-3xl);
   margin-bottom: var(--spacing-3xl);
 }
@@ -350,7 +350,6 @@
   }
 
   .contentGrid {
-    grid-template-columns: 1fr;
     gap: var(--spacing-2xl);
   }
 

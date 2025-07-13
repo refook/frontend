@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store';
-import { addRecipe } from '../store/slices/recipesSlice';
-import type { CreateRecipeForm, Recipe } from '../types';
+import type { CreateRecipeForm } from '../types';
 import RecipeForm from '../components/RecipeForm/RecipeForm';
 import RecipePreview from '../components/RecipePreview/RecipePreview';
 import { EyeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
+import { createRecipe } from '../store/thunks';
+import { useNotification } from '../hooks/useNotification';
+import Notification from '../components/Notification';
 import styles from './CreateRecipePage.module.css';
 
 const CreateRecipePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { notification, showSuccess, showError, hideNotification } = useNotification();
   
   const [activeTab, setActiveTab] = useState<'form' | 'preview'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,60 +38,15 @@ const CreateRecipePage: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Симуляция API запроса
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Создаем объект рецепта
-      const newRecipe: Recipe = {
-        id: `recipe-${Date.now()}`,
-        title: formData.title,
-        description: formData.description,
-        image: formData.image ? URL.createObjectURL(formData.image) : undefined,
-        prepTime: formData.prepTime,
-        cookTime: formData.cookTime,
-        servings: formData.servings,
-        difficulty: formData.difficulty,
-        cuisine: formData.cuisine,
-        tags: formData.tags,
-        // Преобразуем ингредиенты в минимально совместимый формат
-        // TODO: заменить на полноценный Ingredient после интеграции с API
-        ingredients: (formData.ingredients.map((ing, index) => ({
-          id: `ing-${index}`,
-          ingredient: { id: `ingredient-${index}`, name: ing.name, category: { id: 'cat', name: 'Другое', color: '#ccc' }, defaultUnit: ing.unit, possibleUnits: [ing.unit] },
-          amount: parseFloat(ing.amount) || 0,
-          unit: ing.unit
-        })) as any),
-        steps: formData.steps.map((step, index) => ({
-          ...step,
-          id: `step-${index}`,
-          order: index + 1,
-          image: step.image ? URL.createObjectURL(step.image) : undefined
-        })),
-        author: {
-          id: 'current-user',
-          name: 'Вы',
-          avatar: undefined
-        },
-        stats: {
-          views: 0,
-          likes: 0,
-          saves: 0,
-          rating: 0,
-          reviewsCount: 0
-        },
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      // Добавляем рецепт в store
-      dispatch(addRecipe(newRecipe));
+      // Используем thunk для создания рецепта
+      const newRecipe = await dispatch(createRecipe(formData)).unwrap();
       
       // Переходим на страницу рецепта
       navigate(`/recipe/${newRecipe.id}`);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Ошибка при создании рецепта:', error);
-      // TODO: Показать уведомление об ошибке
+      showError('Ошибка', error.message || 'Произошла ошибка при создании рецепта');
     } finally {
       setIsSubmitting(false);
     }
@@ -146,6 +104,14 @@ const CreateRecipePage: React.FC = () => {
           )}
         </div>
       </div>
+      
+      <Notification
+        show={notification.show}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={hideNotification}
+      />
     </div>
   );
 };

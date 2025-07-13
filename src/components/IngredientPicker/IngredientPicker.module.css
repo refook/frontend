@@ -194,6 +194,12 @@
   border-bottom-right-radius: var(--radius-md);
 }
 
+.category {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-xs);
+  margin-left: 4px;
+}
+
 .formActions {
   display: flex;
   gap: var(--spacing-md);

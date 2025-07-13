@@ -79,12 +79,11 @@ export interface NutritionInfo {
 }
 
 // Ingredient types
-export interface Ingredient extends BaseEntity {
+export interface Ingredient {
+  id: string;
   name: string;
   description?: string;
   category: IngredientCategory;
-  defaultUnit: string;
-  possibleUnits: string[];
   nutrition?: NutritionInfo;
   storageInstructions?: string;
   shelfLife?: number; // дни
@@ -99,6 +98,7 @@ export interface IngredientCategory {
 
 // Fridge types
 export interface FridgeItem extends BaseEntity {
+  userId: string;
   ingredient: Ingredient;
   amount: number;
   unit: string;
@@ -197,6 +197,7 @@ export interface AddFridgeItemForm {
   amount: number;
   unit: string;
   expirationDate?: string;
+  purchaseDate?: string;
   location?: FridgeItem['location'];
   notes?: string;
 }

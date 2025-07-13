@@ -6,7 +6,7 @@ import {
   UserIcon, 
   StarIcon, 
   HeartIcon,
-  BookmarkIcon 
+  BookmarkIcon
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import styles from './RecipeCard.module.css';
@@ -16,74 +16,46 @@ interface RecipeCardProps {
   viewMode?: 'grid' | 'list';
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, viewMode = 'grid' }) => {
-  const totalTime = recipe.prepTime + recipe.cookTime;
-  const isFavorite = false; // TODO: Получить из Redux store
-
+const RecipeCard: React.FC<RecipeCardProps> = ({ 
+  recipe, 
+  viewMode = 'grid'
+}) => {
   const getDifficultyLabel = (difficulty: Recipe['difficulty']) => {
-    const labels = {
-      easy: 'Легко',
-      medium: 'Средне',
-      hard: 'Сложно'
-    };
-    return labels[difficulty];
+    switch (difficulty) {
+      case 'easy': return 'Легко';
+      case 'medium': return 'Средне';
+      case 'hard': return 'Сложно';
+      default: return 'Неизвестно';
+    }
   };
 
   const getDifficultyColor = (difficulty: Recipe['difficulty']) => {
-    const colors = {
-      easy: 'var(--color-success)',
-      medium: 'var(--color-warning)',
-      hard: 'var(--color-danger)'
-    };
-    return colors[difficulty];
+    switch (difficulty) {
+      case 'easy': return '#10b981';
+      case 'medium': return '#f59e0b';
+      case 'hard': return '#ef4444';
+      default: return '#6b7280';
+    }
   };
 
+  const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
+
   return (
-    <div className={`${styles.recipeCard} ${styles[viewMode]}`}>
+    <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
       <Link to={`/recipe/${recipe.id}`} className={styles.cardLink}>
         <div className={styles.imageContainer}>
           <img 
-            src={recipe.image || '/placeholder-recipe.jpg'} 
+            src={recipe.image || '/api/placeholder/300/200'} 
             alt={recipe.title}
             className={styles.image}
-            loading="lazy"
           />
-          <div className={styles.imageOverlay}>
-            <div className={styles.tags}>
-              <span 
-                className={styles.difficultyTag}
-                style={{ backgroundColor: getDifficultyColor(recipe.difficulty) }}
-              >
-                {getDifficultyLabel(recipe.difficulty)}
-              </span>
-              {recipe.cuisine && (
-                <span className={styles.cuisineTag}>
-                  {recipe.cuisine}
-                </span>
-              )}
-            </div>
+          <div className={styles.overlay}>
             <div className={styles.actions}>
-              <button 
-                className={`${styles.actionButton} ${isFavorite ? styles.favorite : ''}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  // TODO: Добавить/убрать из избранного
-                }}
-              >
-                {isFavorite ? (
-                  <HeartIconSolid className={styles.actionIcon} />
-                ) : (
-                  <HeartIcon className={styles.actionIcon} />
-                )}
+              <button className={styles.actionBtn}>
+                <HeartIcon className={styles.icon} />
               </button>
-              <button 
-                className={styles.actionButton}
-                onClick={(e) => {
-                  e.preventDefault();
-                  // TODO: Добавить в закладки
-                }}
-              >
-                <BookmarkIcon className={styles.actionIcon} />
+              <button className={styles.actionBtn}>
+                <BookmarkIcon className={styles.icon} />
               </button>
             </div>
           </div>
@@ -96,26 +68,33 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, viewMode = 'grid' }) =>
           <div className={styles.meta}>
             <div className={styles.metaItem}>
               <ClockIcon className={styles.metaIcon} />
-              <span className={styles.metaText}>{totalTime} мин</span>
+              <span>{totalTime} мин</span>
             </div>
             <div className={styles.metaItem}>
               <UserIcon className={styles.metaIcon} />
-              <span className={styles.metaText}>{recipe.servings} порц.</span>
+              <span>{recipe.servings} порций</span>
             </div>
             <div className={styles.metaItem}>
-              <StarIcon className={styles.metaIcon} />
-              <span className={styles.metaText}>{recipe.stats.rating}</span>
+              <StarIcon 
+                className={styles.metaIcon} 
+                style={{ color: getDifficultyColor(recipe.difficulty) }}
+              />
+              <span>{getDifficultyLabel(recipe.difficulty)}</span>
             </div>
           </div>
           
-          <div className={styles.author}>
-            <img 
-              src={recipe.author.avatar || '/placeholder-avatar.jpg'} 
-              alt={recipe.author.name}
-              className={styles.authorAvatar}
-            />
-            <span className={styles.authorName}>{recipe.author.name}</span>
-          </div>
+          {recipe.tags && recipe.tags.length > 0 && (
+            <div className={styles.tags}>
+              {recipe.tags.slice(0, 3).map((tag, index) => (
+                <span key={index} className={styles.tag}>
+                  {tag}
+                </span>
+              ))}
+              {recipe.tags.length > 3 && (
+                <span className={styles.moreTag}>+{recipe.tags.length - 3}</span>
+              )}
+            </div>
+          )}
         </div>
       </Link>
     </div>

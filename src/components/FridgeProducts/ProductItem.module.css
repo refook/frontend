@@ -1,0 +1,209 @@
+.productItem {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.productItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.productItem.expiring {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fef3c7 0%, white 100%);
+}
+
+.productItem.expired {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fecaca 0%, white 100%);
+}
+
+.productHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.productName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editButton:hover {
+  background: #e5e7eb;
+}
+
+.deleteButton:hover {
+  background: #fecaca;
+}
+
+.saveButton:hover {
+  background: #dcfce7;
+}
+
+.cancelButton:hover {
+  background: #fecaca;
+}
+
+.productDetails {
+  color: #6b7280;
+}
+
+.amount {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.amount strong {
+  color: #1f2937;
+}
+
+.expiry {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.notes {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editRow {
+  display: flex;
+  flex-direction: column;
+}
+
+.editRow label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editInput {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  flex: 1;
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.unit {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.statusBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.expired .statusBadge {
+  background: #ef4444;
+  color: white;
+}
+
+.expiring .statusBadge {
+  background: #fbbf24;
+  color: white;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .productItem {
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .productHeader {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .productName {
+    font-size: 16px;
+  }
+
+  .actions {
+    margin-left: 0;
+    align-self: flex-end;
+  }
+
+  .actions button {
+    font-size: 16px;
+    padding: 4px;
+  }
+
+  .editForm {
+    gap: 8px;
+  }
+
+  .editRow label {
+    font-size: 13px;
+  }
+
+  .editInput {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+
+  .statusBadge {
+    position: static;
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+} 

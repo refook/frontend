@@ -2,76 +2,86 @@
   padding: var(--spacing-3xl) 0;
 }
 
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
 .backBtn {
   background: none;
   border: none;
   color: var(--color-primary);
   cursor: pointer;
   font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-lg);
+  margin: 0;
+  transition: color 0.2s;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: var(--spacing-3xl);
+.backBtn:hover {
+  color: var(--color-primary-dark);
 }
 
-.title {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  margin: 0 0 var(--spacing-md) 0;
-}
-
-.description {
-  font-size: var(--font-size-lg);
-  color: var(--text-secondary);
-}
-
-.imageWrapper {
-  text-align: center;
-  margin-bottom: var(--spacing-3xl);
-}
-
-.image {
-  max-width: 100%;
-  border-radius: var(--radius-lg);
-}
-
-.meta {
+.editBtn {
   display: flex;
-  gap: var(--spacing-lg);
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: var(--spacing-3xl);
-  font-weight: var(--font-weight-medium);
-}
-
-.section {
-  margin-bottom: var(--spacing-3xl);
-}
-
-.ingredientsList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.stepsList {
-  padding: 0;
-  margin: 0;
-}
-
-.step {
-  margin-bottom: var(--spacing-xl);
-}
-
-.stepImg {
-  max-width: 200px;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background-color 0.2s;
 }
 
+.editBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+.editIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.loading,
+.error,
 .notFound {
   text-align: center;
   padding: var(--spacing-4xl) 0;
+}
+
+.error h1,
+.notFound h1 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+}
+
+.error p {
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .detailPage {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .topBar {
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .editBtn {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  
+  .editIcon {
+    width: 14px;
+    height: 14px;
+  }
 } 

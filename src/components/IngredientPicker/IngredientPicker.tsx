@@ -1,5 +1,7 @@
-import React, { useState, useRef } from 'react';
-import type { FormIngredient } from '../../types';
+import React, { useState, useRef, useEffect } from 'react';
+import type { FormIngredient, Ingredient } from '../../types';
+import { mockApi } from '../../services/mockApi';
+import { allPossibleUnits } from '../../data';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
 
@@ -13,44 +15,54 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   onChange
 }) => {
   const [showForm, setShowForm] = useState(false);
-  const [name, setName] = useState('');
+  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
   const [amount, setAmount] = useState('');
   const [unit, setUnit] = useState('');
+  const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
+  const [ingredientsLoading, setIngredientsLoading] = useState(true);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Популярные ингредиенты для автокомплита
-  const popularIngredients = [
-    'мука', 'сахар', 'яйца', 'молоко', 'масло сливочное', 'масло растительное',
-    'соль', 'перец', 'лук', 'чеснок', 'морковь', 'картофель', 'томаты',
-    'курица', 'говядина', 'свинина', 'рыба', 'рис', 'гречка', 'макароны',
-    'сыр', 'творог', 'сметана', 'кефир', 'хлеб', 'петрушка', 'укроп',
-    'базилик', 'орегано', 'тимьян', 'лавровый лист', 'паприка', 'куркума'
-  ];
+  // Загружаем ингредиенты из API
+  useEffect(() => {
+    const loadIngredients = async () => {
+      try {
+        setIngredientsLoading(true);
+        const apiIngredients = await mockApi.getIngredients();
+        setAvailableIngredients(apiIngredients);
+      } catch (error) {
+        console.error('Ошибка при загрузке ингредиентов:', error);
+      } finally {
+        setIngredientsLoading(false);
+      }
+    };
 
-  const units = [
-    'г', 'кг', 'мл', 'л', 'шт', 'ст.л.', 'ч.л.', 'стакан', 'щепотка', 'по вкусу'
-  ];
+    loadIngredients();
+  }, []);
 
-  const suggestions = popularIngredients.filter(ingredient => 
-    ingredient.toLowerCase().includes(name.toLowerCase()) &&
-    !ingredients.some(ing => ing.name.toLowerCase() === ingredient.toLowerCase()) &&
-    name.length > 0
+  const units = allPossibleUnits;
+
+  const suggestions = availableIngredients.filter(ingredient => 
+    ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !ingredients.some(ing => ing.name.toLowerCase() === ingredient.name.toLowerCase()) &&
+    searchTerm.length > 0
   );
 
   const addIngredient = () => {
-    if (name.trim()) {
+    if (selectedIngredient && amount.trim()) {
       const newIngredient: FormIngredient = {
         id: `ing-${Date.now()}`,
-        name: name.trim(),
+        name: selectedIngredient.name,
         amount: amount.trim(),
-        unit: unit.trim()
+        unit: unit.trim() || 'шт'
       };
       
       onChange([...ingredients, newIngredient]);
       
       // Сбрасываем форму
-      setName('');
+      setSelectedIngredient(null);
+      setSearchTerm('');
       setAmount('');
       setUnit('');
       setShowForm(false);
@@ -62,14 +74,17 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     onChange(ingredients.filter(ing => ing.id !== id));
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setName(value);
+    setSearchTerm(value);
     setShowSuggestions(value.length > 0);
+    setSelectedIngredient(null);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setName(suggestion);
+  const handleSuggestionClick = (ingredient: Ingredient) => {
+    setSelectedIngredient(ingredient);
+    setSearchTerm(ingredient.name);
+    setUnit(''); // Пользователь выберет единицу сам
     setShowSuggestions(false);
   };
 
@@ -119,26 +134,27 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                 <input
                   ref={nameInputRef}
                   type="text"
-                  value={name}
-                  onChange={handleNameChange}
+                  value={searchTerm}
+                  onChange={handleSearchChange}
                   onKeyDown={handleKeyDown}
-                  onFocus={() => setShowSuggestions(name.length > 0)}
+                  onFocus={() => setShowSuggestions(searchTerm.length > 0)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                  placeholder="Начните вводить название"
+                  placeholder={ingredientsLoading ? "Загрузка..." : "Начните вводить название"}
                   className={styles.input}
+                  disabled={ingredientsLoading}
                   required
                 />
                 
                 {showSuggestions && suggestions.length > 0 && (
                   <div className={styles.suggestions}>
-                    {suggestions.slice(0, 5).map(suggestion => (
+                    {suggestions.slice(0, 5).map(ingredient => (
                       <button
-                        key={suggestion}
+                        key={ingredient.id}
                         type="button"
-                        onClick={() => handleSuggestionClick(suggestion)}
+                        onClick={() => handleSuggestionClick(ingredient)}
                         className={styles.suggestion}
                       >
-                        {suggestion}
+                        {ingredient.name} <span className={styles.category}>({ingredient.category.name})</span>
                       </button>
                     ))}
                   </div>
@@ -177,7 +193,8 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
               type="button"
               onClick={() => {
                 setShowForm(false);
-                setName('');
+                setSelectedIngredient(null);
+                setSearchTerm('');
                 setAmount('');
                 setUnit('');
                 setShowSuggestions(false);
@@ -190,7 +207,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
               type="button"
               className={styles.addButton}
               onClick={addIngredient}
-              disabled={!name.trim()}
+              disabled={!selectedIngredient || !amount.trim()}
             >
               Добавить
             </button>
