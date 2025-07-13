@@ -180,11 +180,143 @@
   color: var(--text-primary);
 }
 
+/* Mobile Menu */
+.mobileMenu {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-primary);
+  transform: translateY(-100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-medium);
+  z-index: var(--z-sticky);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.mobileMenuOpen {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobileNav {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-lg);
+  gap: var(--spacing-lg);
+}
+
+.mobileNavLink {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--border-secondary);
+  transition: color var(--transition-fast);
+}
+
+.mobileNavLink:hover {
+  color: var(--text-primary);
+}
+
+.mobileNavLink:last-child {
+  border-bottom: none;
+}
+
+/* Mobile User Section */
+.mobileUserSection {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border-secondary);
+}
+
+.mobileUserInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+}
+
+.mobileUserName {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.mobileAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--border-primary);
+}
+
+.mobileAuthButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+}
+
+.mobileLoginButton {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-primary);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.mobileLoginButton:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+}
+
+.mobileRegisterButton {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-inverse);
+  background-color: var(--color-primary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  text-align: center;
+  transition: background-color var(--transition-fast);
+}
+
+.mobileRegisterButton:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Mobile Menu Overlay */
+.mobileMenuOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: calc(var(--z-sticky) - 1);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .container {
     padding: 0 var(--spacing-md);
     height: 56px;
+  }
+
+  .mobileMenu {
+    top: 56px;
   }
 
   .nav {
@@ -211,5 +343,13 @@
 
   .logoText {
     font-size: var(--font-size-lg);
+  }
+
+  .mobileNav {
+    padding: var(--spacing-md);
+  }
+
+  .mobileUserSection {
+    padding: var(--spacing-md);
   }
 } 
