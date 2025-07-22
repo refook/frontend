@@ -133,9 +133,10 @@ const DevTools: React.FC = () => {
     }
   }, [isDragging, dragOffset, position, isCollapsed]);
 
-  if (import.meta.env.PROD) {
-    return null;
-  }
+  // Показываем DevTools в продакшн режиме для демонстрации
+  // if (import.meta.env.PROD) {
+  //   return null;
+  // }
 
   return (
     <div 
