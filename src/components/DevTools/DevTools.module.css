@@ -125,6 +125,15 @@
   transition: all 0.2s;
 }
 
+.successBtn {
+  background-color: #28a745;
+  color: white;
+}
+
+.successBtn:hover {
+  background-color: #218838;
+}
+
 .dangerBtn {
   background-color: #dc3545;
   color: white;

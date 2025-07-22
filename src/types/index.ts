@@ -221,6 +221,33 @@ export interface ComponentWithClassName {
   className?: string;
 }
 
+// Shopping list types
+export interface ShoppingListItem {
+  id: string;
+  ingredientName: string;
+  amount: number;
+  unit: string;
+  isCompleted: boolean;
+  notes?: string;
+}
+
+export interface ShoppingList extends BaseEntity {
+  userId: string;
+  title: string;
+  recipeId?: string;
+  recipeName?: string;
+  items: ShoppingListItem[];
+  isCompleted: boolean;
+  completedAt?: string;
+}
+
+export interface ShoppingListFormData {
+  title: string;
+  recipeId?: string;
+  recipeName?: string;
+  items: Omit<ShoppingListItem, 'id' | 'isCompleted'>[];
+}
+
 // Utility types
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>; 

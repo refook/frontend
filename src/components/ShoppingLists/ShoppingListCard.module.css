@@ -1,0 +1,272 @@
+.card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card.completed {
+  background: #f0fdf4;
+  border-color: #22c55e;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+}
+
+.titleSection {
+  flex: 1;
+}
+
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.recipeName {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progressText {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.completedIcon {
+  width: 20px;
+  height: 20px;
+  color: #22c55e;
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.expandButton:hover {
+  background: #f3f4f6;
+}
+
+.chevronIcon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.clockIcon, .checkIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.itemsList {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  transition: opacity 0.2s ease;
+}
+
+.item:last-of-type {
+  border-bottom: none;
+}
+
+.item.itemCompleted {
+  opacity: 0.6;
+}
+
+.checkButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.checkButton:hover {
+  transform: scale(1.1);
+}
+
+.checkIconSolid {
+  width: 20px;
+  height: 20px;
+  color: #22c55e;
+}
+
+.checkIconOutline {
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+}
+
+.itemInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.itemName {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.itemCompleted .itemName {
+  text-decoration: line-through;
+}
+
+.itemAmount {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.itemNotes {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-style: italic;
+  margin-left: auto;
+}
+
+.actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteButton:hover {
+  background: #fecaca;
+  border-color: #f87171;
+}
+
+.trashIcon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .card {
+    padding: 0.75rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  
+  .headerActions {
+    justify-content: space-between;
+  }
+  
+  .title {
+    font-size: 1rem;
+  }
+  
+  .item {
+    gap: 0.5rem;
+  }
+  
+  .itemInfo {
+    gap: 0.125rem;
+  }
+  
+  .actions {
+    justify-content: center;
+  }
+  
+  .metadata {
+    gap: 0.25rem;
+  }
+}

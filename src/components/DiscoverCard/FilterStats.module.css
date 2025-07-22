@@ -1,0 +1,151 @@
+.statsContainer {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1rem;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 0.5rem;
+}
+
+.statsHeader h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.statItem:hover {
+  transform: translateY(-2px);
+}
+
+.statItem.active {
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.statIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.statCount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.statLabel {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Цветовые варианты */
+.neutral {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.neutral .statIcon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.success {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.success .statIcon {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.warning {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.warning .statIcon {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+.danger {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.danger .statIcon {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .statsContainer {
+    padding: 0.75rem;
+  }
+  
+  .statsHeader h4 {
+    font-size: 0.8rem;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+  
+  .statItem {
+    padding: 0.4rem;
+  }
+  
+  .statIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .icon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .statCount {
+    font-size: 0.9rem;
+  }
+  
+  .statLabel {
+    font-size: 0.6rem;
+  }
+} 

@@ -64,6 +64,39 @@ export class StorageUtils {
   }
 
   /**
+   * Отладка данных холодильника
+   */
+  static debugFridge(): void {
+    const fridgeData = localStorage.getItem('mock_fridge');
+    console.log('🧊 Отладка холодильника:');
+    if (!fridgeData) {
+      console.log('  Данные холодильника отсутствуют');
+      return;
+    }
+    
+    try {
+      const items = JSON.parse(fridgeData);
+      console.log(`  Всего элементов: ${items.length}`);
+      const userItems = items.filter((item: any) => item.userId === 'current-user');
+      console.log(`  Элементов для current-user: ${userItems.length}`);
+      
+      if (userItems.length > 0) {
+        console.log('  Первые 3 элемента:');
+        userItems.slice(0, 3).forEach((item: any, index: number) => {
+          console.log(`    ${index + 1}. ${item.ingredient.name} - ${item.amount} ${item.unit}`);
+        });
+      }
+      
+      // Показываем уникальных пользователей
+      const uniqueUsers = [...new Set(items.map((item: any) => item.userId))];
+      console.log(`  Пользователи в данных: ${uniqueUsers.join(', ')}`);
+      
+    } catch (error) {
+      console.error('  Ошибка парсинга данных холодильника:', error);
+    }
+  }
+
+  /**
    * Очистка через браузерное API (альтернативный способ)
    */
   static clearViaBrowserAPI(): void {
@@ -96,5 +129,6 @@ if (typeof window !== 'undefined') {
   (window as any).mockApi = mockApi;
   console.log('🔧 StorageUtils и mockApi доступны в консоли:');
   console.log('  - window.StorageUtils.resetAllData()');
+  console.log('  - window.StorageUtils.debugFridge()');
   console.log('  - window.mockApi.resetData()');
 } 

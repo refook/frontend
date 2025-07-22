@@ -1,0 +1,110 @@
+.hintContainer {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+}
+
+.hintContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.handIcon {
+  width: 20px;
+  height: 20px;
+  color: #4ade80;
+  flex-shrink: 0;
+}
+
+.hintText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hintTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.hintDescription {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.closeIcon {
+  width: 16px;
+  height: 16px;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .hintContainer {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+  }
+  
+  .hintContent {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .handIcon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .hintTitle {
+    font-size: 0.75rem;
+  }
+  
+  .hintDescription {
+    font-size: 0.65rem;
+  }
+  
+  .closeIcon {
+    width: 14px;
+    height: 14px;
+  }
+} 

@@ -1,0 +1,78 @@
+.swipeableCard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 100%;
+  max-width: 400px;
+  height: 80vh;
+  will-change: transform;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: grab;
+}
+
+.swipeableCard.active {
+  z-index: 10;
+}
+
+.swipeableCard.active:active {
+  cursor: grabbing;
+}
+
+.swipeableCard.inactive {
+  z-index: 1;
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.swipeableCard.nextCard {
+  transform: scale(0.95) translateY(20px);
+}
+
+.swipeableCard.prevCard {
+  transform: scale(0.95) translateY(-20px);
+}
+
+/* Анимации для плавных переходов */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cardExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.swipeableCard {
+  animation: cardEnter 0.3s ease-out;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .swipeableCard {
+    height: 90vh;
+    max-width: 100%;
+    margin: 0;
+  }
+} 

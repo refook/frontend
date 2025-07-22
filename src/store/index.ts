@@ -8,6 +8,7 @@ import recipesReducer from './slices/recipesSlice';
 import fridgeReducer from './slices/fridgeSlice';
 import favoritesReducer from './slices/favoritesSlice';
 import uiReducer from './slices/uiSlice';
+import shoppingListReducer from './slices/shoppingListSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     fridge: fridgeReducer,
     favorites: favoritesReducer,
     ui: uiReducer,
+    shoppingList: shoppingListReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

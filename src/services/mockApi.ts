@@ -16,7 +16,8 @@ import {
   initialRecipes, 
   initialIngredients, 
   initialCategories, 
-  initialUsers 
+  initialUsers,
+  initialFridgeItems
 } from '../data';
 
 // Имитация базы данных в localStorage
@@ -54,7 +55,12 @@ class MockDatabase {
       this.storage.setItem('mock_favorites', JSON.stringify([]));
     }
     if (!this.storage.getItem('mock_fridge')) {
-      this.storage.setItem('mock_fridge', JSON.stringify([]));
+      // Добавляем userId к каждому элементу холодильника для демо-пользователя
+      const fridgeWithUserId: FridgeItem[] = initialFridgeItems.map((item: Omit<FridgeItem, 'userId'>) => ({
+        ...item,
+        userId: 'current-user' // ID демо-пользователя
+      }));
+      this.storage.setItem('mock_fridge', JSON.stringify(fridgeWithUserId));
     }
   }
 
@@ -490,7 +496,12 @@ class MockDatabase {
    */
   clearFridge(): void {
     this.storage.removeItem('mock_fridge');
-    this.storage.setItem('mock_fridge', JSON.stringify([]));
+    // Переинициализируем с начальными данными
+    const fridgeWithUserId: FridgeItem[] = initialFridgeItems.map((item: Omit<FridgeItem, 'userId'>) => ({
+      ...item,
+      userId: 'current-user' // ID демо-пользователя
+    }));
+    this.storage.setItem('mock_fridge', JSON.stringify(fridgeWithUserId));
   }
 
   /**

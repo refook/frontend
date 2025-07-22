@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../store';
 import { FridgeProducts } from '../components/FridgeProducts';
 import { RecipeSuggestions } from '../components/RecipeSuggestions';
+import { ShoppingLists } from '../components/ShoppingLists';
 import styles from './FridgePage.module.css';
 
-type TabType = 'products' | 'recipes';
+type TabType = 'products' | 'recipes' | 'shopping';
 
 export const FridgePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('products');
@@ -13,7 +14,8 @@ export const FridgePage: React.FC = () => {
 
   const tabs = [
     { id: 'products' as TabType, label: 'Мои продукты', icon: '🧊' },
-    { id: 'recipes' as TabType, label: 'Идеи рецептов', icon: '💡' }
+    { id: 'recipes' as TabType, label: 'Идеи рецептов', icon: '💡' },
+    { id: 'shopping' as TabType, label: 'Списки покупок', icon: '🛒' }
   ];
 
   return (
@@ -44,6 +46,7 @@ export const FridgePage: React.FC = () => {
       <div className={styles.content}>
         {activeTab === 'products' && <FridgeProducts />}
         {activeTab === 'recipes' && <RecipeSuggestions />}
+        {activeTab === 'shopping' && <ShoppingLists />}
       </div>
     </div>
   );

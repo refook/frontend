@@ -1,0 +1,103 @@
+.filterInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.filterIconContainer {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+.filterText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.filterLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+}
+
+.recipeCount {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  color: white;
+}
+
+/* Цветовые варианты */
+.neutral {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.success {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.success .filterIconContainer {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.warning {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.warning .filterIconContainer {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+.danger {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.danger .filterIconContainer {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .filterInfo {
+    padding: 0.4rem 0.6rem;
+  }
+  
+  .filterIconContainer {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .icon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .filterLabel {
+    font-size: 0.75rem;
+  }
+  
+  .recipeCount {
+    font-size: 0.65rem;
+  }
+} 

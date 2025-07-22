@@ -1,0 +1,173 @@
+.discoverPage {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  overflow: hidden;
+  position: relative;
+}
+
+
+
+.progress {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.cardsContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top: 3px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: white;
+  text-align: center;
+  gap: 1rem;
+}
+
+.emptyContainer h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.emptyContainer p {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  gap: 0.5rem;
+}
+
+.controlButton {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  max-width: 120px;
+}
+
+.controlButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.controlButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controlButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Анимации для карточек */
+.cardEnter {
+  animation: cardEnter 0.5s ease-out;
+}
+
+.cardExit {
+  animation: cardExit 0.5s ease-in;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(100px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-100px) scale(0.9);
+  }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .cardsContainer {
+    padding: 0.5rem;
+  }
+  
+  .controls {
+    padding: 0.75rem 1rem;
+  }
+  
+  .controlButton {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+    max-width: 100px;
+  }
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+  .discoverPage {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  }
+} 

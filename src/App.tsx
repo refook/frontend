@@ -5,10 +5,10 @@ import { store } from './store';
 import Layout from './components/Layout/Layout';
 import { HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage } from './pages';
 import EditRecipePage from './pages/EditRecipePage';
+import DiscoverPage from './pages/DiscoverPage';
 import { DevTools } from './components/DevTools';
 
 // Pages (пока заглушки, создадим позже)
-const DiscoverPage = () => <div className="container"><h1>Discover</h1></div>;
 const LoginPage = () => <div className="container"><h1>Вход</h1></div>;
 const RegisterPage = () => <div className="container"><h1>Регистрация</h1></div>;
 

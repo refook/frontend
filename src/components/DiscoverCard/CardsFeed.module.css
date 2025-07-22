@@ -1,0 +1,40 @@
+.cardsFeed {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: grab;
+}
+
+.cardsFeed:active {
+  cursor: grabbing;
+}
+
+.feedContainer {
+  position: relative;
+  width: 100%;
+  will-change: transform;
+}
+
+.cardWrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .cardWrapper {
+    padding: 0.5rem;
+  }
+}

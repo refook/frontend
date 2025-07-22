@@ -1,0 +1,179 @@
+.tabsContainer {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tabsList {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabsList::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: 1;
+  min-width: 80px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.5rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.tab:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab.active {
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.tabContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tabIconContainer {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tabIcon {
+  width: 14px;
+  height: 14px;
+  color: white;
+}
+
+.tabInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.tabLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabCount {
+  font-size: 0.65rem;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* Цветовые варианты */
+.neutral {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.neutral .tabIconContainer {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.neutral.active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.success {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.success .tabIconContainer {
+  background: rgba(34, 197, 94, 0.3);
+}
+
+.success.active {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.warning {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.warning .tabIconContainer {
+  background: rgba(245, 158, 11, 0.3);
+}
+
+.warning.active {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.danger {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.danger .tabIconContainer {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+.danger.active {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .tabsContainer {
+    padding: 0.5rem;
+  }
+  
+  .tabsList {
+    gap: 0.3rem;
+  }
+  
+  .tab {
+    min-width: 70px;
+    padding: 0.4rem;
+  }
+  
+  .tabContent {
+    gap: 0.3rem;
+  }
+  
+  .tabIconContainer {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .tabIcon {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .tabLabel {
+    font-size: 0.7rem;
+  }
+  
+  .tabCount {
+    font-size: 0.6rem;
+  }
+} 

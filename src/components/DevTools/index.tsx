@@ -1,8 +1,12 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { StorageUtils } from '../../services';
+import { addFridgeItemThunk, fetchFridgeItemsThunk } from '../../store/thunks/fridgeThunks';
+import type { AppDispatch } from '../../store';
 import styles from './DevTools.module.css';
 
 const DevTools: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const [storageInfo, setStorageInfo] = React.useState(() => StorageUtils.getStorageInfo());
   const [isCollapsed, setIsCollapsed] = React.useState(() => {
     const saved = localStorage.getItem('devtools_collapsed');
@@ -38,6 +42,43 @@ const DevTools: React.FC = () => {
 
   const refreshInfo = () => {
     setStorageInfo(StorageUtils.getStorageInfo());
+  };
+
+  const addTestData = async () => {
+    try {
+      const testItems = [
+        {
+          userId: 'current-user',
+          formData: {
+            ingredientId: 'beef',
+            amount: 500,
+            unit: 'г',
+            expirationDate: '2024-12-31',
+            notes: 'Тестовые данные'
+          }
+        },
+        {
+          userId: 'current-user',
+          formData: {
+            ingredientId: 'pasta',
+            amount: 400,
+            unit: 'г',
+            expirationDate: '2024-12-31',
+            notes: 'Тестовые данные'
+          }
+        }
+      ];
+
+      for (const item of testItems) {
+        await dispatch(addFridgeItemThunk(item)).unwrap();
+      }
+      
+      // Перезагружаем данные
+      dispatch(fetchFridgeItemsThunk('current-user'));
+      refreshInfo(); // Обновляем информацию о хранилище
+    } catch (error) {
+      console.error('Error adding test data:', error);
+    }
   };
 
   const toggleCollapse = () => {
@@ -134,6 +175,9 @@ const DevTools: React.FC = () => {
 
           <div className={styles.actions}>
             <h4>🗑️ Actions</h4>
+            <button onClick={addTestData} className={styles.successBtn}>
+              Add Test Data
+            </button>
             <button onClick={handleResetAll} className={styles.dangerBtn}>
               Reset All Data
             </button>
