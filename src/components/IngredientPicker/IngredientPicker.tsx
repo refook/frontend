@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { FormIngredient, Ingredient } from '../../types';
-import { mockApi } from '../../services/mockApi';
+import { ingredientsService } from '../../services/ingredientsService';
 import { allPossibleUnits } from '../../data';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
@@ -29,10 +29,14 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     const loadIngredients = async () => {
       try {
         setIngredientsLoading(true);
-        const apiIngredients = await mockApi.getIngredients();
+        console.log('IngredientPicker: Загрузка ингредиентов из API...');
+        const apiIngredients = await ingredientsService.getIngredientsForFridge();
         setAvailableIngredients(apiIngredients);
+        console.log(`IngredientPicker: Загружено ${apiIngredients.length} ингредиентов`);
       } catch (error) {
-        console.error('Ошибка при загрузке ингредиентов:', error);
+        console.error('IngredientPicker: Ошибка при загрузке ингредиентов:', error);
+        // При ошибке API оставляем пустой массив
+        setAvailableIngredients([]);
       } finally {
         setIngredientsLoading(false);
       }

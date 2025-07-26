@@ -1,38 +1,86 @@
-import { mockApi } from './mockApi';
 import type { Favorite, Recipe } from '../types';
 
+// API endpoint for favorites
+const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'http://82.146.39.131:8080/v1';
+
 export class FavoritesService {
-  // Получение избранных рецептов пользователя
+  
+  /**
+   * Получение избранных рецептов пользователя
+   */
   static async getFavorites(userId: string): Promise<Favorite[]> {
     try {
-      return await mockApi.getFavorites(userId);
+      console.log(`Загрузка избранного для пользователя: ${userId}`);
+      
+      // Пока API не поддерживает избранное, возвращаем пустой массив
+      // В будущем здесь будет: await fetch(`${API_BASE_URL}/favorites/${userId}`)
+      console.log('API избранного пока не реализован, возвращаем пустой список');
+      return [];
+      
     } catch (error: any) {
       console.error('Ошибка при получении избранного:', error);
-      throw error;
+      return [];
     }
   }
 
-  // Добавление рецепта в избранное
+  /**
+   * Добавление рецепта в избранное
+   */
   static async addToFavorites(userId: string, recipeId: string): Promise<Favorite> {
     try {
-      return await mockApi.addToFavorites(userId, recipeId);
+      console.log('Добавление в избранное:', { userId, recipeId });
+      
+      // Создаем временный объект избранного
+      const newFavorite: Favorite = {
+        id: `favorite-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        userId,
+        recipeId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      // Пока API не реализован, просто возвращаем созданный объект
+      console.log('API избранного пока не реализован, возвращаем локальный объект');
+      
+      // В будущем здесь будет реальный API вызов:
+      // const response = await fetch(`${API_BASE_URL}/favorites`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ userId, recipeId })
+      // });
+      
+      return newFavorite;
+      
     } catch (error: any) {
       console.error('Ошибка при добавлении в избранное:', error);
       throw error;
     }
   }
 
-  // Удаление рецепта из избранного
+  /**
+   * Удаление рецепта из избранного
+   */
   static async removeFromFavorites(userId: string, recipeId: string): Promise<void> {
     try {
-      await mockApi.removeFromFavorites(userId, recipeId);
+      console.log('Удаление из избранного:', { userId, recipeId });
+      
+      // Пока API не реализован, просто логируем
+      console.log('API избранного пока не реализован');
+      
+      // В будущем здесь будет реальный API вызов:
+      // await fetch(`${API_BASE_URL}/favorites/${userId}/${recipeId}`, {
+      //   method: 'DELETE'
+      // });
+      
     } catch (error: any) {
       console.error('Ошибка при удалении из избранного:', error);
       throw error;
     }
   }
 
-  // Проверка, находится ли рецепт в избранном
+  /**
+   * Проверка, находится ли рецепт в избранном
+   */
   static async isInFavorites(userId: string, recipeId: string): Promise<boolean> {
     try {
       const favorites = await this.getFavorites(userId);
@@ -43,7 +91,9 @@ export class FavoritesService {
     }
   }
 
-  // Переключение состояния избранного (добавить/удалить)
+  /**
+   * Переключение состояния избранного (добавить/удалить)
+   */
   static async toggleFavorite(userId: string, recipeId: string): Promise<boolean> {
     try {
       const isInFavorites = await this.isInFavorites(userId, recipeId);
@@ -61,7 +111,9 @@ export class FavoritesService {
     }
   }
 
-  // Получение количества избранных рецептов
+  /**
+   * Получение количества избранных рецептов
+   */
   static async getFavoritesCount(userId: string): Promise<number> {
     try {
       const favorites = await this.getFavorites(userId);
@@ -72,30 +124,20 @@ export class FavoritesService {
     }
   }
 
-  // Получение избранных рецептов с полной информацией о рецептах
+  /**
+   * Получение избранных рецептов с полной информацией о рецептах
+   */
   static async getFavoritesWithRecipes(userId: string): Promise<Recipe[]> {
     try {
       const favorites = await this.getFavorites(userId);
-      const recipes: Recipe[] = [];
       
-      for (const favorite of favorites) {
-        if (favorite.recipe) {
-          recipes.push(favorite.recipe);
-        } else {
-          // Если рецепт не загружен, загружаем его
-          try {
-            const recipe = await mockApi.getRecipe(favorite.recipeId);
-            recipes.push(recipe);
-          } catch (error) {
-            console.warn(`Не удалось загрузить рецепт ${favorite.recipeId}:`, error);
-          }
-        }
-      }
+      // Пока нет рецептов в API, возвращаем пустой массив
+      console.log('API рецептов пока возвращает пустой список');
+      return [];
       
-      return recipes;
     } catch (error: any) {
       console.error('Ошибка при получении избранных рецептов:', error);
-      throw error;
+      return [];
     }
   }
 } 

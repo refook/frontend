@@ -93,116 +93,20 @@ export const deleteFridgeItemThunk = createAsyncThunk(
   }
 );
 
-// Получение продуктов по категории
-export const fetchFridgeItemsByCategoryThunk = createAsyncThunk(
-  'fridge/fetchFridgeItemsByCategory',
-  async (
-    params: { userId: string; categoryId: string },
-    { dispatch }
-  ) => {
-    try {
-      dispatch(fetchFridgeStart());
-      
-      const { userId, categoryId } = params;
-      const items = await FridgeService.getFridgeItemsByCategory(userId, categoryId);
-      
-      dispatch(fetchFridgeSuccess(items));
-      
-      return items;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Ошибка при загрузке продуктов по категории';
-      dispatch(fetchFridgeFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
-// Получение продуктов по местоположению
-export const fetchFridgeItemsByLocationThunk = createAsyncThunk(
-  'fridge/fetchFridgeItemsByLocation',
-  async (
-    params: { userId: string; location: FridgeItem['location'] },
-    { dispatch }
-  ) => {
-    try {
-      dispatch(fetchFridgeStart());
-      
-      const { userId, location } = params;
-      const items = await FridgeService.getFridgeItemsByLocation(userId, location);
-      
-      dispatch(fetchFridgeSuccess(items));
-      
-      return items;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Ошибка при загрузке продуктов по местоположению';
-      dispatch(fetchFridgeFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
-// Получение продуктов с истекающим сроком годности
+// Получение истекающих продуктов
 export const fetchExpiringItemsThunk = createAsyncThunk(
   'fridge/fetchExpiringItems',
-  async (
-    params: { userId: string; daysThreshold?: number },
-    { dispatch }
-  ) => {
-    try {
-      dispatch(fetchFridgeStart());
-      
-      const { userId, daysThreshold = 7 } = params;
-      const items = await FridgeService.getExpiringItems(userId, daysThreshold);
-      
-      dispatch(fetchFridgeSuccess(items));
-      
-      return items;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Ошибка при загрузке продуктов с истекающим сроком';
-      dispatch(fetchFridgeFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
-// Получение просроченных продуктов
-export const fetchExpiredItemsThunk = createAsyncThunk(
-  'fridge/fetchExpiredItems',
   async (userId: string, { dispatch }) => {
     try {
       dispatch(fetchFridgeStart());
       
-      const items = await FridgeService.getExpiredItems(userId);
+      const items = await FridgeService.getExpiringItems(userId);
       
       dispatch(fetchFridgeSuccess(items));
       
       return items;
     } catch (error: any) {
-      const errorMessage = error.message || 'Ошибка при загрузке просроченных продуктов';
-      dispatch(fetchFridgeFailure(errorMessage));
-      throw error;
-    }
-  }
-);
-
-// Поиск продуктов в холодильнике
-export const searchFridgeItemsThunk = createAsyncThunk(
-  'fridge/searchFridgeItems',
-  async (
-    params: { userId: string; query: string },
-    { dispatch }
-  ) => {
-    try {
-      dispatch(fetchFridgeStart());
-      
-      const { userId, query } = params;
-      const items = await FridgeService.searchFridgeItems(userId, query);
-      
-      dispatch(fetchFridgeSuccess(items));
-      
-      return items;
-    } catch (error: any) {
-      const errorMessage = error.message || 'Ошибка при поиске продуктов в холодильнике';
+      const errorMessage = error.message || 'Ошибка при загрузке истекающих продуктов';
       dispatch(fetchFridgeFailure(errorMessage));
       throw error;
     }
@@ -218,76 +122,15 @@ export const fetchFridgeStatsThunk = createAsyncThunk(
       
       return stats;
     } catch (error: any) {
-      console.error('Ошибка при получении статистики холодильника:', error);
-      throw error;
-    }
-  }
-);
-
-// Использование ингредиента (уменьшение количества)
-export const useIngredientThunk = createAsyncThunk(
-  'fridge/useIngredient',
-  async (
-    params: { userId: string; ingredientId: string; amount: number },
-    { dispatch }
-  ) => {
-    try {
-      const { userId, ingredientId, amount } = params;
-      await FridgeService.useIngredient(userId, ingredientId, amount);
-      
-      // Обновляем список продуктов в холодильнике
-      const updatedItems = await FridgeService.getFridgeItems(userId);
-      dispatch(fetchFridgeSuccess(updatedItems));
-      
-      return { ingredientId, amount };
-    } catch (error: any) {
-      const errorMessage = error.message || 'Ошибка при использовании ингредиента';
+      const errorMessage = error.message || 'Ошибка при получении статистики холодильника';
       dispatch(fetchFridgeFailure(errorMessage));
       throw error;
     }
   }
 );
 
-// Проверка наличия ингредиента
-export const checkIngredientAvailabilityThunk = createAsyncThunk(
-  'fridge/checkIngredientAvailability',
-  async (
-    params: { userId: string; ingredientId: string },
-    { dispatch }
-  ) => {
-    try {
-      const { userId, ingredientId } = params;
-      const hasIngredient = await FridgeService.hasIngredient(userId, ingredientId);
-      
-      return hasIngredient;
-    } catch (error: any) {
-      console.error('Ошибка при проверке наличия ингредиента:', error);
-      return false;
-    }
-  }
-);
-
-// Получение количества ингредиента
-export const getIngredientAmountThunk = createAsyncThunk(
-  'fridge/getIngredientAmount',
-  async (
-    params: { userId: string; ingredientId: string },
-    { dispatch }
-  ) => {
-    try {
-      const { userId, ingredientId } = params;
-      const amount = await FridgeService.getIngredientAmount(userId, ingredientId);
-      
-      return amount;
-    } catch (error: any) {
-      console.error('Ошибка при получении количества ингредиента:', error);
-      return 0;
-    }
-  }
-);
-
-// Очистка ошибки холодильника
-export const clearFridgeErrorThunk = createAsyncThunk(
+// Очистка ошибок
+export const clearFridgeError = createAsyncThunk(
   'fridge/clearError',
   async (_, { dispatch }) => {
     dispatch(clearError());

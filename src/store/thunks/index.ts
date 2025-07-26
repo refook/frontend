@@ -16,12 +16,9 @@ export {
 // Экспорт всех thunk'ов для избранного
 export {
   fetchFavoritesThunk,
-  fetchFavoritesWithRecipesThunk,
   addToFavoritesThunk,
   removeFromFavoritesThunk,
   toggleFavoriteThunk,
-  checkFavoriteStatusThunk,
-  getFavoritesCountThunk,
   clearFavoritesErrorThunk
 } from './favoritesThunks';
 
@@ -31,14 +28,16 @@ export {
   addFridgeItemThunk,
   updateFridgeItemThunk,
   deleteFridgeItemThunk,
-  fetchFridgeItemsByCategoryThunk,
-  fetchFridgeItemsByLocationThunk,
   fetchExpiringItemsThunk,
-  fetchExpiredItemsThunk,
-  searchFridgeItemsThunk,
   fetchFridgeStatsThunk,
-  useIngredientThunk,
-  checkIngredientAvailabilityThunk,
-  getIngredientAmountThunk,
-  clearFridgeErrorThunk
-} from './fridgeThunks'; 
+  clearFridgeError
+} from './fridgeThunks';
+
+// Экспорт всех thunk'ов для списков покупок
+export {
+  fetchShoppingListsThunk,
+  createShoppingListThunk,
+  deleteShoppingListThunk,
+  toggleShoppingListItemThunk,
+  clearShoppingListsThunk
+} from './shoppingListThunks'; 

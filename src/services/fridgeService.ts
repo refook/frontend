@@ -1,276 +1,175 @@
-import { mockApi } from './mockApi';
-import type { FridgeItem, Ingredient, AddFridgeItemForm } from '../types';
+import type { FridgeItem, AddFridgeItemForm } from '../types';
+
+// API endpoint for fridge
+const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'http://82.146.39.131:8080/v1';
 
 export class FridgeService {
-  // Получение продуктов в холодильнике
+  
+  /**
+   * Получить продукты холодильника для пользователя
+   */
   static async getFridgeItems(userId: string): Promise<FridgeItem[]> {
     try {
-      return await mockApi.getFridgeItems(userId);
-    } catch (error: any) {
-      console.error('Ошибка при получении продуктов холодильника:', error);
-      throw error;
+      console.log(`Загрузка продуктов холодильника для пользователя: ${userId}`);
+      
+      // Пока API не поддерживает холодильник, возвращаем пустой массив
+      // В будущем здесь будет: await fetch(`${API_BASE_URL}/fridge/${userId}`)
+      console.log('API холодильника пока не реализован, возвращаем пустой список');
+      return [];
+      
+    } catch (error) {
+      console.error('Ошибка при загрузке продуктов холодильника:', error);
+      // Возвращаем пустой массив вместо ошибки
+      return [];
     }
   }
 
-  // Добавление продукта в холодильник
+  /**
+   * Добавить продукт в холодильник
+   */
   static async addFridgeItem(userId: string, formData: AddFridgeItemForm): Promise<FridgeItem> {
     try {
-      // Получаем информацию об ингредиенте
-      const ingredients = await mockApi.getIngredients();
-      const ingredient = ingredients.find(ing => ing.id === formData.ingredientId);
+      console.log('Добавление продукта в холодильник:', formData);
       
-      if (!ingredient) {
-        throw new Error('Ингредиент не найден');
-      }
-
-      const newItem: Omit<FridgeItem, 'id' | 'createdAt' | 'updatedAt'> = {
+      // Создаем временный объект продукта
+      const newItem: FridgeItem = {
+        id: `fridge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         userId,
-        ingredient,
+        ingredient: {
+          id: formData.ingredientId,
+          name: 'Неизвестный продукт', // Будет получено из API ингредиентов
+          category: {
+            id: 'temp',
+            name: 'Временная',
+            color: '#ccc'
+          }
+        },
         amount: formData.amount,
         unit: formData.unit,
         expirationDate: formData.expirationDate,
         purchaseDate: formData.purchaseDate,
         location: formData.location,
-        notes: formData.notes
+        notes: formData.notes,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
-
-      return await mockApi.addFridgeItem(newItem);
-    } catch (error: any) {
+      
+      // Пока API не реализован, просто возвращаем созданный объект
+      console.log('API холодильника пока не реализован, возвращаем локальный объект');
+      
+      // В будущем здесь будет реальный API вызов:
+      // const response = await fetch(`${API_BASE_URL}/fridge`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ userId, ...formData })
+      // });
+      
+      return newItem;
+      
+    } catch (error) {
       console.error('Ошибка при добавлении продукта в холодильник:', error);
-      throw error;
+      throw new Error(`Не удалось добавить продукт: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  // Обновление продукта в холодильнике
+  /**
+   * Обновить продукт в холодильнике
+   */
   static async updateFridgeItem(id: string, updates: Partial<FridgeItem>): Promise<FridgeItem> {
     try {
-      return await mockApi.updateFridgeItem(id, updates);
-    } catch (error: any) {
-      console.error('Ошибка при обновлении продукта в холодильнике:', error);
-      throw error;
+      console.log('Обновление продукта в холодильнике:', { id, updates });
+      
+      // Пока API не реализован, возвращаем заглушку
+      console.log('API холодильника пока не реализован');
+      throw new Error('Функция обновления продуктов находится в разработке');
+      
+    } catch (error) {
+      console.error('Ошибка при обновлении продукта:', error);
+      throw new Error(`Не удалось обновить продукт: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  // Удаление продукта из холодильника
+  /**
+   * Удалить продукт из холодильника
+   */
   static async deleteFridgeItem(id: string): Promise<void> {
     try {
-      await mockApi.deleteFridgeItem(id);
-    } catch (error: any) {
-      console.error('Ошибка при удалении продукта из холодильника:', error);
-      throw error;
+      console.log('Удаление продукта из холодильника:', id);
+      
+      // Пока API не реализован, возвращаем заглушку
+      console.log('API холодильника пока не реализован');
+      throw new Error('Функция удаления продуктов находится в разработке');
+      
+    } catch (error) {
+      console.error('Ошибка при удалении продукта:', error);
+      throw new Error(`Не удалось удалить продукт: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  // Получение продуктов по категории
-  static async getFridgeItemsByCategory(userId: string, categoryId: string): Promise<FridgeItem[]> {
+  /**
+   * Получить продукты с истекающим сроком годности
+   */
+  static async getExpiringItems(userId: string, days: number = 3): Promise<FridgeItem[]> {
     try {
-      const items = await this.getFridgeItems(userId);
-      return items.filter(item => item.ingredient.category.id === categoryId);
-    } catch (error: any) {
-      console.error('Ошибка при получении продуктов по категории:', error);
-      throw error;
-    }
-  }
-
-  // Получение продуктов по местоположению
-  static async getFridgeItemsByLocation(userId: string, location: FridgeItem['location']): Promise<FridgeItem[]> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      return items.filter(item => item.location === location);
-    } catch (error: any) {
-      console.error('Ошибка при получении продуктов по местоположению:', error);
-      throw error;
-    }
-  }
-
-  // Получение продуктов с истекающим сроком годности
-  static async getExpiringItems(userId: string, daysThreshold: number = 7): Promise<FridgeItem[]> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      const now = new Date();
-      const thresholdDate = new Date(now.getTime() + daysThreshold * 24 * 60 * 60 * 1000);
-
-      return items.filter(item => {
+      const allItems = await this.getFridgeItems(userId);
+      const expiringDate = new Date();
+      expiringDate.setDate(expiringDate.getDate() + days);
+      
+      return allItems.filter(item => {
         if (!item.expirationDate) return false;
-        const expirationDate = new Date(item.expirationDate);
-        return expirationDate <= thresholdDate && expirationDate >= now;
+        const itemExpiry = new Date(item.expirationDate);
+        return itemExpiry <= expiringDate;
       });
-    } catch (error: any) {
-      console.error('Ошибка при получении продуктов с истекающим сроком:', error);
-      throw error;
+      
+    } catch (error) {
+      console.error('Ошибка при получении истекающих продуктов:', error);
+      return [];
     }
   }
 
-  // Получение просроченных продуктов
-  static async getExpiredItems(userId: string): Promise<FridgeItem[]> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      const now = new Date();
-
-      return items.filter(item => {
-        if (!item.expirationDate) return false;
-        const expirationDate = new Date(item.expirationDate);
-        return expirationDate < now;
-      });
-    } catch (error: any) {
-      console.error('Ошибка при получении просроченных продуктов:', error);
-      throw error;
-    }
-  }
-
-  // Поиск продуктов в холодильнике
-  static async searchFridgeItems(userId: string, query: string): Promise<FridgeItem[]> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      const searchLower = query.toLowerCase();
-
-      return items.filter(item => 
-        item.ingredient.name.toLowerCase().includes(searchLower) ||
-        item.notes?.toLowerCase().includes(searchLower)
-      );
-    } catch (error: any) {
-      console.error('Ошибка при поиске продуктов в холодильнике:', error);
-      throw error;
-    }
-  }
-
-  // Получение статистики холодильника
+  /**
+   * Получить статистику холодильника
+   */
   static async getFridgeStats(userId: string): Promise<{
-    totalItems: number;
-    categories: { [key: string]: number };
-    locations: { [key: string]: number };
+    total: number;
+    byLocation: Record<string, number>;
     expiringSoon: number;
     expired: number;
   }> {
     try {
-      const items = await this.getFridgeItems(userId);
-      const expiringSoon = (await this.getExpiringItems(userId)).length;
-      const expired = (await this.getExpiredItems(userId)).length;
-
-      const categories: { [key: string]: number } = {};
-      const locations: { [key: string]: number } = {};
-
-      items.forEach(item => {
-        const categoryName = item.ingredient.category.name;
-        categories[categoryName] = (categories[categoryName] || 0) + 1;
-
-        if (item.location) {
-          const locationName = this.getLocationName(item.location);
-          locations[locationName] = (locations[locationName] || 0) + 1;
-        }
-      });
-
+      const allItems = await this.getFridgeItems(userId);
+      const now = new Date();
+      const soonDate = new Date();
+      soonDate.setDate(soonDate.getDate() + 3);
+      
+      const byLocation = allItems.reduce((acc, item) => {
+        const location = item.location || 'fridge';
+        acc[location] = (acc[location] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const expiringSoon = allItems.filter(item => {
+        if (!item.expirationDate) return false;
+        const expiry = new Date(item.expirationDate);
+        return expiry <= soonDate && expiry > now;
+      }).length;
+      
+      const expired = allItems.filter(item => {
+        if (!item.expirationDate) return false;
+        const expiry = new Date(item.expirationDate);
+        return expiry <= now;
+      }).length;
+      
       return {
-        totalItems: items.length,
-        categories,
-        locations,
+        total: allItems.length,
+        byLocation,
         expiringSoon,
         expired
       };
-    } catch (error: any) {
+      
+    } catch (error) {
       console.error('Ошибка при получении статистики холодильника:', error);
-      throw error;
-    }
-  }
-
-  // Проверка наличия ингредиента в холодильнике
-  static async hasIngredient(userId: string, ingredientId: string): Promise<boolean> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      return items.some(item => item.ingredient.id === ingredientId);
-    } catch (error: any) {
-      console.error('Ошибка при проверке наличия ингредиента:', error);
-      return false;
-    }
-  }
-
-  // Получение количества ингредиента в холодильнике
-  static async getIngredientAmount(userId: string, ingredientId: string): Promise<number> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      const item = items.find(item => item.ingredient.id === ingredientId);
-      return item ? item.amount : 0;
-    } catch (error: any) {
-      console.error('Ошибка при получении количества ингредиента:', error);
-      return 0;
-    }
-  }
-
-  // Уменьшение количества продукта (например, при использовании в рецепте)
-  static async useIngredient(userId: string, ingredientId: string, amount: number): Promise<void> {
-    try {
-      const items = await this.getFridgeItems(userId);
-      const item = items.find(item => item.ingredient.id === ingredientId);
-
-      if (!item) {
-        throw new Error('Ингредиент не найден в холодильнике');
-      }
-
-      if (item.amount < amount) {
-        throw new Error('Недостаточно ингредиента в холодильнике');
-      }
-
-      const newAmount = item.amount - amount;
-
-      if (newAmount <= 0) {
-        // Удаляем продукт, если количество стало 0 или меньше
-        await this.deleteFridgeItem(item.id);
-      } else {
-        // Обновляем количество
-        await this.updateFridgeItem(item.id, { amount: newAmount });
-      }
-    } catch (error: any) {
-      console.error('Ошибка при использовании ингредиента:', error);
-      throw error;
-    }
-  }
-
-  // Вспомогательные методы
-  private static getLocationName(location: FridgeItem['location']): string {
-    const locationMap = {
-      fridge: 'Холодильник',
-      freezer: 'Морозилка',
-      pantry: 'Кладовая'
-    };
-    
-    return locationMap[location!] || 'Неизвестно';
-  }
-
-  // Форматирование даты истечения срока годности
-  static formatExpirationDate(expirationDate: string): string {
-    const date = new Date(expirationDate);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) {
-      return `Просрочен ${Math.abs(diffDays)} дн. назад`;
-    } else if (diffDays === 0) {
-      return 'Истекает сегодня';
-    } else if (diffDays === 1) {
-      return 'Истекает завтра';
-    } else if (diffDays <= 7) {
-      return `Истекает через ${diffDays} дн.`;
-    } else {
-      return date.toLocaleDateString('ru-RU');
-    }
-  }
-
-  // Получение цвета для срока годности
-  static getExpirationColor(expirationDate: string): string {
-    const date = new Date(expirationDate);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays < 0) {
-      return '#ff6b6b'; // Красный - просрочен
-    } else if (diffDays <= 3) {
-      return '#ff922b'; // Оранжевый - скоро истечет
-    } else if (diffDays <= 7) {
-      return '#ffd43b'; // Желтый - истекает в течение недели
-    } else {
-      return '#51cf66'; // Зеленый - еще много времени
+      return { total: 0, byLocation: {}, expiringSoon: 0, expired: 0 };
     }
   }
 } 

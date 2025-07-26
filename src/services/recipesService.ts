@@ -1,4 +1,4 @@
-import { mockApi } from './mockApi';
+import { realRecipesService } from './realRecipesService';
 import type { 
   Recipe, 
   CreateRecipeForm, 
@@ -17,7 +17,7 @@ export class RecipesService {
     sort?: RecipeSort
   ): Promise<PaginatedResponse<Recipe>> {
     try {
-      return await mockApi.getRecipes(page, limit, filters, sort);
+      return await realRecipesService.getRecipes(page, limit, filters, sort);
     } catch (error: any) {
       console.error('Ошибка при получении рецептов:', error);
       throw error;
@@ -27,7 +27,15 @@ export class RecipesService {
   // Получение одного рецепта по ID
   static async getRecipe(id: string): Promise<Recipe> {
     try {
-      return await mockApi.getRecipe(id);
+      // Временно получаем все рецепты и ищем нужный
+      const allRecipes = await realRecipesService.getAllRecipes();
+      const recipe = allRecipes.find(r => r.id === id);
+      
+      if (!recipe) {
+        throw new Error('Рецепт не найден');
+      }
+      
+      return realRecipesService.transformApiRecipeToLocal(recipe);
     } catch (error: any) {
       console.error('Ошибка при получении рецепта:', error);
       throw error;
@@ -37,7 +45,7 @@ export class RecipesService {
   // Создание нового рецепта
   static async createRecipe(formData: CreateRecipeForm): Promise<Recipe> {
     try {
-      return await mockApi.createRecipe(formData);
+      return await realRecipesService.createRecipe(formData);
     } catch (error: any) {
       console.error('Ошибка при создании рецепта:', error);
       throw error;
@@ -47,7 +55,9 @@ export class RecipesService {
   // Обновление рецепта
   static async updateRecipe(id: string, updates: Partial<Recipe>): Promise<Recipe> {
     try {
-      return await mockApi.updateRecipe(id, updates);
+      // Пока API не поддерживает обновление, возвращаем заглушку
+      console.warn('Обновление рецептов пока не поддерживается API');
+      throw new Error('Функция обновления рецептов находится в разработке');
     } catch (error: any) {
       console.error('Ошибка при обновлении рецепта:', error);
       throw error;
@@ -57,7 +67,9 @@ export class RecipesService {
   // Удаление рецепта
   static async deleteRecipe(id: string): Promise<void> {
     try {
-      await mockApi.deleteRecipe(id);
+      // Пока API не поддерживает удаление, возвращаем заглушку
+      console.warn('Удаление рецептов пока не поддерживается API');
+      throw new Error('Функция удаления рецептов находится в разработке');
     } catch (error: any) {
       console.error('Ошибка при удалении рецепта:', error);
       throw error;
@@ -68,7 +80,7 @@ export class RecipesService {
   static async searchRecipes(query: string, page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
     try {
       const filters: RecipeFilters = { search: query };
-      return await mockApi.getRecipes(page, limit, filters);
+      return await realRecipesService.getRecipes(page, limit, filters);
     } catch (error: any) {
       console.error('Ошибка при поиске рецептов:', error);
       throw error;
@@ -83,7 +95,7 @@ export class RecipesService {
   ): Promise<PaginatedResponse<Recipe>> {
     try {
       const filters: RecipeFilters = { difficulty: [difficulty] };
-      return await mockApi.getRecipes(page, limit, filters);
+      return await realRecipesService.getRecipes(page, limit, filters);
     } catch (error: any) {
       console.error('Ошибка при получении рецептов по сложности:', error);
       throw error;
@@ -98,7 +110,7 @@ export class RecipesService {
   ): Promise<PaginatedResponse<Recipe>> {
     try {
       const filters: RecipeFilters = { cuisine: [cuisine] };
-      return await mockApi.getRecipes(page, limit, filters);
+      return await realRecipesService.getRecipes(page, limit, filters);
     } catch (error: any) {
       console.error('Ошибка при получении рецептов по кухне:', error);
       throw error;
@@ -112,7 +124,7 @@ export class RecipesService {
         prepTime: { max: 30 } 
       };
       const sort: RecipeSort = { field: 'prepTime', order: 'asc' };
-      return await mockApi.getRecipes(page, limit, filters, sort);
+      return await realRecipesService.getRecipes(page, limit, filters, sort);
     } catch (error: any) {
       console.error('Ошибка при получении быстрых рецептов:', error);
       throw error;
@@ -123,7 +135,7 @@ export class RecipesService {
   static async getPopularRecipes(page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
     try {
       const sort: RecipeSort = { field: 'rating', order: 'desc' };
-      return await mockApi.getRecipes(page, limit, undefined, sort);
+      return await realRecipesService.getRecipes(page, limit, undefined, sort);
     } catch (error: any) {
       console.error('Ошибка при получении популярных рецептов:', error);
       throw error;
@@ -134,7 +146,7 @@ export class RecipesService {
   static async getNewRecipes(page: number = 1, limit: number = 12): Promise<PaginatedResponse<Recipe>> {
     try {
       const sort: RecipeSort = { field: 'createdAt', order: 'desc' };
-      return await mockApi.getRecipes(page, limit, undefined, sort);
+      return await realRecipesService.getRecipes(page, limit, undefined, sort);
     } catch (error: any) {
       console.error('Ошибка при получении новых рецептов:', error);
       throw error;
@@ -251,8 +263,13 @@ export class RecipesService {
     return `${reviewsCount} отзывов`;
   }
 
-  // Сброс данных (для тестирования)
-  static resetData(): void {
-    mockApi.resetData();
+  // Получение статистики из API
+  static async getRecipesStats() {
+    try {
+      return await realRecipesService.getRecipesStats();
+    } catch (error) {
+      console.error('Ошибка при получении статистики рецептов:', error);
+      return { total: 0, byDifficulty: {}, byCuisine: {} };
+    }
   }
 } 

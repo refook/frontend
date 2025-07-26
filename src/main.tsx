@@ -1,21 +1,27 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { HashRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { store } from './store'
+import { StorageUtils } from './services'
+import App from './App'
 import './index.css'
-import App from './App.tsx'
-import { StorageUtils, mockApi } from './services'
 
-// Инициализируем глобальные утилиты для разработки и демонстрации
-// if (import.meta.env.DEV) {
+// Добавляем утилиты в глобальную область для отладки
+if (import.meta.env.DEV) {
   (window as any).StorageUtils = StorageUtils;
-  (window as any).mockApi = mockApi;
-  console.log('🔧 Dev tools доступны в консоли:');
-  console.log('  - StorageUtils.resetAllData()');
-  console.log('  - StorageUtils.debugFridge()');
-  console.log('  - mockApi.resetData()');
-// }
+  console.log('🔧 Инструменты разработки доступны в консоли:');
+  console.log('  - StorageUtils.clearAllData() - очистить все данные');
+  console.log('  - StorageUtils.getStorageInfo() - информация о хранилище');
+  console.log('  - StorageUtils.getApiStats() - статистика API');
+}
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <Provider store={store}>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </Provider>
+  </React.StrictMode>,
 )

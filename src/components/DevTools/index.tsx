@@ -20,23 +20,23 @@ const DevTools: React.FC = () => {
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 });
 
   const handleResetAll = () => {
-    StorageUtils.resetAllData();
+    StorageUtils.clearAllData();
     setStorageInfo(StorageUtils.getStorageInfo());
     window.location.reload();
   };
 
   const handleClearUserData = () => {
-    StorageUtils.clearUserData();
+    StorageUtils.clearAllData();
     setStorageInfo(StorageUtils.getStorageInfo());
   };
 
   const handleClearFavorites = () => {
-    StorageUtils.clearFavorites();
+    console.log('Очистка избранного больше не поддерживается (используется API)');
     setStorageInfo(StorageUtils.getStorageInfo());
   };
 
   const handleClearFridge = () => {
-    StorageUtils.clearFridge();
+    console.log('Очистка холодильника больше не поддерживается (используется API)');
     setStorageInfo(StorageUtils.getStorageInfo());
   };
 
@@ -164,7 +164,7 @@ const DevTools: React.FC = () => {
         <>
           <div className={styles.storageInfo}>
             <h4>📊 Storage Info</h4>
-            <p>Общий размер: {(storageInfo.totalSize / 1024).toFixed(2)} KB</p>
+            <p>Общий размер: {(storageInfo.total / 1024).toFixed(2)} KB</p>
             <ul>
               {Object.entries(storageInfo.items).map(([key, size]) => (
                 <li key={key}>
@@ -195,7 +195,7 @@ const DevTools: React.FC = () => {
         </>
       ) : (
         <div className={styles.collapsedHint}>
-          <span>💾 {(storageInfo.totalSize / 1024).toFixed(1)}KB</span>
+          <span>💾 {(storageInfo.total / 1024).toFixed(1)}KB</span>
         </div>
       )}
     </div>

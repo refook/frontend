@@ -1,6 +1,5 @@
 // Экспорт всех сервисов
 export { default as apiService } from './api';
-export { mockApi } from './mockApi';
 export { RecipesService } from './recipesService';
 export { FavoritesService } from './favoritesService';
 export { FridgeService } from './fridgeService';
@@ -22,5 +21,6 @@ export type {
   User,
   FridgeItem,
   Favorite,
-  AddFridgeItemForm
+  AddFridgeItemForm,
+  ApiIngredient
 } from '../types'; 
