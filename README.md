@@ -1,69 +1,86 @@
-# React + TypeScript + Vite
+# Refook v3 - Кулинарное приложение
 
-This template goooo provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🍳 Описание
 
-Currently, two official plugins are available:
+Современное веб-приложение для управления рецептами с интеграцией реального API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Деплой
 
-## Expanding the ESLint configuration
+### GitHub Pages (автоматический)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Приложение автоматически деплоится на GitHub Pages при push в ветку `v4`:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **URL**: https://mujlax.github.io/refook_v3/
+- **Триггер**: Push в ветку `v4`
+- **Workflow**: `.github/workflows/deploy.yml`
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### API Integration
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+В production используется многоуровневая стратегия для работы с API:
+
+1. **Прямое подключение** - пытается подключиться к API напрямую
+2. **CORS Proxy** - использует Vercel proxy при необходимости
+3. **Fallback** - переключается на mock данные при недоступности API
+
+### Переменные окружения
+
+- `VITE_USE_CORS_PROXY` - включает/отключает CORS proxy (true/false)
+
+## 🛠 Разработка
+
+### Установка зависимостей
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Запуск в режиме разработки
+```bash
+npm run dev
 ```
+
+### Сборка для продакшена
+```bash
+npm run build
+```
+
+### Предварительный просмотр сборки
+```bash
+npm run preview
+```
+
+## 📁 Структура проекта
+
+```
+src/
+├── components/     # React компоненты
+├── services/       # API сервисы
+├── store/          # Redux store
+├── types/          # TypeScript типы
+└── data/           # Исходные данные
+```
+
+## 🔧 Настройки
+
+### Vite Configuration
+- **Base URL**: `/refook_v3/` для GitHub Pages
+- **Proxy**: настроен для development режима
+- **Build**: оптимизирован для production
+
+### API Integration
+- **Development**: использует Vite proxy
+- **Production**: прямое подключение + fallback на mock данные
+
+## 📝 Функции
+
+- ✅ Управление рецептами
+- ✅ Холодильник с реальными ингредиентами из API
+- ✅ Избранные рецепты  
+- ✅ Списки покупок
+- ✅ Адаптивный дизайн
+- ✅ Автоматический деплой
+
+## 🔗 API
+
+Приложение интегрировано с реальным API ингредиентов:
+- **Endpoint**: `http://82.146.39.131:8080/v1/ingredient/all`
+- **Fallback**: Mock данные при недоступности API

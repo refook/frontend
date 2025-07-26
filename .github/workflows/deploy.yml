@@ -30,6 +30,11 @@ jobs:
         
       - name: Build with Vite
         run: npm run build
+        env:
+          # Пытаемся использовать прямое подключение к API
+          VITE_USE_CORS_PROXY: "false"
+          # Если будут проблемы с CORS, можно включить proxy:
+          # VITE_USE_CORS_PROXY: "true"
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

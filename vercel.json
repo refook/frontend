@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/cors-proxy.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/cors-proxy/(.*)",
+      "destination": "/api/cors-proxy?path=$1"
+    }
+  ]
+} 
