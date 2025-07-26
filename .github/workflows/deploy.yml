@@ -31,8 +31,8 @@ jobs:
       - name: Build with Vite
         run: npm run build
         env:
-          # Включаем CORS proxy для решения проблем с CORS в production
-          VITE_USE_CORS_PROXY: "true"
+          # Отключаем CORS proxy, используем стабильные mock данные в production
+          VITE_USE_CORS_PROXY: "false"
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

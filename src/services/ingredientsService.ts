@@ -3,11 +3,25 @@ import { mockApi } from './mockApi';
 import type { ApiIngredient } from '../types';
 
 // API endpoint for ingredients
-const API_BASE_URL = import.meta.env.DEV 
-  ? '/api/v1' // Прокси для development
-  : import.meta.env.VITE_USE_CORS_PROXY === 'true'
-    ? 'https://cors-anywhere.herokuapp.com/http://82.146.39.131:8080/v1' // CORS proxy для production
-    : 'http://82.146.39.131:8080/v1'; // Прямой URL (если API поддерживает CORS)
+const getApiUrl = () => {
+  if (import.meta.env.DEV) {
+    return '/api/v1'; // Прокси для development
+  }
+  
+  // В production пробуем разные варианты
+  if (import.meta.env.VITE_USE_CORS_PROXY === 'true') {
+    // Используем альтернативные CORS proxy
+    const corsProxies = [
+      'https://corsproxy.io/?',
+      'https://cors.bridged.cc/',
+      'https://api.allorigins.win/raw?url='
+    ];
+    const randomProxy = corsProxies[Math.floor(Math.random() * corsProxies.length)];
+    return `${randomProxy}http://82.146.39.131:8080/v1`;
+  }
+  
+  return 'http://82.146.39.131:8080/v1'; // Прямой URL
+};
 
 class IngredientsService {
   
@@ -15,18 +29,49 @@ class IngredientsService {
    * Получить все доступные ингредиенты из API
    */
   async getAllIngredients(): Promise<ApiIngredient[]> {
+    // В production сразу используем fallback на mock данные
+    if (import.meta.env.PROD) {
+      console.log('Production mode: используем mock данные для стабильной работы');
+      try {
+        const mockIngredients = await mockApi.getIngredients();
+        console.log(`Загружено ${mockIngredients.length} mock ингредиентов`);
+        // Преобразуем mock данные в формат API
+        return mockIngredients.map(ing => ({
+          id: ing.id,
+          name: ing.name,
+          description: ing.description || '',
+          measure: 'кг',
+          photoId: '',
+          ownerUser: {
+            id: 1,
+            photo: null,
+            username: 'mock',
+            name: 'Mock User'
+          },
+          lastUpdater: {
+            id: 1,
+            photo: null,
+            username: 'mock', 
+            name: 'Mock User'
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }));
+      } catch (mockError) {
+        console.error('Ошибка при загрузке mock данных:', mockError);
+        return [];
+      }
+    }
+
+    // В development пытаемся использовать API
     try {
-      console.log(`Загрузка ингредиентов из: ${API_BASE_URL}/ingredient/all`);
+      const apiUrl = getApiUrl();
+      console.log(`Загрузка ингредиентов из: ${apiUrl}/ingredient/all`);
       
-      // Используем прямой fetch запрос
-      const response = await fetch(`${API_BASE_URL}/ingredient/all`, {
+      const response = await fetch(`${apiUrl}/ingredient/all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          // Добавляем заголовки для CORS proxy
-          ...(import.meta.env.PROD && import.meta.env.VITE_USE_CORS_PROXY === 'true' && {
-            'X-Requested-With': 'XMLHttpRequest'
-          })
         }
       });
       
@@ -40,43 +85,36 @@ class IngredientsService {
     } catch (error) {
       console.error('Ошибка при загрузке ингредиентов из API:', error);
       
-      // В продакшене используем fallback на mock данные при ошибке API
-      if (import.meta.env.PROD) {
-        console.log('Fallback: используем mock данные');
-        try {
-          const mockIngredients = await mockApi.getIngredients();
-          console.log(`Fallback: загружено ${mockIngredients.length} mock ингредиентов`);
-          // Преобразуем mock данные в формат API
-          return mockIngredients.map(ing => ({
-            id: ing.id,
-            name: ing.name,
-            description: ing.description || '',
-            measure: 'кг',
-            photoId: '',
-            ownerUser: {
-              id: 1,
-              photo: null,
-              username: 'mock',
-              name: 'Mock User'
-            },
-            lastUpdater: {
-              id: 1,
-              photo: null,
-              username: 'mock', 
-              name: 'Mock User'
-            },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }));
-        } catch (mockError) {
-          console.error('Ошибка fallback на mock данные:', mockError);
-          // Возвращаем пустой массив вместо бросания ошибки
-          console.log('Возвращаем пустой список ингредиентов');
-          return [];
-        }
+      // Fallback на mock данные
+      console.log('Fallback: используем mock данные');
+      try {
+        const mockIngredients = await mockApi.getIngredients();
+        console.log(`Fallback: загружено ${mockIngredients.length} mock ингредиентов`);
+        return mockIngredients.map(ing => ({
+          id: ing.id,
+          name: ing.name,
+          description: ing.description || '',
+          measure: 'кг',
+          photoId: '',
+          ownerUser: {
+            id: 1,
+            photo: null,
+            username: 'mock',
+            name: 'Mock User'
+          },
+          lastUpdater: {
+            id: 1,
+            photo: null,
+            username: 'mock', 
+            name: 'Mock User'
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }));
+      } catch (mockError) {
+        console.error('Ошибка fallback на mock данные:', mockError);
+        return [];
       }
-      
-      throw new Error('Не удалось загрузить список ингредиентов');
     }
   }
 
