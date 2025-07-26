@@ -45,6 +45,7 @@ class IngredientsService {
         console.log('Fallback: используем mock данные');
         try {
           const mockIngredients = await mockApi.getIngredients();
+          console.log(`Fallback: загружено ${mockIngredients.length} mock ингредиентов`);
           // Преобразуем mock данные в формат API
           return mockIngredients.map(ing => ({
             id: ing.id,
@@ -69,6 +70,9 @@ class IngredientsService {
           }));
         } catch (mockError) {
           console.error('Ошибка fallback на mock данные:', mockError);
+          // Возвращаем пустой массив вместо бросания ошибки
+          console.log('Возвращаем пустой список ингредиентов');
+          return [];
         }
       }
       
