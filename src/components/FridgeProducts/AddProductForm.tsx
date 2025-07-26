@@ -122,8 +122,11 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
                 try {
                   const ingredients = await ingredientsService.getIngredientsForFridge();
                   setAvailableIngredients(ingredients);
+                  if (ingredients.length === 0) {
+                    setErrors({ api: 'API вернул пустой список. Возможно, данные еще не добавлены в систему.' });
+                  }
                 } catch (error) {
-                  setErrors({ api: 'Ошибка загрузки ингредиентов. Попробуйте обновить страницу.' });
+                  setErrors({ api: 'Ошибка подключения к API. Проверьте интернет соединение.' });
                 } finally {
                   setIngredientsLoading(false);
                 }
@@ -131,6 +134,13 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
             >
               Попробовать снова
             </button>
+          </div>
+        )}
+
+        {availableIngredients.length === 0 && !ingredientsLoading && !errors.api && (
+          <div className={styles.emptyState}>
+            <p>🍽️ Список ингредиентов пуст</p>
+            <p>Возможно, администратор еще не добавил продукты в систему</p>
           </div>
         )}
 

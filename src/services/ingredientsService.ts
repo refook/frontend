@@ -1,27 +1,7 @@
-import { apiService } from './api';
-import { mockApi } from './mockApi';
 import type { ApiIngredient } from '../types';
 
 // API endpoint for ingredients
-const getApiUrl = () => {
-  if (import.meta.env.DEV) {
-    return '/api/v1'; // Прокси для development
-  }
-  
-  // В production пробуем разные варианты
-  if (import.meta.env.VITE_USE_CORS_PROXY === 'true') {
-    // Используем альтернативные CORS proxy
-    const corsProxies = [
-      'https://corsproxy.io/?',
-      'https://cors.bridged.cc/',
-      'https://api.allorigins.win/raw?url='
-    ];
-    const randomProxy = corsProxies[Math.floor(Math.random() * corsProxies.length)];
-    return `${randomProxy}http://82.146.39.131:8080/v1`;
-  }
-  
-  return 'http://82.146.39.131:8080/v1'; // Прямой URL
-};
+const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'http://82.146.39.131:8080/v1';
 
 class IngredientsService {
   
@@ -29,46 +9,10 @@ class IngredientsService {
    * Получить все доступные ингредиенты из API
    */
   async getAllIngredients(): Promise<ApiIngredient[]> {
-    // В production сразу используем fallback на mock данные
-    if (import.meta.env.PROD) {
-      console.log('Production mode: используем mock данные для стабильной работы');
-      try {
-        const mockIngredients = await mockApi.getIngredients();
-        console.log(`Загружено ${mockIngredients.length} mock ингредиентов`);
-        // Преобразуем mock данные в формат API
-        return mockIngredients.map(ing => ({
-          id: ing.id,
-          name: ing.name,
-          description: ing.description || '',
-          measure: 'кг',
-          photoId: '',
-          ownerUser: {
-            id: 1,
-            photo: null,
-            username: 'mock',
-            name: 'Mock User'
-          },
-          lastUpdater: {
-            id: 1,
-            photo: null,
-            username: 'mock', 
-            name: 'Mock User'
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }));
-      } catch (mockError) {
-        console.error('Ошибка при загрузке mock данных:', mockError);
-        return [];
-      }
-    }
-
-    // В development пытаемся использовать API
     try {
-      const apiUrl = getApiUrl();
-      console.log(`Загрузка ингредиентов из: ${apiUrl}/ingredient/all`);
+      console.log(`Загрузка ингредиентов из: ${API_BASE_URL}/ingredient/all`);
       
-      const response = await fetch(`${apiUrl}/ingredient/all`, {
+      const response = await fetch(`${API_BASE_URL}/ingredient/all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -80,41 +24,56 @@ class IngredientsService {
       }
       
       const ingredients: ApiIngredient[] = await response.json();
-      console.log(`Успешно загружено ${ingredients.length} ингредиентов`);
+      console.log(`Успешно загружено ${ingredients.length} ингредиентов из API`);
       return ingredients;
     } catch (error) {
       console.error('Ошибка при загрузке ингредиентов из API:', error);
+      throw new Error(`Не удалось загрузить список ингредиентов: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Получить ингредиент по ID
+   */
+  async getIngredientById(id: string): Promise<ApiIngredient | null> {
+    try {
+      const allIngredients = await this.getAllIngredients();
+      return allIngredients.find(ing => ing.id === id) || null;
+    } catch (error) {
+      console.error('Ошибка при получении ингредиента по ID:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Создать новый ингредиент (POST)
+   */
+  async createIngredient(ingredientData: {
+    name: string;
+    description: string;
+    measure: string;
+  }): Promise<ApiIngredient> {
+    try {
+      console.log('Создание нового ингредиента:', ingredientData);
       
-      // Fallback на mock данные
-      console.log('Fallback: используем mock данные');
-      try {
-        const mockIngredients = await mockApi.getIngredients();
-        console.log(`Fallback: загружено ${mockIngredients.length} mock ингредиентов`);
-        return mockIngredients.map(ing => ({
-          id: ing.id,
-          name: ing.name,
-          description: ing.description || '',
-          measure: 'кг',
-          photoId: '',
-          ownerUser: {
-            id: 1,
-            photo: null,
-            username: 'mock',
-            name: 'Mock User'
-          },
-          lastUpdater: {
-            id: 1,
-            photo: null,
-            username: 'mock', 
-            name: 'Mock User'
-          },
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }));
-      } catch (mockError) {
-        console.error('Ошибка fallback на mock данные:', mockError);
-        return [];
+      const response = await fetch(`${API_BASE_URL}/ingredient`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(ingredientData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
+      const newIngredient: ApiIngredient = await response.json();
+      console.log('Ингредиент успешно создан:', newIngredient);
+      return newIngredient;
+    } catch (error) {
+      console.error('Ошибка при создании ингредиента:', error);
+      throw new Error(`Не удалось создать ингредиент: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -147,25 +106,36 @@ class IngredientsService {
    * Получить ингредиенты в локальном формате для использования в компонентах
    */
   async getIngredientsForFridge() {
-    const apiIngredients = await this.getAllIngredients();
-    return apiIngredients.map(ingredient => this.transformApiIngredientToLocal(ingredient));
+    try {
+      const apiIngredients = await this.getAllIngredients();
+      return apiIngredients.map(ingredient => this.transformApiIngredientToLocal(ingredient));
+    } catch (error) {
+      console.error('Ошибка при загрузке ингредиентов для холодильника:', error);
+      // Возвращаем пустой массив вместо падения приложения
+      return [];
+    }
   }
 
   /**
    * Поиск ингредиентов по названию
    */
   async searchIngredients(query: string): Promise<ApiIngredient[]> {
-    const allIngredients = await this.getAllIngredients();
-    const searchQuery = query.toLowerCase().trim();
-    
-    if (!searchQuery) {
-      return allIngredients;
+    try {
+      const allIngredients = await this.getAllIngredients();
+      const searchQuery = query.toLowerCase().trim();
+      
+      if (!searchQuery) {
+        return allIngredients;
+      }
+      
+      return allIngredients.filter(ingredient => 
+        ingredient.name.toLowerCase().includes(searchQuery) ||
+        ingredient.description.toLowerCase().includes(searchQuery)
+      );
+    } catch (error) {
+      console.error('Ошибка при поиске ингредиентов:', error);
+      return [];
     }
-    
-    return allIngredients.filter(ingredient => 
-      ingredient.name.toLowerCase().includes(searchQuery) ||
-      ingredient.description.toLowerCase().includes(searchQuery)
-    );
   }
 
   /**
@@ -182,6 +152,41 @@ class IngredientsService {
     );
     
     return units;
+  }
+
+  /**
+   * Получить URL изображения по photoId (если API поддерживает)
+   */
+  getImageUrl(photoId: string): string | null {
+    if (!photoId) return null;
+    
+    // Предполагаем что есть эндпоинт для получения изображений
+    return `${API_BASE_URL}/photo/${photoId}`;
+  }
+
+  /**
+   * Получить статистику ингредиентов
+   */
+  async getIngredientsStats(): Promise<{
+    total: number;
+    byMeasure: Record<string, number>;
+  }> {
+    try {
+      const ingredients = await this.getAllIngredients();
+      
+      const byMeasure = ingredients.reduce((acc, ing) => {
+        acc[ing.measure] = (acc[ing.measure] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      return {
+        total: ingredients.length,
+        byMeasure
+      };
+    } catch (error) {
+      console.error('Ошибка при получении статистики:', error);
+      return { total: 0, byMeasure: {} };
+    }
   }
 }
 

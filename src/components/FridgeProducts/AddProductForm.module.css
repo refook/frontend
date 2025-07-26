@@ -261,4 +261,25 @@
 
 .retryButton:hover {
   background-color: #b91c1c;
+}
+
+/* Empty state styles */
+.emptyState {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.emptyState p {
+  margin: 4px 0;
+  color: #6b7280;
+}
+
+.emptyState p:first-child {
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
 } 
