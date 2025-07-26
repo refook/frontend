@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../store';
-import { mockApi } from '../../services/mockApi';
+import { ingredientsService } from '../../services/ingredientsService';
 import { allPossibleUnits } from '../../data';
 import type { Ingredient } from '../../types';
 import styles from './AddProductForm.module.css';
@@ -31,10 +31,18 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
     const loadIngredients = async () => {
       try {
         setIngredientsLoading(true);
-        const ingredients = await mockApi.getIngredients();
+        console.log('Начинаем загрузку ингредиентов...');
+        
+        // Используем новый API сервис
+        const ingredients = await ingredientsService.getIngredientsForFridge();
+        console.log('Загружено ингредиентов:', ingredients.length);
+        
         setAvailableIngredients(ingredients);
+        setErrors(prev => ({ ...prev, api: '' })); // Очищаем ошибки при успешной загрузке
       } catch (error) {
         console.error('Ошибка при загрузке ингредиентов:', error);
+        // В случае ошибки показываем сообщение пользователю
+        setErrors({ api: 'Ошибка загрузки ингредиентов. Проверьте подключение к интернету.' });
       } finally {
         setIngredientsLoading(false);
       }
@@ -102,6 +110,30 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
       </div>
 
       <form onSubmit={handleSubmit} className={styles.form}>
+        {errors.api && (
+          <div className={styles.apiError}>
+            <p>{errors.api}</p>
+            <button 
+              type="button" 
+              className={styles.retryButton}
+              onClick={async () => {
+                setErrors(prev => ({ ...prev, api: '' }));
+                setIngredientsLoading(true);
+                try {
+                  const ingredients = await ingredientsService.getIngredientsForFridge();
+                  setAvailableIngredients(ingredients);
+                } catch (error) {
+                  setErrors({ api: 'Ошибка загрузки ингредиентов. Попробуйте обновить страницу.' });
+                } finally {
+                  setIngredientsLoading(false);
+                }
+              }}
+            >
+              Попробовать снова
+            </button>
+          </div>
+        )}
+
         <div className={styles.formGroup}>
           <label className={styles.label}>
             Продукт *
@@ -114,14 +146,17 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
               handleIngredientSelect(ingredient || null);
             }}
             className={`${styles.select} ${errors.ingredient ? styles.inputError : ''}`}
-            disabled={ingredientsLoading}
+            disabled={ingredientsLoading || !!errors.api}
           >
             <option value="">
-              {ingredientsLoading ? 'Загрузка ингредиентов...' : 'Выберите продукт...'}
+              {ingredientsLoading ? 'Загрузка ингредиентов...' : 
+               errors.api ? 'Ошибка загрузки...' :
+               'Выберите продукт...'}
             </option>
             {availableIngredients.map(ingredient => (
               <option key={ingredient.id} value={ingredient.id}>
-                {ingredient.name} ({ingredient.category.name})
+                {ingredient.name}
+                {ingredient.description && ` - ${ingredient.description}`}
               </option>
             ))}
           </select>

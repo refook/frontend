@@ -5,6 +5,26 @@ export interface BaseEntity {
   updatedAt: string;
 }
 
+// API Ingredient types - for real API integration
+export interface ApiUser {
+  id: number;
+  photo: string | null;
+  username: string;
+  name: string;
+}
+
+export interface ApiIngredient {
+  id: string;
+  name: string;
+  description: string;
+  measure: string;
+  photoId: string;
+  ownerUser: ApiUser;
+  lastUpdater: ApiUser;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // User types
 export interface User extends BaseEntity {
   email: string;

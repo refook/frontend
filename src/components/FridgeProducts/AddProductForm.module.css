@@ -231,4 +231,34 @@
     padding: 8px 16px;
     font-size: 13px;
   }
+}
+
+/* API Error styles */
+.apiError {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.apiError p {
+  color: #dc2626;
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.retryButton {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retryButton:hover {
+  background-color: #b91c1c;
 } 
