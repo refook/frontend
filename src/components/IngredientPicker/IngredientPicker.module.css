@@ -39,6 +39,14 @@
 .ingredientAmount {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  margin-right: var(--spacing-sm);
+}
+
+.errorText {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: block;
 }
 
 .removeButton {
@@ -194,10 +202,11 @@
   border-bottom-right-radius: var(--radius-md);
 }
 
-.category {
+.measure {
   color: var(--text-tertiary);
   font-size: var(--font-size-xs);
   margin-left: 4px;
+  font-style: italic;
 }
 
 .formActions {

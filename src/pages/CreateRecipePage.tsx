@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store';
-import type { CreateRecipeForm } from '../types';
+import type { CreateRecipeDto } from '../types/recipe.types';
 import RecipeForm from '../components/RecipeForm/RecipeForm';
 import RecipePreview from '../components/RecipePreview/RecipePreview';
 import { EyeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
@@ -17,24 +17,25 @@ const CreateRecipePage: React.FC = () => {
   
   const [activeTab, setActiveTab] = useState<'form' | 'preview'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CreateRecipeForm>({
-    title: '',
+  const [formData, setFormData] = useState<CreateRecipeDto>({
+    name: '',
     description: '',
-    prepTime: 0,
+    level: 'EASY',
+    kitchen: undefined,
     cookTime: 0,
-    servings: 1,
-    difficulty: 'easy',
-    cuisine: '',
+    allTime: 0,
+    portion: 1,
+    photos: [],
     tags: [],
     ingredients: [],
     steps: []
   });
 
-  const handleFormChange = (newFormData: CreateRecipeForm) => {
+  const handleFormChange = (newFormData: CreateRecipeDto) => {
     setFormData(newFormData);
   };
 
-  const handleSubmit = async (formData: CreateRecipeForm) => {
+  const handleSubmit = async (formData: CreateRecipeDto) => {
     setIsSubmitting(true);
     
     try {
@@ -52,8 +53,9 @@ const CreateRecipePage: React.FC = () => {
     }
   };
 
-  const isFormValid = formData.title.trim() !== '' && 
+  const isFormValid = formData.name.trim() !== '' && 
                      formData.description.trim() !== '' &&
+                     formData.level &&
                      formData.ingredients.length > 0 &&
                      formData.steps.length > 0;
 

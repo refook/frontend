@@ -4,13 +4,17 @@ import { StorageUtils } from '../../services';
 import { addFridgeItemThunk, fetchFridgeItemsThunk } from '../../store/thunks/fridgeThunks';
 import type { AppDispatch } from '../../store';
 import styles from './DevTools.module.css';
+import ApiLogger from './ApiLogger';
 
 const DevTools: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [storageInfo, setStorageInfo] = React.useState(() => StorageUtils.getStorageInfo());
   const [isCollapsed, setIsCollapsed] = React.useState(() => {
     const saved = localStorage.getItem('devtools_collapsed');
     return saved ? JSON.parse(saved) : false;
+  });
+  const [isWide, setIsWide] = React.useState(() => {
+    const saved = localStorage.getItem('devtools_wide');
+    return saved ? JSON.parse(saved) : true;
   });
   const [position, setPosition] = React.useState(() => {
     const saved = localStorage.getItem('devtools_position');
@@ -21,27 +25,19 @@ const DevTools: React.FC = () => {
 
   const handleResetAll = () => {
     StorageUtils.clearAllData();
-    setStorageInfo(StorageUtils.getStorageInfo());
     window.location.reload();
   };
 
   const handleClearUserData = () => {
     StorageUtils.clearAllData();
-    setStorageInfo(StorageUtils.getStorageInfo());
   };
 
   const handleClearFavorites = () => {
     console.log('Очистка избранного больше не поддерживается (используется API)');
-    setStorageInfo(StorageUtils.getStorageInfo());
   };
 
   const handleClearFridge = () => {
     console.log('Очистка холодильника больше не поддерживается (используется API)');
-    setStorageInfo(StorageUtils.getStorageInfo());
-  };
-
-  const refreshInfo = () => {
-    setStorageInfo(StorageUtils.getStorageInfo());
   };
 
   const addTestData = async () => {
@@ -75,7 +71,6 @@ const DevTools: React.FC = () => {
       
       // Перезагружаем данные
       dispatch(fetchFridgeItemsThunk('current-user'));
-      refreshInfo(); // Обновляем информацию о хранилище
     } catch (error) {
       console.error('Error adding test data:', error);
     }
@@ -85,6 +80,12 @@ const DevTools: React.FC = () => {
     const newCollapsed = !isCollapsed;
     setIsCollapsed(newCollapsed);
     localStorage.setItem('devtools_collapsed', JSON.stringify(newCollapsed));
+  };
+
+  const toggleWide = () => {
+    const newWide = !isWide;
+    setIsWide(newWide);
+    localStorage.setItem('devtools_wide', JSON.stringify(newWide));
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -106,7 +107,8 @@ const DevTools: React.FC = () => {
     const newY = e.clientY - dragOffset.y;
     
     // Ограничиваем позицию в пределах окна
-    const maxX = window.innerWidth - (isCollapsed ? 120 : 300);
+    const devToolsWidth = isCollapsed ? 120 : (isWide ? 600 : 300);
+    const maxX = window.innerWidth - devToolsWidth;
     const maxY = window.innerHeight - 100;
     
     const clampedX = Math.max(0, Math.min(newX, maxX));
@@ -140,7 +142,7 @@ const DevTools: React.FC = () => {
 
   return (
     <div 
-      className={`${styles.devTools} ${isCollapsed ? styles.collapsed : ''} ${isDragging ? styles.dragging : ''}`}
+      className={`${styles.devTools} ${isCollapsed ? styles.collapsed : ''} ${isWide ? styles.wide : ''} ${isDragging ? styles.dragging : ''}`}
       style={{ 
         left: `${position.x}px`, 
         top: `${position.y}px`,
@@ -151,9 +153,11 @@ const DevTools: React.FC = () => {
       <div className={styles.header}>
         <h3>🔧 Dev Tools</h3>
         <div className={styles.headerButtons}>
-          <button onClick={refreshInfo} className={styles.refreshBtn} title="Обновить информацию">
-            🔄
-          </button>
+          {!isCollapsed && (
+            <button onClick={toggleWide} className={styles.collapseBtn} title={isWide ? "Узкий режим" : "Широкий режим"}>
+              {isWide ? '📏' : '📐'}
+            </button>
+          )}
           <button onClick={toggleCollapse} className={styles.collapseBtn} title={isCollapsed ? "Развернуть" : "Свернуть"}>
             {isCollapsed ? '📂' : '📁'}
           </button>
@@ -162,18 +166,6 @@ const DevTools: React.FC = () => {
       
       {!isCollapsed ? (
         <>
-          <div className={styles.storageInfo}>
-            <h4>📊 Storage Info</h4>
-            <p>Общий размер: {(storageInfo.total / 1024).toFixed(2)} KB</p>
-            <ul>
-              {Object.entries(storageInfo.items).map(([key, size]) => (
-                <li key={key}>
-                  {key}: {(size / 1024).toFixed(2)} KB
-                </li>
-              ))}
-            </ul>
-          </div>
-
           <div className={styles.actions}>
             <h4>🗑️ Actions</h4>
             <button onClick={addTestData} className={styles.successBtn}>
@@ -192,10 +184,12 @@ const DevTools: React.FC = () => {
               Clear Fridge
             </button>
           </div>
+
+          <ApiLogger />
         </>
       ) : (
         <div className={styles.collapsedHint}>
-          <span>💾 {(storageInfo.total / 1024).toFixed(1)}KB</span>
+          <span>🔧 DevTools</span>
         </div>
       )}
     </div>

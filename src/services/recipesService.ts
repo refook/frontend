@@ -1,12 +1,11 @@
 import { realRecipesService } from './realRecipesService';
 import type { 
   Recipe, 
-  CreateRecipeForm, 
   RecipeFilters, 
   RecipeSort, 
-  PaginatedResponse,
-  ApiError 
+  PaginatedResponse
 } from '../types';
+import type { CreateRecipeDto, DifficultyLevel, KitchenType } from '../types/recipe.types';
 
 export class RecipesService {
   // Получение списка рецептов с пагинацией и фильтрами
@@ -27,15 +26,13 @@ export class RecipesService {
   // Получение одного рецепта по ID
   static async getRecipe(id: string): Promise<Recipe> {
     try {
-      // Временно получаем все рецепты и ищем нужный
-      const allRecipes = await realRecipesService.getAllRecipes();
-      const recipe = allRecipes.find(r => r.id === id);
+      const recipe = await realRecipesService.getRecipeById(id);
       
       if (!recipe) {
         throw new Error('Рецепт не найден');
       }
       
-      return realRecipesService.transformApiRecipeToLocal(recipe);
+      return recipe;
     } catch (error: any) {
       console.error('Ошибка при получении рецепта:', error);
       throw error;
@@ -43,7 +40,7 @@ export class RecipesService {
   }
 
   // Создание нового рецепта
-  static async createRecipe(formData: CreateRecipeForm): Promise<Recipe> {
+  static async createRecipe(formData: CreateRecipeDto): Promise<Recipe> {
     try {
       return await realRecipesService.createRecipe(formData);
     } catch (error: any) {
@@ -94,7 +91,9 @@ export class RecipesService {
     limit: number = 12
   ): Promise<PaginatedResponse<Recipe>> {
     try {
-      const filters: RecipeFilters = { difficulty: [difficulty] };
+      // Преобразуем локальную сложность в API формат
+      const apiDifficulty = difficulty.toUpperCase() as DifficultyLevel;
+      const filters: RecipeFilters = { difficulty: [apiDifficulty] };
       return await realRecipesService.getRecipes(page, limit, filters);
     } catch (error: any) {
       console.error('Ошибка при получении рецептов по сложности:', error);
@@ -104,7 +103,7 @@ export class RecipesService {
 
   // Получение рецептов по кухне
   static async getRecipesByCuisine(
-    cuisine: string, 
+    cuisine: KitchenType, 
     page: number = 1, 
     limit: number = 12
   ): Promise<PaginatedResponse<Recipe>> {
@@ -154,34 +153,38 @@ export class RecipesService {
   }
 
   // Проверка валидности формы рецепта
-  static validateRecipeForm(formData: CreateRecipeForm): { isValid: boolean; errors: string[] } {
+  static validateRecipeForm(formData: CreateRecipeDto): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (!formData.title.trim()) {
+    if (!formData.name?.trim()) {
       errors.push('Название рецепта обязательно');
     }
 
-    if (!formData.description.trim()) {
+    if (!formData.description?.trim()) {
       errors.push('Описание рецепта обязательно');
     }
 
-    if (formData.prepTime < 0) {
-      errors.push('Время подготовки не может быть отрицательным');
+    if (!formData.level) {
+      errors.push('Выберите сложность рецепта');
+    }
+
+    if (formData.allTime < 0) {
+      errors.push('Общее время приготовления не может быть отрицательным');
     }
 
     if (formData.cookTime < 0) {
-      errors.push('Время приготовления не может быть отрицательным');
+      errors.push('Время готовки не может быть отрицательным');
     }
 
-    if (formData.servings < 1) {
+    if (formData.portion < 1) {
       errors.push('Количество порций должно быть больше 0');
     }
 
-    if (formData.ingredients.length === 0) {
+    if (!formData.ingredients?.length) {
       errors.push('Добавьте хотя бы один ингредиент');
     }
 
-    if (formData.steps.length === 0) {
+    if (!formData.steps?.length) {
       errors.push('Добавьте хотя бы один шаг приготовления');
     }
 

@@ -3,12 +3,29 @@ import { useAppDispatch, useAppSelector } from '../../store';
 import { fetchFridgeItemsThunk, addFridgeItemThunk, deleteFridgeItemThunk, updateFridgeItemThunk } from '../../store/thunks/fridgeThunks';
 import { AddProductForm } from './AddProductForm';
 import { ProductItem } from './ProductItem';
+import { SuggestProductForm } from './SuggestProductForm';
+import type { MeasureType } from '../../types/measures.types';
+import { ingredientsService } from '../../services/ingredientsService';
 import styles from './FridgeProducts.module.css';
 
 export const FridgeProducts: React.FC = () => {
   const dispatch = useAppDispatch();
   const { items, loading, error } = useAppSelector(state => state.fridge);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showSuggestForm, setShowSuggestForm] = useState(false);
+
+  const handleSuggestProduct = async (productData: { name: string; description: string; measure: MeasureType }) => {
+    try {
+      const newIngredient = await ingredientsService.createIngredient(productData);
+      console.log('Продукт успешно предложен:', newIngredient);
+      setShowSuggestForm(false);
+      // Обновляем список ингредиентов после успешного добавления
+      await dispatch(fetchFridgeItemsThunk('current-user'));
+    } catch (error) {
+      console.error('Ошибка при предложении продукта:', error);
+      // Можно добавить уведомление об ошибке
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchFridgeItemsThunk('current-user'));
@@ -80,13 +97,21 @@ export const FridgeProducts: React.FC = () => {
     <div className={styles.fridgeProducts}>
       <div className={styles.header}>
         <h2>Мои продукты</h2>
-        <button 
-          className={styles.addButton}
-          onClick={() => setShowAddForm(true)}
-        >
-          <span className={styles.addIcon}>+</span>
-          Добавить продукт
-        </button>
+        <div className={styles.headerButtons}>
+          <button 
+            className={styles.suggestButton}
+            onClick={() => setShowSuggestForm(true)}
+          >
+            Предложить продукт
+          </button>
+          <button 
+            className={styles.addButton}
+            onClick={() => setShowAddForm(true)}
+          >
+            <span className={styles.addIcon}>+</span>
+            Добавить продукт
+          </button>
+        </div>
       </div>
 
       {showAddForm && (
@@ -94,6 +119,15 @@ export const FridgeProducts: React.FC = () => {
           <AddProductForm
             onSubmit={handleAddProduct}
             onCancel={() => setShowAddForm(false)}
+          />
+        </div>
+      )}
+
+      {showSuggestForm && (
+        <div className={styles.addFormContainer}>
+          <SuggestProductForm
+            onSubmit={handleSuggestProduct}
+            onCancel={() => setShowSuggestForm(false)}
           />
         </div>
       )}

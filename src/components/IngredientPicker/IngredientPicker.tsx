@@ -1,24 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { FormIngredient, Ingredient } from '../../types';
+import type { ApiIngredient, CreateRecipeIngredientDto } from '../../types/ingredient.types';
+import type { MeasureType } from '../../types/measures.types';
 import { ingredientsService } from '../../services/ingredientsService';
-import { allPossibleUnits } from '../../data';
+import { MEASURES_ARRAY } from '../../constants/measures';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
 
 interface IngredientPickerProps {
-  ingredients: FormIngredient[];
-  onChange: (ingredients: FormIngredient[]) => void;
+  ingredients: CreateRecipeIngredientDto[];
+  onChange: (ingredients: CreateRecipeIngredientDto[]) => void;
+  errors?: Record<string, string>;
+  compact?: boolean;
 }
 
 const IngredientPicker: React.FC<IngredientPickerProps> = ({
   ingredients,
-  onChange
+  onChange,
+  errors = {},
+  compact = false
 }) => {
   const [showForm, setShowForm] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+  const [selectedIngredient, setSelectedIngredient] = useState<ApiIngredient | null>(null);
   const [amount, setAmount] = useState('');
   const [unit, setUnit] = useState('');
-  const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
+  const [availableIngredients, setAvailableIngredients] = useState<ApiIngredient[]>([]);
   const [ingredientsLoading, setIngredientsLoading] = useState(true);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,21 +50,21 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     loadIngredients();
   }, []);
 
-  const units = allPossibleUnits;
+  // Получаем единицы измерения из API
+  const units = MEASURES_ARRAY.map(measure => measure.value);
 
   const suggestions = availableIngredients.filter(ingredient => 
     ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !ingredients.some(ing => ing.name.toLowerCase() === ingredient.name.toLowerCase()) &&
+    !ingredients.some(ing => ing.id === ingredient.id) &&
     searchTerm.length > 0
   );
 
   const addIngredient = () => {
     if (selectedIngredient && amount.trim()) {
-      const newIngredient: FormIngredient = {
-        id: `ing-${Date.now()}`,
-        name: selectedIngredient.name,
-        amount: amount.trim(),
-        unit: unit.trim() || 'шт'
+      const newIngredient: CreateRecipeIngredientDto = {
+        id: selectedIngredient.id,
+        count: parseInt(amount.trim()) || 0,
+        measure: unit as MeasureType
       };
       
       onChange([...ingredients, newIngredient]);
@@ -85,10 +90,15 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     setSelectedIngredient(null);
   };
 
-  const handleSuggestionClick = (ingredient: Ingredient) => {
+  const handleSuggestionClick = (ingredient: ApiIngredient) => {
     setSelectedIngredient(ingredient);
     setSearchTerm(ingredient.name);
-    setUnit(''); // Пользователь выберет единицу сам
+    // Устанавливаем единицу измерения из API
+    if (ingredient.measure) {
+      setUnit(ingredient.measure);
+    } else {
+      setUnit('GR'); // По умолчанию граммы
+    }
     setShowSuggestions(false);
   };
 
@@ -108,19 +118,31 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     <div className={styles.ingredientPicker}>
       {/* Список ингредиентов */}
       <div className={styles.ingredientsList}>
-        {ingredients.map((ingredient) => (
+        {ingredients.map((ingredient, index) => (
           <div key={ingredient.id} className={styles.ingredientItem}>
             <div className={styles.ingredientInfo}>
-              <span className={styles.ingredientName}>{ingredient.name}</span>
-              <span className={styles.ingredientAmount}>
-                {ingredient.amount} {ingredient.unit}
+              <span className={styles.ingredientName}>
+                {availableIngredients.find(i => i.id === ingredient.id)?.name || 'Неизвестный ингредиент'}
               </span>
+              <span className={styles.ingredientAmount}>
+                {ingredient.count} {MEASURES_ARRAY.find(m => m.value === ingredient.measure)?.label}
+              </span>
+              {errors[`ingredients.${index}.count`] && (
+                <span className={styles.errorText}>
+                  {errors[`ingredients.${index}.count`]}
+                </span>
+              )}
+              {errors[`ingredients.${index}.measure`] && (
+                <span className={styles.errorText}>
+                  {errors[`ingredients.${index}.measure`]}
+                </span>
+              )}
             </div>
             <button
               type="button"
               onClick={() => removeIngredient(ingredient.id)}
               className={styles.removeButton}
-              title={`Удалить ингредиент "${ingredient.name}"`}
+              title={`Удалить ингредиент "${availableIngredients.find(i => i.id === ingredient.id)?.name || 'Неизвестный ингредиент'}"`}
             >
               <XMarkIcon className={styles.removeIcon} />
             </button>
@@ -158,7 +180,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                         onClick={() => handleSuggestionClick(ingredient)}
                         className={styles.suggestion}
                       >
-                        {ingredient.name} <span className={styles.category}>({ingredient.category.name})</span>
+                        {ingredient.name} <span className={styles.measure}>({MEASURES_ARRAY.find(m => m.value === ingredient.measure)?.label})</span>
                       </button>
                     ))}
                   </div>
@@ -185,8 +207,10 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                 className={styles.select}
               >
                 <option value="">Выберите</option>
-                {units.map(u => (
-                  <option key={u} value={u}>{u}</option>
+                {MEASURES_ARRAY.map(measure => (
+                  <option key={measure.value} value={measure.value}>
+                    {measure.label}
+                  </option>
                 ))}
               </select>
             </div>

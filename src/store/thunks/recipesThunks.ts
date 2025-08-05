@@ -2,11 +2,11 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { RecipesService } from '../../services/recipesService';
 import type { 
   Recipe, 
-  CreateRecipeForm, 
   RecipeFilters, 
   RecipeSort,
   PaginatedResponse 
 } from '../../types';
+import type { CreateRecipeDto } from '../../types/recipe.types';
 import {
   fetchRecipesStart,
   fetchRecipesSuccess,
@@ -83,7 +83,7 @@ export const fetchRecipe = createAsyncThunk(
 // Создание рецепта
 export const createRecipe = createAsyncThunk(
   'recipes/createRecipe',
-  async (formData: CreateRecipeForm, { dispatch }) => {
+  async (formData: CreateRecipeDto, { dispatch }) => {
     try {
       // Валидация формы
       const validation = RecipesService.validateRecipeForm(formData);

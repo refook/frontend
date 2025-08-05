@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Recipe JSON</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .json-output { background: #f5f5f5; padding: 15px; border-radius: 5px; white-space: pre-wrap; }
+        button { padding: 10px 20px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Test Recipe JSON Format</h1>
+    
+    <button onclick="testRecipeFormat()">Создать тестовый рецепт</button>
+    
+    <h3>Результат JSON:</h3>
+    <div id="output" class="json-output">Нажмите кнопку для создания тестового рецепта</div>
+
+    <script>
+        function testRecipeFormat() {
+            const testRecipe = {
+                name: "Тестовый рецепт",
+                description: "Описание тестового рецепта",
+                kitchen: "RUSSIAN",
+                level: "EASY",
+                cookTime: 1800,
+                allTime: 3600,
+                portion: 4,
+                photos: [
+                    "12fcd2f5-f976-44bc-bd33-c495a8daff34",
+                    "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
+                ],
+                tags: null,
+                ingredients: [
+                    {
+                        id: "fc01f44c-cc90-44c9-b0f4-53f586f41e30",
+                        count: 500,
+                        measure: "GR"
+                    }
+                ],
+                steps: [
+                    {
+                        index: 1,
+                        name: "Выбор картошки",
+                        description: "Привет, меня зовут описание говна",
+                        photos: [
+                            "12fcd2f5-f976-44bc-bd33-c495a8daff34",
+                            "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
+                        ],
+                        ingredients: [
+                            {
+                                id: "fc01f44c-cc90-44c9-b0f4-53f586f41e30",
+                                count: 1,
+                                measure: "KG"
+                            }
+                        ],
+                        time: 0
+                    },
+                    {
+                        index: 2,
+                        description: "Второй шаг без названия",
+                        photos: [],
+                        ingredients: [],
+                        time: 600
+                    }
+                ]
+            };
+
+            document.getElementById('output').textContent = JSON.stringify(testRecipe, null, 2);
+            
+            // Также выводим в консоль для DevTools
+            console.log('🧪 Тестовый JSON рецепта:', testRecipe);
+        }
+    </script>
+</body>
+</html>

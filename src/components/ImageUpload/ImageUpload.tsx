@@ -3,16 +3,14 @@ import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './ImageUpload.module.css';
 
 interface ImageUploadProps {
-  image?: File;
+  image?: string;
   onImageChange: (image: File | undefined) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ image, onImageChange }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [preview, setPreview] = useState<string | undefined>(
-    image ? URL.createObjectURL(image) : undefined
-  );
+  const [preview, setPreview] = useState<string | undefined>(image);
 
   const handleFileSelect = (file: File) => {
     if (file && file.type.startsWith('image/')) {

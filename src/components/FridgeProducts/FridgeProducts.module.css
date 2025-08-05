@@ -11,6 +11,29 @@
   margin-bottom: 24px;
 }
 
+.headerButtons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.suggestButton {
+  padding: 12px 20px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suggestButton:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+}
+
 .title {
   font-size: 24px;
   font-weight: 600;

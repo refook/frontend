@@ -1,7 +1,18 @@
-import type { ApiIngredient } from '../types';
+import type { ApiIngredient } from '../types/ingredient.types';
+import type { MeasureType } from '../types/measures.types';
+import { apiLogger } from '../utils/apiLogger';
+
+// Функция для получения авторизационных заголовков
+function getAuthHeaders() {
+  const token = localStorage.getItem('authToken');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+}
 
 // API endpoint for ingredients
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'http://82.146.39.131:8080/v1';
+const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://refook.ru/v1';
 
 class IngredientsService {
   
@@ -14,9 +25,7 @@ class IngredientsService {
       
       const response = await fetch(`${API_BASE_URL}/ingredient/all`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        headers: getAuthHeaders()
       });
       
       if (!response.ok) {
@@ -28,6 +37,13 @@ class IngredientsService {
       return ingredients;
     } catch (error) {
       console.error('Ошибка при загрузке ингредиентов из API:', error);
+      
+      // Если ошибка 401 - проблема с авторизацией
+      if (error instanceof Error && error.message.includes('401')) {
+        console.warn('Ошибка авторизации. Необходим валидный JWT токен для доступа к API');
+        console.warn('Попробуйте установить токен: localStorage.setItem("authToken", "your-jwt-token")');
+      }
+      
       throw new Error(`Не удалось загрузить список ингредиентов: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -51,16 +67,22 @@ class IngredientsService {
   async createIngredient(ingredientData: {
     name: string;
     description: string;
-    measure: string;
+    measure: MeasureType;
   }): Promise<ApiIngredient> {
     try {
       console.log('Создание нового ингредиента:', ingredientData);
       
-      const response = await fetch(`${API_BASE_URL}/ingredient`, {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      const url = `${API_BASE_URL}/ingredient`;
+      
+      // Логируем запрос
+      apiLogger.logRequest(url, 'POST', headers, ingredientData);
+      
+      const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(ingredientData)
       });
       
@@ -105,10 +127,9 @@ class IngredientsService {
   /**
    * Получить ингредиенты в локальном формате для использования в компонентах
    */
-  async getIngredientsForFridge() {
+  async getIngredientsForFridge(): Promise<ApiIngredient[]> {
     try {
-      const apiIngredients = await this.getAllIngredients();
-      return apiIngredients.map(ingredient => this.transformApiIngredientToLocal(ingredient));
+      return await this.getAllIngredients();
     } catch (error) {
       console.error('Ошибка при загрузке ингредиентов для холодильника:', error);
       // Возвращаем пустой массив вместо падения приложения

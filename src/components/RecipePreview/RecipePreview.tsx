@@ -1,5 +1,8 @@
-import React from 'react';
-import type { CreateRecipeForm, Recipe } from '../../types';
+import React, { useState, useEffect } from 'react';
+import { ingredientsService } from '../../services/ingredientsService';
+import type { Recipe } from '../../types';
+import type { CreateRecipeDto, CreateRecipeIngredientDto, RecipeIngredientDto } from '../../types/recipe.types';
+import type { ApiIngredient } from '../../types/ingredient.types';
 import { 
   ClockIcon, 
   UserGroupIcon, 
@@ -10,7 +13,7 @@ import {
 import styles from './RecipePreview.module.css';
 
 interface RecipePreviewProps {
-  formData?: CreateRecipeForm;
+  formData?: CreateRecipeDto;
   recipe?: Recipe;
   onEdit?: () => void;
   onSubmit?: () => void;
@@ -27,32 +30,46 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   showActions = true
 }) => {
   // Используем данные из recipe или formData
+  const [availableIngredients, setAvailableIngredients] = useState<ApiIngredient[]>([]);
+
+  useEffect(() => {
+    const loadIngredients = async () => {
+      try {
+        const ingredients = await ingredientsService.getAllIngredients();
+        setAvailableIngredients(ingredients);
+      } catch (error) {
+        console.error('Ошибка при загрузке ингредиентов:', error);
+      }
+    };
+    loadIngredients();
+  }, []);
+
   const data = recipe || formData;
   if (!data) return null;
 
   const isFormData = !recipe;
   
-  const title = isFormData ? (data as CreateRecipeForm).title : (data as Recipe).title;
-  const description = isFormData ? (data as CreateRecipeForm).description : (data as Recipe).description;
-  const prepTime = isFormData ? (data as CreateRecipeForm).prepTime : (data as Recipe).prepTime || 0;
-  const cookTime = isFormData ? (data as CreateRecipeForm).cookTime : (data as Recipe).cookTime || 0;
-  const servings = isFormData ? (data as CreateRecipeForm).servings : (data as Recipe).servings;
-  const difficulty = isFormData ? (data as CreateRecipeForm).difficulty : (data as Recipe).difficulty;
-  const cuisine = isFormData ? (data as CreateRecipeForm).cuisine : (data as Recipe).cuisine;
-  const tags = isFormData ? (data as CreateRecipeForm).tags : (data as Recipe).tags || [];
-  const ingredients = isFormData ? (data as CreateRecipeForm).ingredients : (data as Recipe).ingredients;
-  const steps = isFormData ? (data as CreateRecipeForm).steps : (data as Recipe).steps;
-  const image = isFormData ? (data as CreateRecipeForm).image : (data as Recipe).image;
+  const title = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
+  const description = isFormData ? (data as CreateRecipeDto).description : (data as Recipe).description;
+  const prepTime = isFormData ? (data as CreateRecipeDto).allTime : (data as Recipe).prepTime || 0;
+  const cookTime = isFormData ? (data as CreateRecipeDto).cookTime : (data as Recipe).cookTime || 0;
+  const servings = isFormData ? (data as CreateRecipeDto).portion : (data as Recipe).servings;
+  const difficulty = isFormData ? (data as CreateRecipeDto).level.toLowerCase() : (data as Recipe).difficulty;
+  const cuisine = isFormData ? (data as CreateRecipeDto).kitchen : (data as Recipe).cuisine;
+  const tags = isFormData ? (data as CreateRecipeDto).tags : (data as Recipe).tags || [];
+  const ingredients = isFormData ? (data as CreateRecipeDto).ingredients : (data as Recipe).ingredients;
+  const steps = isFormData ? (data as CreateRecipeDto).steps : (data as Recipe).steps;
+  const photos = isFormData ? (data as CreateRecipeDto).photos : (data as Recipe).photos;
   
   const totalTime = prepTime + cookTime;
   
-  const difficultyMap = {
+  const difficultyMap: Record<string, string> = {
     easy: 'Легко',
     medium: 'Средне',
     hard: 'Сложно'
   };
 
-  const difficultyColor = {
+  const difficultyColor: Record<string, string> = {
     easy: 'var(--color-success)',
     medium: 'var(--color-warning)',
     hard: 'var(--color-danger)'
@@ -107,10 +124,10 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
         </div>
 
         {/* Изображение */}
-        {image && (
+        {photos && photos.length > 0 && (
           <div className={styles.imageContainer}>
             <img 
-              src={isFormData ? URL.createObjectURL(image as File) : image as string} 
+              src={`/api/v1/photo/${photos[0]}`}
               alt={title}
               className={styles.image}
             />
@@ -118,7 +135,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
         )}
 
         {/* Теги */}
-        {tags.length > 0 && (
+        {tags && tags.length > 0 && (
           <div className={styles.tagsSection}>
             <h3 className={styles.sectionTitle}>Теги</h3>
             <div className={styles.tags}>
@@ -143,15 +160,16 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                   <li key={index} className={styles.ingredient}>
                     <span className={styles.ingredientName}>
                       {isFormData 
-                        ? (ingredient as CreateRecipeForm['ingredients'][0]).name
-                        : (ingredient as Recipe['ingredients'][0]).ingredient?.name || 'Ингредиент'
+                        ? availableIngredients.find(i => i.id === (ingredient as CreateRecipeIngredientDto).id)?.name || 'Ингредиент'
+                        : (ingredient as RecipeIngredientDto).name || 'Ингредиент'
                       }
                     </span>
-                    {ingredient.amount && (
-                      <span className={styles.ingredientAmount}>
-                        {ingredient.amount} {ingredient.unit}
-                      </span>
-                    )}
+                    <span className={styles.ingredientAmount}>
+                      {isFormData 
+                        ? `${(ingredient as CreateRecipeIngredientDto).count} ${(ingredient as CreateRecipeIngredientDto).measure.toLowerCase()}`
+                        : `${(ingredient as RecipeIngredientDto).count} ${(ingredient as RecipeIngredientDto).measure.toLowerCase()}`
+                      }
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -178,10 +196,10 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                       <p className={styles.stepDescription}>
                         {step.description || 'Описание шага'}
                       </p>
-                      {step.image && (
+                      {step.photos && step.photos.length > 0 && (
                         <div className={styles.stepImage}>
                           <img 
-                            src={isFormData ? URL.createObjectURL(step.image as File) : step.image as string} 
+                            src={`/api/v1/photo/${step.photos[0]}`}
                             alt={`Шаг ${index + 1}`}
                             className={styles.stepImg}
                           />

@@ -38,7 +38,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
     }
   };
 
-  const totalTime = (recipe.prepTime || 0) + (recipe.cookTime || 0);
+  // Конвертируем время из минут в читаемый формат
+  const formatTime = (minutes: number) => {
+    if (minutes < 60) return `${minutes} мин`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours} ч ${mins} мин` : `${hours} ч`;
+  };
+
+  const totalTime = formatTime((recipe.prepTime || 0) + (recipe.cookTime || 0));
 
   return (
     <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
@@ -68,7 +76,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <div className={styles.meta}>
             <div className={styles.metaItem}>
               <ClockIcon className={styles.metaIcon} />
-              <span>{totalTime} мин</span>
+              <span>{totalTime}</span>
             </div>
             <div className={styles.metaItem}>
               <UserIcon className={styles.metaIcon} />
@@ -83,18 +91,43 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             </div>
           </div>
           
-          {recipe.tags && recipe.tags.length > 0 && (
-            <div className={styles.tags}>
-              {recipe.tags.slice(0, 3).map((tag, index) => (
-                <span key={index} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-              {recipe.tags.length > 3 && (
-                <span className={styles.moreTag}>+{recipe.tags.length - 3}</span>
-              )}
-            </div>
-          )}
+          <div className={styles.footer}>
+            {recipe.tags && recipe.tags.length > 0 && (
+              <div className={styles.tags}>
+                {recipe.tags.slice(0, 3).map((tag, index) => (
+                  <span key={index} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
+                {recipe.tags.length > 3 && (
+                  <span className={styles.moreTag}>+{recipe.tags.length - 3}</span>
+                )}
+              </div>
+            )}
+
+            {recipe.ingredients && recipe.ingredients.length > 0 && (
+              <div className={styles.ingredients}>
+                <h4 className={styles.ingredientsTitle}>
+                  Ингредиенты ({recipe.ingredients.length})
+                </h4>
+                <div className={styles.ingredientsList}>
+                  {recipe.ingredients.slice(0, 3).map((ingredient, index) => (
+                    <div key={index} className={styles.ingredient}>
+                      <span className={styles.ingredientName}>{ingredient.name}</span>
+                      <span className={styles.ingredientAmount}>
+                        {ingredient.count} {ingredient.measure.toLowerCase()}
+                      </span>
+                    </div>
+                  ))}
+                  {recipe.ingredients.length > 3 && (
+                    <div className={styles.moreIngredients}>
+                      +{recipe.ingredients.length - 3} ингр.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </Link>
     </div>
