@@ -1,32 +1,31 @@
 import React, { useState } from 'react';
-import type { FridgeItem } from '../../types';
-import { useAppDispatch } from '../../store';
-import { updateFridgeItemThunk, deleteFridgeItemThunk } from '../../store/thunks/fridgeThunks';
+import type { FridgeProduct } from '../../types/fridge.types';
 import styles from './ProductItem.module.css';
 
 interface ProductItemProps {
-  item: FridgeItem;
+  item: FridgeProduct;
+  onUpdate?: (id: string, updates: any) => void;
+  onDelete?: (id: string) => void;
 }
 
-export const ProductItem: React.FC<ProductItemProps> = ({ item }) => {
-  const dispatch = useAppDispatch();
+export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editAmount, setEditAmount] = useState(item.amount.toString());
   const [editNotes, setEditNotes] = useState(item.notes || '');
 
   const handleUpdate = () => {
-    const updates: Partial<FridgeItem> = {
-      amount: parseFloat(editAmount) || 0,
-      notes: editNotes.trim() || undefined
+    const updates = {
+      count: parseFloat(editAmount) || 0,
+      comment: editNotes.trim() || undefined
     };
     
-    dispatch(updateFridgeItemThunk({ id: item.id, updates }));
+    onUpdate?.(item.id, updates);
     setIsEditing(false);
   };
 
   const handleDelete = () => {
     if (window.confirm(`Удалить ${item.ingredient.name} из холодильника?`)) {
-      dispatch(deleteFridgeItemThunk(item.id));
+      onDelete?.(item.id);
     }
   };
 
@@ -36,8 +35,8 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item }) => {
     setIsEditing(false);
   };
 
-  const isExpiringSoon = item.expirationDate && new Date(item.expirationDate) <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-  const isExpired = item.expirationDate && new Date(item.expirationDate) < new Date();
+  const isExpiringSoon = item.expiryDate && item.expiryDate <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+  const isExpired = item.expiryDate && item.expiryDate < new Date();
 
   return (
     <div className={`${styles.productItem} ${isExpired ? styles.expired : isExpiringSoon ? styles.expiring : ''}`}>
@@ -88,9 +87,9 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item }) => {
             <div className={styles.amount}>
               <strong>{item.amount} {item.unit}</strong>
             </div>
-            {item.expirationDate && (
+            {item.expiryDate && (
               <div className={styles.expiry}>
-                Годен до: {new Date(item.expirationDate).toLocaleDateString('ru-RU')}
+                Годен до: {item.expiryDate.toLocaleDateString('ru-RU')}
               </div>
             )}
             {item.notes && (

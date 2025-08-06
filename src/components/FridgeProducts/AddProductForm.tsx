@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../store';
 import { ingredientsService } from '../../services/ingredientsService';
-import { allPossibleUnits } from '../../data';
-import type { Ingredient } from '../../types';
+import { MEASURES_ARRAY } from '../../constants/measures';
+import type { ApiIngredient } from '../../types/ingredient.types';
 import styles from './AddProductForm.module.css';
 
 interface AddProductFormProps {
   onSubmit: (productData: {
-    ingredient: Ingredient;
+    ingredient: ApiIngredient;
     amount: number;
     unit: string;
     expiryDate?: string;
@@ -17,9 +17,9 @@ interface AddProductFormProps {
 }
 
 export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCancel }) => {
-  const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
+  const [availableIngredients, setAvailableIngredients] = useState<ApiIngredient[]>([]);
   const [ingredientsLoading, setIngredientsLoading] = useState(true);
-  const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
+  const [selectedIngredient, setSelectedIngredient] = useState<ApiIngredient | null>(null);
   const [amount, setAmount] = useState<string>('');
   const [unit, setUnit] = useState<string>('');
   const [expiryDate, setExpiryDate] = useState<string>('');
@@ -91,7 +91,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
     });
   };
 
-  const handleIngredientSelect = (ingredient: Ingredient | null) => {
+  const handleIngredientSelect = (ingredient: ApiIngredient | null) => {
     setSelectedIngredient(ingredient);
     setErrors(prev => ({ ...prev, ingredient: '' }));
   };
@@ -206,8 +206,10 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
               className={`${styles.select} ${errors.unit ? styles.inputError : ''}`}
             >
               <option value="">Выберите единицу</option>
-              {allPossibleUnits.map(u => (
-                <option key={u} value={u}>{u}</option>
+              {MEASURES_ARRAY.map(measure => (
+                <option key={measure.value} value={measure.value}>
+                  {measure.label}
+                </option>
               ))}
             </select>
           </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { Recipe } from '../../types';
+import type { CreateRecipeDto } from '../../types/recipe.types';
 import { 
   ClockIcon, 
   UserIcon, 
@@ -12,7 +13,7 @@ import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import styles from './RecipeCard.module.css';
 
 interface RecipeCardProps {
-  recipe: Recipe;
+  recipe: Recipe | CreateRecipeDto;
   viewMode?: 'grid' | 'list';
 }
 
@@ -20,7 +21,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   recipe, 
   viewMode = 'grid'
 }) => {
-  const getDifficultyLabel = (difficulty: Recipe['difficulty']) => {
+  // Определяем, является ли recipe объектом CreateRecipeDto
+  const isFormData = 'portion' in recipe && 'allTime' in recipe;
+  const getDifficultyLabel = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
+    if (difficulty === 'EASY') return 'Легко';
+    if (difficulty === 'MEDIUM') return 'Средне';
+    if (difficulty === 'HARD') return 'Сложно';
     switch (difficulty) {
       case 'easy': return 'Легко';
       case 'medium': return 'Средне';
@@ -29,7 +35,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
     }
   };
 
-  const getDifficultyColor = (difficulty: Recipe['difficulty']) => {
+  const getDifficultyColor = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
+    if (difficulty === 'EASY') return '#10b981';
+    if (difficulty === 'MEDIUM') return '#f59e0b';
+    if (difficulty === 'HARD') return '#ef4444';
     switch (difficulty) {
       case 'easy': return '#10b981';
       case 'medium': return '#f59e0b';
@@ -46,15 +55,26 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
     return mins > 0 ? `${hours} ч ${mins} мин` : `${hours} ч`;
   };
 
-  const totalTime = formatTime((recipe.prepTime || 0) + (recipe.cookTime || 0));
+  // Логируем входящие данные для отладки
+  console.log('Recipe data:', recipe);
+  console.log('Is form data:', isFormData);
+
+  // Получаем значения в зависимости от типа данных
+  const prepTime = isFormData ? recipe.allTime : (recipe.prepTime || 0);
+  const cookTime = isFormData ? recipe.cookTime : (recipe.cookTime || 0);
+  const servingsCount = isFormData ? (recipe.portion || 4) : (recipe.servings || 4); // Используем дефолтное значение 4 порции
+
+  console.log('Calculated values:', { prepTime, cookTime, servingsCount });
+  
+  const totalTime = formatTime(prepTime + cookTime);
 
   return (
     <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
-      <Link to={`/recipe/${recipe.id}`} className={styles.cardLink}>
+      <Link to={`/recipe/${isFormData ? '' : recipe.id}`} className={styles.cardLink}>
         <div className={styles.imageContainer}>
           <img 
-            src={recipe.image || '/api/placeholder/300/200'} 
-            alt={recipe.title}
+            src={isFormData ? (recipe.photos?.[0] ? `/api/v1/photo/${recipe.photos[0]}` : '/api/placeholder/300/200') : (recipe.image || '/api/placeholder/300/200')}
+            alt={isFormData ? recipe.name : recipe.title}
             className={styles.image}
           />
           <div className={styles.overlay}>
@@ -70,7 +90,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         </div>
         
         <div className={styles.content}>
-          <h3 className={styles.title}>{recipe.title}</h3>
+          <h3 className={styles.title}>{isFormData ? recipe.name : recipe.title}</h3>
           <p className={styles.description}>{recipe.description}</p>
           
           <div className={styles.meta}>
@@ -80,14 +100,14 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             </div>
             <div className={styles.metaItem}>
               <UserIcon className={styles.metaIcon} />
-              <span>{recipe.servings} порций</span>
+              <span>{servingsCount} порций</span>
             </div>
             <div className={styles.metaItem}>
               <StarIcon 
                 className={styles.metaIcon} 
-                style={{ color: getDifficultyColor(recipe.difficulty) }}
+                style={{ color: getDifficultyColor(isFormData ? recipe.level : recipe.difficulty) }}
               />
-              <span>{getDifficultyLabel(recipe.difficulty)}</span>
+              <span>{getDifficultyLabel(isFormData ? recipe.level : recipe.difficulty)}</span>
             </div>
           </div>
           
@@ -105,28 +125,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               </div>
             )}
 
-            {recipe.ingredients && recipe.ingredients.length > 0 && (
-              <div className={styles.ingredients}>
-                <h4 className={styles.ingredientsTitle}>
-                  Ингредиенты ({recipe.ingredients.length})
-                </h4>
-                <div className={styles.ingredientsList}>
-                  {recipe.ingredients.slice(0, 3).map((ingredient, index) => (
-                    <div key={index} className={styles.ingredient}>
-                      <span className={styles.ingredientName}>{ingredient.name}</span>
-                      <span className={styles.ingredientAmount}>
-                        {ingredient.count} {ingredient.measure.toLowerCase()}
-                      </span>
-                    </div>
-                  ))}
-                  {recipe.ingredients.length > 3 && (
-                    <div className={styles.moreIngredients}>
-                      +{recipe.ingredients.length - 3} ингр.
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+
           </div>
         </div>
       </Link>

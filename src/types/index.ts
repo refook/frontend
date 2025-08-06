@@ -10,6 +10,7 @@ export interface Recipe extends BaseEntity {
   title: string;
   description: string;
   photos: string[];
+  image?: string; // Опциональное поле для основного изображения
   prepTime: number; // в секундах
   cookTime: number; // в секундах
   servings: number;

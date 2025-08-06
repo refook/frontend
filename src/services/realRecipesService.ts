@@ -27,9 +27,9 @@ class RealRecipesService {
   /**
    * Получить все рецепты из API
    */
-  async getAllRecipes(): Promise<RecipeResponseDto[]> {
+  async getAllRecipes(): Promise<Recipe[]> {
     try {
-      console.log(`Загрузка рецептов из: ${API_BASE_URL}/recipe/all`);
+      console.log(`Загрузка списка рецептов из: ${API_BASE_URL}/recipe/all`);
       
       const response = await fetch(`${API_BASE_URL}/recipe/all`, {
         method: 'GET',
@@ -40,23 +40,24 @@ class RealRecipesService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const recipes: RecipeResponseDto[] = await response.json();
-      console.log(`Успешно загружено ${recipes.length} рецептов из API`);
+      const recipesList = await response.json();
+      console.log(`Получен список из ${recipesList.length} рецептов`);
 
-      // Добавляем заглушки для отсутствующих данных
-      return recipes.map(recipe => ({
-        ...recipe,
-        ownerUser: recipe.ownerUser || DEFAULT_USER,
-        tags: recipe.tags || null,
-        photos: recipe.photos || [],
-        ingredients: recipe.ingredients || [],
-        steps: (recipe.steps || []).map(step => ({
-          ...step,
-          photos: step.photos || [],
-          ingredients: step.ingredients || [],
-          time: step.time || 0
-        }))
-      }));
+      // Загружаем полные данные для каждого рецепта
+      const fullRecipes = await Promise.all(
+        recipesList.map(async (recipeInfo: { id: string }) => {
+          try {
+            const detailedRecipe = await this.getRecipeById(recipeInfo.id);
+            return detailedRecipe;
+          } catch (error) {
+            console.error(`Ошибка при загрузке детальной информации рецепта ${recipeInfo.id}:`, error);
+            return null;
+          }
+        })
+      );
+
+      // Фильтруем null значения (рецепты, которые не удалось загрузить)
+      return fullRecipes.filter((recipe): recipe is Recipe => recipe !== null);
     } catch (error) {
       console.error('Ошибка при загрузке рецептов из API:', error);
       // Возвращаем пустой массив вместо ошибки
@@ -120,15 +121,19 @@ class RealRecipesService {
     sort?: RecipeSort
   ): Promise<PaginatedResponse<Recipe>> {
     try {
-      // Пока API не поддерживает пагинацию, получаем все и фильтруем локально
+      // Получаем все рецепты с полными данными
       const allRecipes = await this.getAllRecipes();
-      let filteredRecipes = this.transformAndFilterRecipes(allRecipes, filters);
+      console.log('Получены полные данные рецептов:', allRecipes);
       
+      // Применяем фильтры
+      let filteredRecipes = filters ? this.filterRecipes(allRecipes, filters) : allRecipes;
+      
+      // Применяем сортировку
       if (sort) {
         filteredRecipes = this.sortRecipes(filteredRecipes, sort);
       }
       
-      // Локальная пагинация
+      // Применяем пагинацию
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
       const paginatedRecipes = filteredRecipes.slice(startIndex, endIndex);
@@ -218,46 +223,45 @@ class RealRecipesService {
     const prepTimeMinutes = Math.max(0, Math.round((apiRecipe.allTime - apiRecipe.cookTime) / 60));
     const cookTimeMinutes = Math.round(apiRecipe.cookTime / 60);
     
-    return {
-      id: apiRecipe.id,
-      title: apiRecipe.name,
-      description: apiRecipe.description,
-      image: apiRecipe.photos?.[0] ? `${API_BASE_URL}/photo/${apiRecipe.photos[0]}` : undefined,
-      prepTime: prepTimeMinutes, // время подготовки в минутах
-      cookTime: cookTimeMinutes, // время готовки в минутах  
-      servings: apiRecipe.portion, // количество порций
-      difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
-      cuisine: apiRecipe.kitchen,
-      tags: apiRecipe.tags || [],
-      ingredients: apiRecipe.ingredients || [],
-      steps: apiRecipe.steps.map(step => ({
-        ...step,
-        photos: step.photos || [],
-        ingredients: step.ingredients || []
-      })) || [],
-      author: {
-        id: apiRecipe.ownerUser.id.toString(),
-        name: apiRecipe.ownerUser.name,
-        avatar: apiRecipe.ownerUser.photo || undefined
-      },
-      stats: {
-        views: 0,
-        likes: 0,
-        saves: 0,
-        rating: 0,
-        reviewsCount: 0
-      },
-      createdAt: apiRecipe.createdAt,
-      updatedAt: apiRecipe.updatedAt
+          return {
+        id: apiRecipe.id,
+        title: apiRecipe.name,
+        description: apiRecipe.description,
+        photos: apiRecipe.photos || [],
+        image: apiRecipe.photos?.[0] ? `${API_BASE_URL}/photo/${apiRecipe.photos[0]}` : undefined,
+        prepTime: prepTimeMinutes, // время подготовки в минутах
+        cookTime: cookTimeMinutes, // время готовки в минутах  
+        servings: apiRecipe.portion || 4, // количество порций с дефолтным значением
+        difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
+        cuisine: apiRecipe.kitchen,
+        tags: apiRecipe.tags || [],
+        ingredients: apiRecipe.ingredients || [],
+        steps: apiRecipe.steps.map(step => ({
+          ...step,
+          photos: step.photos || [],
+          ingredients: step.ingredients || []
+        })) || [],
+        author: {
+          id: apiRecipe.ownerUser.id.toString(),
+          name: apiRecipe.ownerUser.name,
+          avatar: apiRecipe.ownerUser.photo || undefined
+        },
+        stats: {
+          views: 0,
+          likes: 0,
+          saves: 0,
+          rating: 0,
+          reviewsCount: 0
+        },
+        createdAt: apiRecipe.createdAt,
+        updatedAt: apiRecipe.updatedAt
     };
   }
 
   /**
    * Преобразовать и отфильтровать рецепты
    */
-  private transformAndFilterRecipes(apiRecipes: RecipeResponseDto[], filters?: RecipeFilters): Recipe[] {
-    let recipes = apiRecipes.map(recipe => this.transformApiRecipeToLocal(recipe));
-    
+  private filterRecipes(recipes: Recipe[], filters?: RecipeFilters): Recipe[] {
     if (!filters) return recipes;
     
     // Применяем фильтры
@@ -375,13 +379,14 @@ class RealRecipesService {
       const recipes = await this.getAllRecipes();
       
       const byDifficulty = recipes.reduce((acc, recipe) => {
-        acc[recipe.level] = (acc[recipe.level] || 0) + 1;
+        const difficulty = recipe.difficulty.toUpperCase();
+        acc[difficulty] = (acc[difficulty] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       
       const byCuisine = recipes.reduce((acc, recipe) => {
-        const kitchen = recipe.kitchen || 'Не указана';
-        acc[kitchen] = (acc[kitchen] || 0) + 1;
+        const cuisine = recipe.cuisine || 'Не указана';
+        acc[cuisine] = (acc[cuisine] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       

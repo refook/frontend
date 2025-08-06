@@ -1,35 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store';
-import { fetchFridgeItemsThunk, addFridgeItemThunk, deleteFridgeItemThunk, updateFridgeItemThunk } from '../../store/thunks/fridgeThunks';
 import { AddProductForm } from './AddProductForm';
 import { ProductItem } from './ProductItem';
 import { SuggestProductForm } from './SuggestProductForm';
 import type { MeasureType } from '../../types/measures.types';
+import type { FridgeProduct } from '../../types/fridge.types';
 import { ingredientsService } from '../../services/ingredientsService';
+import { fridgeApiService } from '../../services/fridgeApiService';
 import styles from './FridgeProducts.module.css';
 
 export const FridgeProducts: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const { items, loading, error } = useAppSelector(state => state.fridge);
+  const [items, setItems] = useState<FridgeProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSuggestForm, setShowSuggestForm] = useState(false);
+
+  // Загрузка продуктов из API
+  const loadFridgeProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const products = await fridgeApiService.getAllFridgeProducts();
+      setItems(products);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ошибка загрузки продуктов');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSuggestProduct = async (productData: { name: string; description: string; measure: MeasureType }) => {
     try {
       const newIngredient = await ingredientsService.createIngredient(productData);
       console.log('Продукт успешно предложен:', newIngredient);
       setShowSuggestForm(false);
-      // Обновляем список ингредиентов после успешного добавления
-      await dispatch(fetchFridgeItemsThunk('current-user'));
+      // Обновляем список продуктов после успешного добавления
+      await loadFridgeProducts();
     } catch (error) {
       console.error('Ошибка при предложении продукта:', error);
-      // Можно добавить уведомление об ошибке
+      setError('Не удалось предложить продукт');
     }
   };
 
   useEffect(() => {
-    dispatch(fetchFridgeItemsThunk('current-user'));
-  }, [dispatch]);
+    loadFridgeProducts();
+  }, []);
 
   const handleAddProduct = async (productData: {
     ingredient: any;
@@ -39,37 +54,36 @@ export const FridgeProducts: React.FC = () => {
     notes?: string;
   }) => {
     try {
-      const formData = {
-        userId: 'current-user',
-        formData: {
-          ingredientId: productData.ingredient.id,
-          amount: productData.amount,
-          unit: productData.unit,
-          expirationDate: productData.expiryDate,
-          notes: productData.notes
-        }
-      };
-      
-      await dispatch(addFridgeItemThunk(formData)).unwrap();
+      const apiData = fridgeApiService.transformLocalProductToApi(productData);
+      await fridgeApiService.createFridgeProduct(apiData);
       setShowAddForm(false);
+      // Обновляем список продуктов
+      await loadFridgeProducts();
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error('Ошибка добавления продукта:', error);
+      setError('Не удалось добавить продукт');
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
     try {
-      await dispatch(deleteFridgeItemThunk(id)).unwrap();
+      await fridgeApiService.deleteFridgeProduct(id);
+      // Обновляем список продуктов
+      await loadFridgeProducts();
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error('Ошибка удаления продукта:', error);
+      setError('Не удалось удалить продукт');
     }
   };
 
   const handleUpdateProduct = async (id: string, updates: any) => {
     try {
-      await dispatch(updateFridgeItemThunk({ id, updates })).unwrap();
+      await fridgeApiService.updateFridgeProduct(id, updates);
+      // Обновляем список продуктов
+      await loadFridgeProducts();
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Ошибка обновления продукта:', error);
+      setError('Не удалось обновить продукт');
     }
   };
 
@@ -86,7 +100,7 @@ export const FridgeProducts: React.FC = () => {
     return (
       <div className={styles.error}>
         <p>Ошибка загрузки продуктов: {error}</p>
-        <button onClick={() => dispatch(fetchFridgeItemsThunk('current-user'))}>
+        <button onClick={loadFridgeProducts}>
           Попробовать снова
         </button>
       </div>
@@ -150,6 +164,8 @@ export const FridgeProducts: React.FC = () => {
             <ProductItem
               key={item.id}
               item={item}
+              onUpdate={handleUpdateProduct}
+              onDelete={handleDeleteProduct}
             />
           ))}
         </div>
