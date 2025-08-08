@@ -1,4 +1,26 @@
-import type { MeasureType } from './measures.types';
+import type {BaseEntity, Ingredient, MeasureType} from "./index.ts";
+
+// Fridge types
+export interface FridgeItem extends BaseEntity {
+  userId: string;
+  ingredient: Ingredient;
+  amount: number;
+  unit: string;
+  expirationDate?: string;
+  purchaseDate?: string;
+  location?: 'fridge' | 'freezer' | 'pantry';
+  notes?: string;
+}
+
+export interface AddFridgeItemForm {
+  ingredientId: string;
+  amount: number;
+  unit: string;
+  expirationDate?: string;
+  purchaseDate?: string;
+  location?: FridgeItem['location'];
+  notes?: string;
+}
 
 // DTO для создания продукта в холодильнике
 export interface CreateFridgeProductDto {

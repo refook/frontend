@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store';
 import { createShoppingListThunk } from '../../store/thunks/shoppingListThunks';
-import type { Recipe, RecipeIngredient } from '../../types';
+import type {Recipe, RecipeIngredient} from '../../types';
 import type { FilterType } from './FilterSettings';
 import { 
   HeartIcon, 
@@ -106,7 +106,7 @@ const DiscoverCard: React.FC<DiscoverCardProps> = ({
     if (total === 0) return 0;
     
     const available = recipe.ingredients.filter(ing => 
-      availableIngredients.includes(ing.ingredient.id)
+      availableIngredients.includes(ing.id)
     ).length;
     return Math.round((available / total) * 100);
   };
@@ -418,7 +418,7 @@ const DiscoverCard: React.FC<DiscoverCardProps> = ({
             <h3>Ингредиенты:</h3>
             <div className={styles.ingredientsGrid}>
               {recipe.ingredients.map((ingredient) => {
-                const isAvailable = availableIngredients.includes(ingredient.ingredient.id);
+                const isAvailable = availableIngredients.includes(ingredient.id);
                 const hasNoIngredients = availableIngredients.length === 0;
                 return (
                   <div 
@@ -435,7 +435,7 @@ const DiscoverCard: React.FC<DiscoverCardProps> = ({
                       )}
                     </div>
                     <span className={styles.ingredientText}>
-                      {ingredient.ingredient.name} ({ingredient.amount} {ingredient.unit})
+                      {ingredient.name} ({ingredient.count} {ingredient.measure})
                     </span>
                   </div>
                 );
@@ -459,7 +459,7 @@ const DiscoverCard: React.FC<DiscoverCardProps> = ({
                 <ul>
                   {recipe.ingredients.map((ingredient) => (
                     <li key={ingredient.id}>
-                      {ingredient.ingredient.name} - {ingredient.amount} {ingredient.unit}
+                      {ingredient.name} - {ingredient.count} {ingredient.measure}
                     </li>
                   ))}
                 </ul>
