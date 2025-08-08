@@ -10,7 +10,7 @@
 ## API Integration Strategy
 
 ### Development Mode
-- Использует Vite proxy `/api/v1` → `http://82.146.39.131:8080/v1`
+- Использует Vite proxy `/api/v1` → `https://api.refook.ru/v1`
 - CORS проблемы решены через прокси
 
 ### Production Mode  

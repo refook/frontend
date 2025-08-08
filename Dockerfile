@@ -1,27 +1,38 @@
 # Этап 1: Сборка приложения
-FROM node:18-alpine AS builder
+#FROM node:18-alpine AS builder
 
-WORKDIR /app
+#WORKDIR /app
 
-# Копируем package.json и устанавливаем зависимости
-COPY package*.json ./
-RUN npm install
+# Копируем package.json и package-lock.json для установки зависимостей
+#COPY package*.json ./
 
-# Копируем исходники и собираем
-COPY . .
-RUN npm run build
+# Устанавливаем зависимости
+#RUN npm ci
 
-# Этап 2: Раздача статики через Nginx
+# Копируем остальные файлы проекта
+#COPY . .
+
+# Собираем приложение для продакшена
+#RUN npm run build
+
+# Этап 2: Создание продакшен-образа с Nginx
 FROM nginx:alpine
 
-# Копируем кастомный конфиг Nginx
+# Копируем собранные файлы из этапа сборки
+#COPY --from=builder /app/dist /usr/share/nginx/html
+COPY dist /usr/share/nginx/html
+
+# Копируем конфигурацию Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Копируем собранные файлы из первого этапа
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Копируем скрипт запуска
+COPY start.sh /start.sh
 
-# Экспозируем порт
+# Делаем скрипт запуска исполняемым
+RUN chmod +x /start.sh
+
+# Открываем порт 80
 EXPOSE 80
 
-# Запускаем Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Запускаем скрипт
+CMD ["/start.sh"]
