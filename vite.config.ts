@@ -1,11 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  base: '',
-  server: {
+export default defineConfig(({ mode }) => {
+  return {
+    plugins: [react()],
+    base: '',
+    build: {
+      outDir: mode == 'production' ? 'prod/dist' : 'dist',
+      emptyOutDir: true,
+    },
+    server: {
     proxy: {
       '/api/v1': {
         target: 'https://api.refook.ru',
@@ -27,4 +31,5 @@ export default defineConfig({
       }
     }
   }
-})
+  };
+});
