@@ -55,7 +55,7 @@ jobs:
       - name: Deploy with docker compose
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.SSH_ }}
+          host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
