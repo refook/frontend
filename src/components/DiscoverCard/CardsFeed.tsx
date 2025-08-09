@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Recipe } from '../../types';
+import type {Recipe, RecipeIngredient} from '../../types';
 import type { FilterType } from './FilterSettings';
 import DiscoverCard from './DiscoverCard';
 import styles from './CardsFeed.module.css';
@@ -231,7 +231,18 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
       >
         {recipes.map((recipe, index) => {
           const missingIngredients = recipe.ingredients.filter(
-            ing => !availableIngredients.includes(ing.ingredient.id)
+            ing => !availableIngredients.includes(ing.id)
+          ).map( ingr =>
+              ({
+                id: ingr.id,
+                ingredient: {
+                  id: 'beef',
+                  name: 'Говядина',
+                  category: { id: 'meat', name: 'Мясо', color: '#ff6b6b' }
+                },
+                amount: ingr.count,
+                unit: ingr.measure,
+              }) as RecipeIngredient
           );
           
           return (

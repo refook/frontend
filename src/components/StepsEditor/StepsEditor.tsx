@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import type { CreateStepDto, CreateRecipeIngredientDto } from '../../types/recipe.types';
 import IngredientPicker from '../IngredientPicker/IngredientPicker';
 import { 
   PlusIcon, 
@@ -11,6 +10,7 @@ import {
   ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import styles from './StepsEditor.module.css';
+import type {CreateStepDto} from "../../types";
 
 interface StepsEditorProps {
   steps: CreateStepDto[];

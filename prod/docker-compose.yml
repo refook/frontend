@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  refook:
+    image: refook-front
+    build: .
+    container_name: refook-front
+    ports:
+      - "4173:80"

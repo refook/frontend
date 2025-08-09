@@ -37,7 +37,7 @@ export const RecipeSuggestions: React.FC = () => {
     return allRecipes
       .map(recipe => {
         const recipeIngredients = recipe.ingredients.map(ing => 
-          ing.ingredient.name.toLowerCase()
+          ing.name.toLowerCase()
         );
         
         const matchingIngredients = recipeIngredients.filter(ing => 

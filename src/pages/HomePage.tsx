@@ -9,7 +9,7 @@ const HomePage: React.FC = () => {
         <section className={styles.hero}>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
-              Добро пожаловать в <span className={styles.brandName}>RecipeApp</span>
+              Добро пожаловать в <span className={styles.brandName}>Refook</span>
             </h1>
             <p className={styles.heroSubtitle}>
               Откройте для себя новые рецепты, управляйте холодильником и создавайте кулинарные шедевры

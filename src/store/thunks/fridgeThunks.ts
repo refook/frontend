@@ -1,6 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { FridgeService } from '../../services/fridgeService';
-import type { FridgeItem, AddFridgeItemForm } from '../../types';
 import {
   fetchFridgeStart,
   fetchFridgeSuccess,
@@ -10,6 +9,7 @@ import {
   removeFridgeItem,
   clearError
 } from '../slices/fridgeSlice';
+import type {AddFridgeItemForm, FridgeItem} from "../../types/fridge.types.ts";
 
 // Получение продуктов в холодильнике
 export const fetchFridgeItemsThunk = createAsyncThunk(

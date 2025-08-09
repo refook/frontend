@@ -1,8 +1,32 @@
-import type { MeasureType } from './measures.types';
+import type {FormIngredient, FormStep, Ingredient, MeasureType, Recipe} from "./index.ts";
 
 export type KitchenType = 'RUSSIAN' | 'ASIAN';
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
 
+
+export interface RecipeIngredient {
+  id: string;
+  ingredient: Ingredient;
+  amount: number;
+  unit: string;
+  notes?: string;
+  optional?: boolean;
+}
+
+// Form types
+export interface CreateRecipeForm {
+  title: string;
+  description: string;
+  image?: File;
+  prepTime: number;
+  cookTime: number;
+  servings: number;
+  difficulty: Recipe['difficulty'];
+  cuisine?: string;
+  tags: string[];
+  ingredients: FormIngredient[];
+  steps: FormStep[];
+}
 // DTO для создания рецепта
 export interface CreateRecipeDto {
   name: string;

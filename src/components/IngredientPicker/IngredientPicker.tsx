@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { ApiIngredient, CreateRecipeIngredientDto } from '../../types/ingredient.types';
 import type { MeasureType } from '../../types/measures.types';
 import { ingredientsService } from '../../services/ingredientsService';
 import { MEASURES_ARRAY } from '../../constants/measures';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
+import type {ApiIngredient, CreateRecipeIngredientDto} from "../../types";
 
 interface IngredientPickerProps {
   ingredients: CreateRecipeIngredientDto[];

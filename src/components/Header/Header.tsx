@@ -28,7 +28,7 @@ const Header: React.FC = () => {
       <div className={styles.container}>
         {/* Logo */}
         <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
-          <span className={styles.logoText}>RecipeApp</span>
+          <span className={styles.logoText}>Refook</span>
         </Link>
 
         {/* Desktop Navigation */}

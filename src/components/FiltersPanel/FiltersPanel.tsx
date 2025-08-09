@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { setFilters, setSort, clearFilters } from '../../store/slices/recipesSlice';
-import type { RecipeFilters, RecipeSort } from '../../types';
+import type {DifficultyLevel, KitchenType, RecipeFilters, RecipeSort} from '../../types';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './FiltersPanel.module.css';
 
@@ -31,9 +31,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ isOpen, onClose }) => {
 
   const handleDifficultyChange = (difficulty: string) => {
     const currentDifficulties = localFilters.difficulty || [];
-    const newDifficulties = currentDifficulties.includes(difficulty as any)
+    const newDifficulties = currentDifficulties.includes(difficulty as DifficultyLevel)
       ? currentDifficulties.filter(d => d !== difficulty)
-      : [...currentDifficulties, difficulty as any];
+      : [...currentDifficulties, difficulty as DifficultyLevel];
     
     const newFilters = { ...localFilters, difficulty: newDifficulties };
     setLocalFilters(newFilters);
@@ -42,9 +42,9 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ isOpen, onClose }) => {
 
   const handleCuisineChange = (cuisine: string) => {
     const currentCuisines = localFilters.cuisine || [];
-    const newCuisines = currentCuisines.includes(cuisine)
+    const newCuisines = currentCuisines.includes(cuisine as KitchenType)
       ? currentCuisines.filter(c => c !== cuisine)
-      : [...currentCuisines, cuisine];
+      : [...currentCuisines, cuisine as KitchenType];
     
     const newFilters = { ...localFilters, cuisine: newCuisines };
     setLocalFilters(newFilters);
@@ -141,7 +141,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ isOpen, onClose }) => {
               <label key={difficulty.value} className={styles.checkbox}>
                 <input
                   type="checkbox"
-                  checked={localFilters.difficulty?.includes(difficulty.value as any) || false}
+                  checked={localFilters.difficulty?.includes(difficulty.value.toUpperCase() as DifficultyLevel) || false}
                   onChange={() => handleDifficultyChange(difficulty.value)}
                 />
                 <span className={styles.checkboxLabel}>{difficulty.label}</span>
@@ -158,7 +158,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ isOpen, onClose }) => {
               <label key={cuisine} className={styles.checkbox}>
                 <input
                   type="checkbox"
-                  checked={localFilters.cuisine?.includes(cuisine) || false}
+                  checked={localFilters.cuisine?.includes(cuisine.toUpperCase() as KitchenType) || false}
                   onChange={() => handleCuisineChange(cuisine)}
                 />
                 <span className={styles.checkboxLabel}>{cuisine}</span>
