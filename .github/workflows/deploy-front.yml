@@ -1,0 +1,108 @@
+name: Build and Deploy
+
+on:
+  workflow_dispatch: # чтобы добавить кнопку на запуск cicd
+
+env:
+  #  IMAGE_NAME: masedar/refook-front
+  CONTAINER_NAME: refook-front
+  APP_NAME: refook
+  BASE_PATH_APP: /home/user/app/frontend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      service_version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - name: Копирование репозитория
+        uses: actions/checkout@v4
+
+      - name: Установка Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Установка зависимостей
+        run: npm ci
+
+      - name: Сборка приложения
+        run: npm run build:prod
+
+      - name: Получение версии образа package.json
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "::set-output name=version::$VERSION"
+
+      - name: Cохранение папки prod
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}
+          path: prod
+  build_docker_and_deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      VERSION: ${{ needs.build.outputs.service_version }}
+    steps:
+      - name: Получение папки prod
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}
+          path: ${{ env.BASE_PATH_APP }}
+
+      - name: Deploy with docker compose
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_ }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ env.BASE_PATH_APP }}
+            docker compose up -d --build --force-recreate
+
+#      - name: Log in to DockerHub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+#      - name: Сборка докер image
+#        run: docker build -t ${{ env.IMAGE_NAME }}:${{ env.VERSION }} .
+
+#      - name: Push Docker image
+#        run: docker push ${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: .
+#          file: ./Dockerfile
+#          push: true
+#          tags: ${{env.IMAGE_NAME}}:latest
+
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build
+#      - publish
+#    env:
+#      VERSION: ${{ needs.build.outputs.service_version }}
+#    steps:
+#      - name: Получение папки prod
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: ${{ env.APP_NAME }}
+#          path: ${{ env.BASE_PATH_APP }}
+#      - name: Deploy to server via SSH
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ secrets.SSH_HOST }}
+#          username: ${{ secrets.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          script: |
+#            docker pull ${{env.IMAGE_NAME}}:latest
+#            docker stop ${{ env.CONTAINER_NAME }} 2>/dev/null || true
+#            docker rm ${{ env.CONTAINER_NAME }} 2>/dev/null || true
+#            docker run -d --name ${{ env.CONTAINER_NAME }} -p 4173:80 ${{env.IMAGE_NAME}}:latest
