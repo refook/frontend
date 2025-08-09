@@ -141,58 +141,59 @@ const DevTools: React.FC = () => {
   // }
 
   return (
-    <div 
-      className={`${styles.devTools} ${isCollapsed ? styles.collapsed : ''} ${isWide ? styles.wide : ''} ${isDragging ? styles.dragging : ''}`}
-      style={{ 
-        left: `${position.x}px`, 
-        top: `${position.y}px`,
-        cursor: isDragging ? 'grabbing' : 'default'
-      }}
-      onMouseDown={handleMouseDown}
-    >
-      <div className={styles.header}>
-        <h3>🔧 Dev Tools</h3>
-        <div className={styles.headerButtons}>
-          {!isCollapsed && (
-            <button onClick={toggleWide} className={styles.collapseBtn} title={isWide ? "Узкий режим" : "Широкий режим"}>
-              {isWide ? '📏' : '📐'}
-            </button>
-          )}
-          <button onClick={toggleCollapse} className={styles.collapseBtn} title={isCollapsed ? "Развернуть" : "Свернуть"}>
-            {isCollapsed ? '📂' : '📁'}
-          </button>
-        </div>
-      </div>
-      
-      {!isCollapsed ? (
-        <>
-          <div className={styles.actions}>
-            <h4>🗑️ Actions</h4>
-            <button onClick={addTestData} className={styles.successBtn}>
-              Add Test Data
-            </button>
-            <button onClick={handleResetAll} className={styles.dangerBtn}>
-              Reset All Data
-            </button>
-            <button onClick={handleClearUserData} className={styles.warningBtn}>
-              Clear User Data
-            </button>
-            <button onClick={handleClearFavorites} className={styles.infoBtn}>
-              Clear Favorites
-            </button>
-            <button onClick={handleClearFridge} className={styles.infoBtn}>
-              Clear Fridge
-            </button>
-          </div>
-
-          <ApiLogger />
-        </>
-      ) : (
-        <div className={styles.collapsedHint}>
-          <span>🔧 DevTools</span>
-        </div>
-      )}
-    </div>
+      <> </>
+    // <div
+    //   className={`${styles.devTools} ${isCollapsed ? styles.collapsed : ''} ${isWide ? styles.wide : ''} ${isDragging ? styles.dragging : ''}`}
+    //   style={{
+    //     left: `${position.x}px`,
+    //     top: `${position.y}px`,
+    //     cursor: isDragging ? 'grabbing' : 'default'
+    //   }}
+    //   onMouseDown={handleMouseDown}
+    // >
+    //   <div className={styles.header}>
+    //     <h3>🔧 Dev Tools</h3>
+    //     <div className={styles.headerButtons}>
+    //       {!isCollapsed && (
+    //         <button onClick={toggleWide} className={styles.collapseBtn} title={isWide ? "Узкий режим" : "Широкий режим"}>
+    //           {isWide ? '📏' : '📐'}
+    //         </button>
+    //       )}
+    //       <button onClick={toggleCollapse} className={styles.collapseBtn} title={isCollapsed ? "Развернуть" : "Свернуть"}>
+    //         {isCollapsed ? '📂' : '📁'}
+    //       </button>
+    //     </div>
+    //   </div>
+    //
+    //   {!isCollapsed ? (
+    //     <>
+    //       <div className={styles.actions}>
+    //         <h4>🗑️ Actions</h4>
+    //         <button onClick={addTestData} className={styles.successBtn}>
+    //           Add Test Data
+    //         </button>
+    //         <button onClick={handleResetAll} className={styles.dangerBtn}>
+    //           Reset All Data
+    //         </button>
+    //         <button onClick={handleClearUserData} className={styles.warningBtn}>
+    //           Clear User Data
+    //         </button>
+    //         <button onClick={handleClearFavorites} className={styles.infoBtn}>
+    //           Clear Favorites
+    //         </button>
+    //         <button onClick={handleClearFridge} className={styles.infoBtn}>
+    //           Clear Fridge
+    //         </button>
+    //       </div>
+    //
+    //       <ApiLogger />
+    //     </>
+    //   ) : (
+    //     <div className={styles.collapsedHint}>
+    //       <span>🔧 DevTools</span>
+    //     </div>
+    //   )}
+    // </div>
   );
 };
 

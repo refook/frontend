@@ -1,4 +1,31 @@
 import type { MeasureType } from './measures.types';
+import type {NutritionInfo} from "./common.types.ts";
+
+
+export interface FormIngredient {
+  id: string;
+  name: string;
+  amount: string;
+  unit: string;
+}
+
+// Ingredient types
+export interface Ingredient {
+  id: string;
+  name: string;
+  description?: string;
+  category: IngredientCategory;
+  nutrition?: NutritionInfo;
+  storageInstructions?: string;
+  shelfLife?: number; // дни
+}
+
+export interface IngredientCategory {
+  id: string;
+  name: string;
+  color: string;
+  icon?: string;
+}
 
 export interface ApiIngredient {
   id: string;
@@ -20,10 +47,4 @@ export interface ApiIngredient {
   };
   createdAt: string;
   updatedAt: string;
-}
-
-export interface CreateRecipeIngredientDto {
-  id: string;
-  count: number;
-  measure: MeasureType;
 }

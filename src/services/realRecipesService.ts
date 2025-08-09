@@ -12,7 +12,7 @@ function getAuthHeaders() {
 }
 
 // API endpoint for recipes
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'http://82.146.39.131:8080/v1';
+const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
 
 // Заглушка для отсутствующего пользователя
 const DEFAULT_USER: UserInfoResponseDto = {

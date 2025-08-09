@@ -1,7 +1,7 @@
 import type { Favorite, Recipe } from '../types';
 
 // API endpoint for favorites
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'http://82.146.39.131:8080/v1';
+const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
 
 export class FavoritesService {
   
