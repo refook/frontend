@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd ${{ env.BASE_PATH_APP }}
+            cd ${{ env.BASE_PATH_APP }}/prod
             docker compose up -d --build --force-recreate
 
 #      - name: Log in to DockerHub
