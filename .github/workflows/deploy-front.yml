@@ -4,7 +4,7 @@ on:
   workflow_dispatch: # чтобы добавить кнопку на запуск cicd
 
 env:
-#  IMAGE_NAME: masedar/refook-front
+  #  IMAGE_NAME: masedar/refook-front
   CONTAINER_NAME: refook-front
   APP_NAME: refook
   BASE_PATH_APP: /home/user/app/frontend
