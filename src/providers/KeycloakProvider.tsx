@@ -2,6 +2,7 @@ import React, {createContext, useEffect, useState} from 'react';
 import keycloak from "../services/keycloak.ts";
 import Keycloak from "keycloak-js";
 import type {ComponentWithChildren} from "../types";
+import { apiService } from "../services/api";
 
 interface KeycloakContextType {
     keycloak: Keycloak | null;
@@ -39,8 +40,27 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                             if (auth) {
                                 setAuthenticated(true);
                                 setUser(keycloak.tokenParsed);
+                                // Сохраняем токен для API
+                                if (keycloak.token) {
+                                    localStorage.setItem('authToken', keycloak.token);
+                                    apiService.setAuthToken(keycloak.token);
+                                }
+                                // Обновляем токен перед истечением
+                                keycloak.onTokenExpired = async () => {
+                                    try {
+                                        const refreshed = await keycloak.updateToken(30);
+                                        if (refreshed && keycloak.token) {
+                                            localStorage.setItem('authToken', keycloak.token);
+                                            apiService.setAuthToken(keycloak.token);
+                                        }
+                                    } catch (e) {
+                                        console.error('Не удалось обновить токен Keycloak', e);
+                                    }
+                                };
                             } else {
                                 setAuthenticated(false);
+                                // Очищаем токен если не авторизованы
+                                apiService.removeAuthToken();
                             }
                             setKeycloakInstance(keycloak);
                             setIsInitialized(true)
@@ -62,6 +82,8 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
         };
 
         const logout = () => {
+            // Чистим localStorage и axios заголовки заранее
+            apiService.removeAuthToken();
             keycloakInstance?.logout();
         };
 
