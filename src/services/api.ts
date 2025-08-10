@@ -3,7 +3,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
 import type { ApiResponse, ApiError } from '../types';
 
 // Base API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+export const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
 
 class ApiService {
   private api: AxiosInstance;
