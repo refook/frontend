@@ -71,9 +71,7 @@ class IngredientsService {
     try {
       console.log('Создание нового ингредиента:', ingredientData);
       
-      const headers = {
-        'Content-Type': 'application/json',
-      };
+      const headers = getAuthHeaders();
       const url = `${API_BASE_URL}/ingredient`;
       
       // Логируем запрос
