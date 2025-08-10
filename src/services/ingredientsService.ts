@@ -1,6 +1,7 @@
 import type { ApiIngredient } from '../types/ingredient.types';
 import type { MeasureType } from '../types/measures.types';
 import { apiLogger } from '../utils/apiLogger';
+import {API_BASE_URL} from "./api.ts";
 
 // Функция для получения авторизационных заголовков
 function getAuthHeaders() {
@@ -12,8 +13,6 @@ function getAuthHeaders() {
 }
 
 // API endpoint for ingredients
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://refook.ru/v1';
-
 class IngredientsService {
   
   /**

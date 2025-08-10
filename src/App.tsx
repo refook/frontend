@@ -6,21 +6,12 @@ import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage} f
 import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
-import LoginPage from "./pages/LoginPage.tsx";
-import {useEffect} from "react";
-
-// Pages (пока заглушки, создадим позже)
-const RegisterPage = () => <div className="container"><h1>Регистрация</h1></div>;
 
 function App() {
-    useEffect(() => {
-        console.log('App mounted');
-    }, []); // Логирование для проверки монтирования
     return (
         <>
             <Layout>
                 <Routes>
-                    <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/" element={<HomePage/>}/>
                     <Route path="/recipes" element={<RecipesPage/>}/>
                     <Route path="/recipe/:id" element={<RecipeDetailPage/>}/>
@@ -28,7 +19,6 @@ function App() {
                     <Route path="/fridge" element={<FridgePage/>}/>
                     <Route path="/discover" element={<DiscoverPage/>}/>
                     <Route path="/create-recipe" element={<CreateRecipePage/>}/>
-                    <Route path="/register" element={<RegisterPage/>}/>
                 </Routes>
             </Layout>
             <DevTools/>

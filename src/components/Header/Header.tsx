@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setTheme } from '../../store/slices/uiSlice';
 import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
+import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
 
 const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useAppSelector((state) => state.ui);
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const context = useContext(KeycloakContext);
+
+  if (context == null) {
+    throw new Error('KeycloakContext must be used within a KeycloakProvider');
+  }
+
+  const {authenticated, user, login, logout, register, keycloak} = context;
 
   const toggleTheme = () => {
     dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
@@ -63,25 +72,29 @@ const Header: React.FC = () => {
           </button>
 
           {/* Desktop User section */}
-          {isAuthenticated ? (
+          {authenticated ? (
             <div className={styles.userSection}>
               <span className={styles.userName}>{user?.name}</span>
               {user?.avatar && (
-                <img 
-                  src={user.avatar} 
-                  alt="Avatar" 
-                  className={styles.avatar} 
+                <img
+                  src={user.avatar}
+                  alt="Avatar"
+                  className={styles.avatar}
                 />
               )}
+              <div onClick={logout} className={styles.loginButton}>
+                Выйти
+              </div>
             </div>
           ) : (
+
             <div className={styles.authButtons}>
-              <Link to="/login" className={styles.loginButton}>
+              <div onClick={login} className={styles.loginButton}>
                 Войти
-              </Link>
-              <Link to="/register" className={styles.registerButton}>
+              </div>
+              <div onClick={register} className={styles.registerButton}>
                 Регистрация
-              </Link>
+              </div>
             </div>
           )}
 
@@ -123,22 +136,25 @@ const Header: React.FC = () => {
             <div className={styles.mobileUserInfo}>
               <span className={styles.mobileUserName}>{user?.name}</span>
               {user?.avatar && (
-                <img 
-                  src={user.avatar} 
-                  alt="Avatar" 
-                  className={styles.mobileAvatar} 
+                <img
+                  src={user.avatar}
+                  alt="Avatar"
+                  className={styles.mobileAvatar}
                 />
               )}
+              <div onClick={logout} className={styles.loginButton}>
+                Выйти
+              </div>
             </div>
           ) : (
-            <div className={styles.mobileAuthButtons}>
-              <Link to="/login" className={styles.mobileLoginButton} onClick={closeMobileMenu}>
-                Войти
-              </Link>
-              <Link to="/register" className={styles.mobileRegisterButton} onClick={closeMobileMenu}>
-                Регистрация
-              </Link>
-            </div>
+              <div className={styles.authButtons}>
+                <div onClick={login} className={styles.loginButton}>
+                  Войти
+                </div>
+                <div onClick={register} className={styles.registerButton}>
+                  Регистрация
+                </div>
+              </div>
           )}
         </div>
       </div>
