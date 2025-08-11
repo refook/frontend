@@ -230,20 +230,18 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
         }}
       >
         {recipes.map((recipe, index) => {
-          const missingIngredients = recipe.ingredients.filter(
-            ing => !availableIngredients.includes(ing.id)
-          ).map( ingr =>
-              ({
+          const missingIngredients = recipe.ingredients
+            .filter(ing => !availableIngredients.includes(ing.id))
+            .map((ingr) => ({
+              id: ingr.id,
+              ingredient: {
                 id: ingr.id,
-                ingredient: {
-                  id: 'beef',
-                  name: 'Говядина',
-                  category: { id: 'meat', name: 'Мясо', color: '#ff6b6b' }
-                },
-                amount: ingr.count,
-                unit: ingr.measure,
-              }) as RecipeIngredient
-          );
+                name: ingr.name,
+                category: { id: 'api', name: 'Из API', color: '#4f46e5' }
+              },
+              amount: ingr.count,
+              unit: ingr.measure,
+            }) as RecipeIngredient);
           
           return (
             <div key={recipe.id} className={styles.cardWrapper}>
