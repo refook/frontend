@@ -83,7 +83,7 @@ const DiscoverPage: React.FC = () => {
           
           // Для остальных фильтров проверяем доступность ингредиентов
           const availableIngredients = fridgeItems.map((item: any) => item.ingredient.id);
-          const recipeIngredients = recipe.ingredients.map((ing: any) => ing.ingredient.id);
+          const recipeIngredients = recipe.ingredients.map((ing: any) => ing.id);
           
           // Если в холодильнике нет ингредиентов, все рецепты попадают в "missing"
           if (availableIngredients.length === 0) {
@@ -112,7 +112,7 @@ const DiscoverPage: React.FC = () => {
         // Детальная отладка фильтрации
         const filterDebug = allRecipes.slice(0, 3).map((recipe: Recipe) => {
           const availableIngredients = fridgeItems.map((item: any) => item.ingredient.id);
-          const recipeIngredients = recipe.ingredients.map((ing: any) => ing.ingredient.id);
+          const recipeIngredients = recipe.ingredients.map((ing: any) => ing.id);
           const availableCount = recipeIngredients.filter((id: string) => 
             availableIngredients.includes(id)
           ).length;
