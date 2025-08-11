@@ -176,12 +176,21 @@ class FridgeApiService {
     expiryDate?: string;
     notes?: string;
   }): CreateFridgeProductDto {
+    const toIsoStartOfDayUtc = (dateStr?: string): string | undefined => {
+      if (!dateStr) return undefined;
+      // Ожидаем формат YYYY-MM-DD из инпута и конвертируем в ISO в UTC полночь
+      const [year, month, day] = dateStr.split('-').map(n => parseInt(n, 10));
+      if (!year || !month || !day) return undefined;
+      const iso = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0)).toISOString();
+      return iso;
+    };
+
     return {
       ingredientId: localProduct.ingredient.id,
-      count: localProduct.amount,
+      count: Math.round(localProduct.amount),
       measure: localProduct.unit as any, // Приводим к типу MeasureType
-      expiryDate: localProduct.expiryDate,
-      comment: localProduct.notes
+      expiryDate: toIsoStartOfDayUtc(localProduct.expiryDate),
+      comment: localProduct.notes || undefined
     };
   }
 }

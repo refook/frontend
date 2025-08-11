@@ -1,10 +1,89 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './EditRecipePage.module.css';
+import RecipeForm from '../components/RecipeForm/RecipeForm';
+import { useAppDispatch, useAppSelector } from '../store';
+import { fetchRecipe } from '../store/thunks/recipesThunks';
+import { updateRecipeThunk } from '../store/thunks/recipesThunks';
+import type { CreateRecipeDto, UpdateRecipeDto } from '../types/recipe.types';
 
 const EditRecipePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { currentRecipe, loading } = useAppSelector((state) => state.recipes);
+  const [submitting, setSubmitting] = useState(false);
+  const [isValid, setIsValid] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchRecipe(id));
+    }
+  }, [dispatch, id]);
+
+  const initialData: CreateRecipeDto = useMemo(() => {
+    if (!currentRecipe) {
+      return {
+        name: '',
+        description: '',
+        kitchen: undefined,
+        level: 'EASY',
+        cookTime: 0,
+        allTime: 0,
+        portion: 1,
+        photos: [],
+        tags: [],
+        ingredients: [],
+        steps: [],
+      };
+    }
+    return {
+      name: currentRecipe.title,
+      description: currentRecipe.description,
+      kitchen: currentRecipe.cuisine,
+      level: currentRecipe.difficulty.toUpperCase() as any,
+      cookTime: currentRecipe.cookTime * 60, // локальная модель в минутах, API в секундах
+      allTime: currentRecipe.prepTime * 60 + currentRecipe.cookTime * 60,
+      portion: currentRecipe.servings,
+      photos: currentRecipe.photos || [],
+      tags: currentRecipe.tags || [],
+      ingredients: (currentRecipe.ingredients || []).map((ing) => ({
+        id: ing.id,
+        count: ing.count,
+        measure: ing.measure,
+      })),
+      steps: (currentRecipe.steps || []).map((s) => ({
+        id: s.id,
+        index: s.index,
+        name: s.name,
+        description: s.description,
+        photos: s.photos || [],
+        ingredients: s.ingredients || [],
+        time: s.time || 0,
+      })),
+    };
+  }, [currentRecipe]);
+
+  const onChange = (data: CreateRecipeDto) => {
+    // Минимальная валидация для кнопки
+    const valid = Boolean(data.name?.trim()) && Boolean(data.description?.trim()) && data.ingredients?.length > 0 && data.steps?.length > 0;
+    setIsValid(valid);
+  };
+
+  const onSubmit = async (data: CreateRecipeDto) => {
+    if (!id) return;
+    setSubmitting(true);
+    try {
+      const payload: UpdateRecipeDto = data;
+      await dispatch(updateRecipeThunk({ id, updates: payload })).unwrap();
+      navigate(`/recipe/${id}`);
+    } catch (e) {
+      // TODO: показать уведомление об ошибке
+      console.error('Ошибка при обновлении рецепта', e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className={styles.editRecipePage}>
@@ -18,29 +97,24 @@ const EditRecipePage: React.FC = () => {
         <h1>Редактировать рецепт</h1>
       </div>
 
-      <div className={styles.notice}>
-        <div className={styles.noticeIcon}>🚧</div>
-        <div className={styles.noticeContent}>
-          <h2>Функция в разработке</h2>
-          <p>Редактирование рецептов временно недоступно, так как API еще не поддерживает эту функцию.</p>
-          <p>Мы работаем над добавлением этой возможности в ближайшее время.</p>
-          
-          <div className={styles.actions}>
-            <button 
-              onClick={() => navigate('/recipes')}
-              className={styles.recipesButton}
-            >
-              Посмотреть все рецепты
-            </button>
-            <button 
-              onClick={() => navigate('/recipes/create')}
-              className={styles.createButton}
-            >
-              Создать новый рецепт
-            </button>
+      {loading && (
+        <div className={styles.notice}>
+          <div className={styles.noticeIcon}>⏳</div>
+          <div className={styles.noticeContent}>
+            <h2>Загружаем рецепт...</h2>
           </div>
         </div>
-      </div>
+      )}
+
+      {!loading && (
+        <RecipeForm
+          initialData={initialData}
+          onChange={onChange}
+          onSubmit={onSubmit}
+          isSubmitting={submitting}
+          isValid={isValid}
+        />
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import type {
   RecipeSort, 
   PaginatedResponse
 } from '../types';
-import type { CreateRecipeDto, DifficultyLevel, KitchenType } from '../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto, DifficultyLevel, KitchenType } from '../types/recipe.types';
 
 export class RecipesService {
   // Получение списка рецептов с пагинацией и фильтрами
@@ -50,11 +50,9 @@ export class RecipesService {
   }
 
   // Обновление рецепта
-  static async updateRecipe(id: string, updates: Partial<Recipe>): Promise<Recipe> {
+  static async updateRecipe(id: string, updates: UpdateRecipeDto): Promise<Recipe> {
     try {
-      // Пока API не поддерживает обновление, возвращаем заглушку
-      console.warn('Обновление рецептов пока не поддерживается API');
-      throw new Error('Функция обновления рецептов находится в разработке');
+      return await realRecipesService.updateRecipe(id, updates);
     } catch (error: any) {
       console.error('Ошибка при обновлении рецепта:', error);
       throw error;

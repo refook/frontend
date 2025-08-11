@@ -1,5 +1,5 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
-import type { CreateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel } from '../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel } from '../types/recipe.types';
 import { apiLogger } from '../utils/apiLogger';
 
 // Функция для получения авторизационных заголовков
@@ -211,6 +211,57 @@ class RealRecipesService {
     } catch (error) {
       console.error('Ошибка при создании рецепта:', error);
       throw new Error(`Не удалось создать рецепт: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Обновить рецепт (PUT)
+   */
+  async updateRecipe(id: string, formData: UpdateRecipeDto): Promise<Recipe> {
+    try {
+      console.log('Обновление рецепта:', id, formData.name);
+
+      const apiRecipeData = {
+        name: formData.name,
+        description: formData.description,
+        kitchen: formData.kitchen,
+        level: formData.level,
+        cookTime: formData.cookTime,
+        allTime: formData.allTime,
+        portion: formData.portion,
+        photos: formData.photos || [],
+        tags: formData.tags || null,
+        ingredients: formData.ingredients || [],
+        steps: (formData.steps || []).map(step => ({
+          id: (step as any).id, // если приходит id шага — передаем, чтобы бэкенд обновлял, а не дублировал
+          index: step.index,
+          name: step.name || undefined,
+          description: step.description,
+          photos: step.photos || [],
+          ingredients: step.ingredients || [],
+          time: step.time || 0
+        }))
+      };
+
+      const headers = getAuthHeaders();
+      const url = `${API_BASE_URL}/recipe/${id}`;
+      apiLogger.logRequest(url, 'PUT', headers, apiRecipeData);
+
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(apiRecipeData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updated: RecipeResponseDto = await response.json();
+      return this.transformApiRecipeToLocal(updated);
+    } catch (error) {
+      console.error('Ошибка при обновлении рецепта:', error);
+      throw new Error(`Не удалось обновить рецепт: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
