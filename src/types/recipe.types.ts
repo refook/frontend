@@ -42,6 +42,25 @@ export interface CreateRecipeDto {
   steps: CreateStepDto[];
 }
 
+// DTO для обновления рецепта (тот же формат, что и создание)
+export interface UpdateStepDto extends CreateStepDto {
+  id?: string;
+}
+
+export interface UpdateRecipeDto {
+  name: string;
+  description: string;
+  kitchen?: KitchenType;
+  level: DifficultyLevel;
+  cookTime: number;
+  allTime: number;
+  portion: number;
+  photos?: string[];
+  tags?: string[] | null;
+  ingredients: CreateRecipeIngredientDto[];
+  steps: UpdateStepDto[];
+}
+
 // DTO для создания ингредиента в рецепте
 export interface CreateRecipeIngredientDto {
   id: string;

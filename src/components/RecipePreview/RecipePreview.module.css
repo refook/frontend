@@ -183,11 +183,51 @@
   flex: 1;
 }
 
+.stepTitle {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
 .stepDescription {
   font-size: var(--font-size-base);
   color: var(--text-primary);
   line-height: var(--line-height-relaxed);
   margin: 0;
+}
+
+.stepIngredients {
+  margin-top: var(--spacing-sm);
+}
+
+.stepIngredientsTitle {
+  margin: 0 0 var(--spacing-xs) 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.stepIngredientsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.stepIngredient {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+}
+
+.stepIngredientName {
+  color: var(--text-primary);
+}
+
+.stepIngredientAmount {
+  color: var(--text-secondary);
 }
 
 .stepImage {

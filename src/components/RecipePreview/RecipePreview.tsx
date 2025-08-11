@@ -193,9 +193,33 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                       {index + 1}
                     </div>
                     <div className={styles.stepContent}>
+                      {step.name && (
+                        <h4 className={styles.stepTitle}>{step.name}</h4>
+                      )}
                       <p className={styles.stepDescription}>
                         {step.description || 'Описание шага'}
                       </p>
+                      {step.ingredients && step.ingredients.length > 0 && (
+                        <div className={styles.stepIngredients}>
+                          <h5 className={styles.stepIngredientsTitle}>Ингредиенты шага</h5>
+                          <ul className={styles.stepIngredientsList}>
+                            {step.ingredients.map((ing, i) => (
+                              <li key={i} className={styles.stepIngredient}>
+                                <span className={styles.stepIngredientName}>
+                                  {isFormData
+                                    ? (availableIngredients.find(ai => ai.id === (ing as CreateRecipeIngredientDto).id)?.name || 'Ингредиент')
+                                    : (ing as RecipeIngredientDto).name}
+                                </span>
+                                <span className={styles.stepIngredientAmount}>
+                                  {isFormData
+                                    ? `${(ing as CreateRecipeIngredientDto).count} ${(ing as CreateRecipeIngredientDto).measure.toLowerCase()}`
+                                    : `${(ing as RecipeIngredientDto).count} ${(ing as RecipeIngredientDto).measure.toLowerCase()}`}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                       {step.photos && step.photos.length > 0 && (
                         <div className={styles.stepImage}>
                           <img 

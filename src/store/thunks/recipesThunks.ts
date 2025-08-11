@@ -6,7 +6,7 @@ import type {
   RecipeSort,
   PaginatedResponse 
 } from '../../types';
-import type { CreateRecipeDto } from '../../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto } from '../../types/recipe.types';
 import {
   fetchRecipesStart,
   fetchRecipesSuccess,
@@ -107,7 +107,7 @@ export const createRecipe = createAsyncThunk(
 export const updateRecipeThunk = createAsyncThunk(
   'recipes/updateRecipe',
   async (
-    params: { id: string; updates: Partial<Recipe> },
+    params: { id: string; updates: UpdateRecipeDto },
     { dispatch }
   ) => {
     try {
