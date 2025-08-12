@@ -3,6 +3,7 @@ import type { Recipe } from '../../types';
 import RecipeCard from '../RecipeCard/RecipeCard';
 import RecipeCardSkeleton from '../RecipeCard/RecipeCardSkeleton';
 import styles from './RecipesList.module.css';
+import { useNavigate } from 'react-router-dom';
 
 interface RecipesListProps {
   recipes: Recipe[];
@@ -10,11 +11,20 @@ interface RecipesListProps {
   viewMode?: 'grid' | 'list';
 }
 
-const RecipesList: React.FC<RecipesListProps> = ({ 
-  recipes, 
-  loading, 
-  viewMode = 'grid' 
+const RecipesList: React.FC<RecipesListProps> = ({
+  recipes,
+  loading,
+  viewMode = 'grid'
 }) => {
+  const navigate = useNavigate();
+
+  const handleRandomRecipe = () => {
+    if (!recipes || recipes.length === 0) return;
+    const random = recipes[Math.floor(Math.random() * recipes.length)];
+    if (random?.id) {
+      navigate(`/recipe/${random.id}`);
+    }
+  };
   if (loading && recipes.length === 0) {
     return (
       <div className={`${styles.recipesList} ${styles[viewMode]}`}>
@@ -37,15 +47,43 @@ const RecipesList: React.FC<RecipesListProps> = ({
     );
   }
 
+  // Рендерим карточки по 3 в ряд и добавляем баннер после каждой 3-й строки
+  const elements: React.ReactNode[] = [];
+  let rowIndex = 0;
+
+  recipes.forEach((recipe, index) => {
+    elements.push(
+      <RecipeCard
+        key={recipe.id}
+        recipe={recipe}
+        viewMode={viewMode}
+      />
+    );
+
+    const isRowEnd = (index % 3) === 2; // каждые 3 карточки
+    if (isRowEnd) {
+      rowIndex += 1;
+      if (rowIndex % 3 === 0) {
+        elements.push(
+          <div key={`banner-${rowIndex}`} className={`${styles.fullWidth}`}>
+            <div className={styles.banner}>
+              <div className={styles.bannerContent}>
+                <div>
+                  <h3 className={styles.bannerTitle}>Нужна идея? Попробуйте случайный рецепт</h3>
+                  <p className={styles.bannerSubtitle}>Мы подберем рецепт из текущей выборки</p>
+                </div>
+                <button onClick={handleRandomRecipe} className={styles.bannerButton}>Случайный рецепт</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+    }
+  });
+
   return (
     <div className={`${styles.recipesList} ${styles[viewMode]}`}>
-      {recipes.map((recipe) => (
-        <RecipeCard 
-          key={recipe.id} 
-          recipe={recipe} 
-          viewMode={viewMode}
-        />
-      ))}
+      {elements}
       {loading && (
         <>
           {Array.from({ length: 6 }).map((_, index) => (

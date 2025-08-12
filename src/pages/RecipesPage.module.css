@@ -158,7 +158,160 @@
     align-self: center;
   }
 }
+/* New design styles */
+.pageHeader {
+  text-align: center;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
 
+.pageTitleNew {
+  font-size: var(--token-text-3xl);
+  line-height: 2.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--token-text);
+  margin: 0 0 var(--token-space-2) 0;
+}
+
+.pageSubtitle { color: var(--token-muted); margin: 0; }
+
+.searchForm { max-width: 48rem; margin: 0 auto var(--token-space-3) auto; }
+
+.searchGroup {
+  position: relative;
+  border-radius: 9999px;
+}
+
+.searchGroupAi {
+  position: relative;
+  border-radius: 9999px;
+}
+
+.searchGroupAi::before {
+  content: "";
+  position: absolute;
+  inset: -2px; /* за пределами, не смещает лэйаут */
+  border-radius: inherit;
+  background: linear-gradient(120deg, #a78bfa, #7c3aed, #60a5fa);
+  background-size: 200% 200%;
+  filter: blur(10px);
+  opacity: 0.35;
+  animation: gradientShift 10s linear infinite;
+  z-index: 0;
+}
+
+.searchInput {
+  width: 100%;
+  border-radius: var(--token-radius-full);
+  border: 1px solid var(--token-border);
+  padding: 12px 112px 12px 20px;
+  box-shadow: var(--token-shadow-sm);
+  color: var(--token-text);
+  background: var(--token-bg);
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  transition: box-shadow var(--token-duration-fast) ease, border-color var(--token-duration-fast) ease, background-position 0.4s ease;
+}
+
+.searchInputAi {
+  border-color: var(--token-accent-200, #c7d2fe);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  background-image: linear-gradient(90deg, var(--token-accent-weak), var(--token-neutral-50));
+  background-size: 200% 200%;
+  animation: inputGlow 8s ease infinite;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #9ca3af; /* gray-400 */
+}
+
+.searchActions {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+}
+
+.aiToggle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--token-radius-full);
+  border: none;
+  background: transparent;
+  color: var(--token-accent-strong);
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease, filter 0.2s ease;
+}
+
+.aiToggle:hover { transform: scale(1.04); }
+
+.aiToggleActive { color: var(--token-accent); filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.45)); }
+
+.searchBtn {
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background-color: #111827; /* gray-900 */
+  color: white;
+  border: none;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.searchBtn:hover {
+  background-color: #0b1220; /* darker */
+}
+
+.quickFilters { max-width: 64rem; margin: 0 auto var(--token-space-8) auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
+
+.filtersLabel { color: var(--token-muted); font-size: var(--token-text-sm); }
+
+.filterBtn { padding: 6px 12px; border-radius: var(--token-radius-full); background: var(--token-neutral-100); color: var(--token-neutral-800); border: 1px solid var(--token-border); font-size: var(--token-text-sm); cursor: pointer; }
+.filterBtnActive {
+  background: color-mix(in oklab, var(--token-accent-weak) 60%, transparent) !important;
+  color: var(--token-accent-strong) !important;
+  border-color: var(--token-accent) !important;
+}
+.filterBtnActive:hover { filter: brightness(0.98); }
+
+.filterBtn:hover {
+  background-color: #e5e7eb; /* gray-200 */
+}
+
+.addFilterBtn { border: 1px dashed var(--token-border) !important; }
+
+.addFilterBtn:hover {
+  background-color: #f9fafb; /* gray-50 */
+}
+
+.resultsBar { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--token-space-3); }
+
+.resultsTextNew { color: var(--token-muted); }
+
+/* Add filter dropdown */
+.addFilterMenu { margin-top: var(--token-space-3); }
+.addFilterList { display: flex; flex-wrap: wrap; gap: var(--token-space-3); }
+.addFilterItem { height: 36px; }
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes inputGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 @media (max-width: 480px) {
   .filtersToggle {
     width: 100%;

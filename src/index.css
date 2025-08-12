@@ -1,4 +1,6 @@
 @import './styles/variables.css';
+@import './styles/tokens.css';
+@import './styles/ui.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -19,8 +21,8 @@ body {
                Oxygen, Ubuntu, Cantarell, sans-serif;
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
+  color: var(--token-text);
+  background-color: var(--token-bg);
   transition: color var(--transition-normal), background-color var(--transition-normal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -4,20 +4,20 @@
 
 .recipesList.grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--spacing-2xl);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--token-space-6);
 }
 
 .recipesList.list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--token-space-4);
 }
 
 .emptyState {
   text-align: center;
-  padding: var(--spacing-5xl) var(--spacing-2xl);
-  color: var(--text-secondary);
+  padding: var(--token-space-8) var(--token-space-4);
+  color: var(--token-muted);
 }
 
 .emptyIcon {
@@ -25,26 +25,15 @@
   margin-bottom: var(--spacing-2xl);
 }
 
-.emptyTitle {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-lg);
-}
+.emptyTitle { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--token-text); margin-bottom: var(--token-space-4); }
 
-.emptyDescription {
-  font-size: var(--font-size-base);
-  color: var(--text-secondary);
-  line-height: var(--line-height-relaxed);
-  max-width: 400px;
-  margin: 0 auto;
-}
+.emptyDescription { font-size: var(--font-size-base); color: var(--token-muted); line-height: var(--line-height-relaxed); max-width: 400px; margin: 0 auto; }
 
 /* Responsive styles */
 @media (max-width: 768px) {
   .recipesList.grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: var(--spacing-lg);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--token-space-4);
   }
   
   .emptyIcon {
@@ -65,3 +54,29 @@
     grid-template-columns: 1fr;
   }
 } 
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.banner {
+  background: linear-gradient(90deg, var(--token-neutral-50), var(--token-accent-100, #e0e7ff));
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-lg);
+  padding: var(--token-space-4);
+}
+
+.bannerContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bannerTitle { margin: 0 0 4px 0; font-size: var(--token-text-lg); color: var(--token-text); }
+
+.bannerSubtitle { margin: 0; color: var(--token-muted); font-size: var(--token-text-sm); }
+
+.bannerButton { background: var(--token-text); color: var(--token-neutral-0); border: none; border-radius: var(--token-radius-full); padding: 10px 16px; cursor: pointer; }
+
+.bannerButton:hover { filter: brightness(0.95); }

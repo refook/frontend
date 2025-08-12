@@ -1,0 +1,42 @@
+/* Библиотека UI-классов на токенах */
+
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid var(--token-border);
+  background: var(--token-surface);
+  color: var(--token-text);
+  box-shadow: var(--token-shadow-sm);
+  cursor: pointer;
+  transition: filter var(--token-duration-fast), background var(--token-duration-fast), border-color var(--token-duration-fast);
+}
+
+.ui-btn:hover { filter: brightness(0.98); }
+.ui-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ui-btn--primary { background: var(--token-accent); color: var(--token-neutral-0); border-color: transparent; }
+.ui-btn--primary:hover { filter: brightness(0.96); }
+
+.ui-btn--ghost { background: transparent; border-color: var(--token-border); }
+
+.ui-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid var(--token-border);
+  background: var(--token-bg);
+  color: var(--token-text);
+  box-shadow: var(--token-shadow-sm);
+  transition: border-color var(--token-duration-fast), box-shadow var(--token-duration-fast);
+  box-sizing: border-box;
+}
+
+.ui-input:focus { outline: none; border-color: var(--token-accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--token-accent) 20%, transparent); }
+
+

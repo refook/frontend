@@ -6,8 +6,10 @@ import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage} f
 import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
+import { useInitializeTheme } from './hooks/useInitializeTheme';
 
 function App() {
+    useInitializeTheme();
     return (
         <>
             <Layout>
