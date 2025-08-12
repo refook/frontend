@@ -5,144 +5,130 @@ import type { CreateRecipeDto } from '../../types/recipe.types';
 import { 
   ClockIcon, 
   UserIcon, 
-  StarIcon
+  StarIcon, 
+  HeartIcon,
+  BookmarkIcon
 } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import styles from './RecipeCard.module.css';
 
 interface RecipeCardProps {
   recipe: Recipe | CreateRecipeDto;
   viewMode?: 'grid' | 'list';
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, viewMode = 'grid' }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ 
+  recipe, 
+  viewMode = 'grid'
+}) => {
+  // Определяем, является ли recipe объектом CreateRecipeDto
   const isFormData = 'portion' in recipe && 'allTime' in recipe;
-
-  const getDifficultyLabel = (
-    difficulty: Recipe['difficulty'] | CreateRecipeDto['level']
-  ) => {
-    if (difficulty === 'EASY' || difficulty === 'easy') return 'Легко';
-    if (difficulty === 'MEDIUM' || difficulty === 'medium') return 'Средне';
-    if (difficulty === 'HARD' || difficulty === 'hard') return 'Сложно';
-    return 'Неизвестно';
+  const getDifficultyLabel = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
+    if (difficulty === 'EASY') return 'Легко';
+    if (difficulty === 'MEDIUM') return 'Средне';
+    if (difficulty === 'HARD') return 'Сложно';
+    switch (difficulty) {
+      case 'easy': return 'Легко';
+      case 'medium': return 'Средне';
+      case 'hard': return 'Сложно';
+      default: return 'Неизвестно';
+    }
   };
 
-  const getDifficultyBadgeClasses = (
-    difficulty: Recipe['difficulty'] | CreateRecipeDto['level']
-  ) => {
-    if (difficulty === 'EASY' || difficulty === 'easy') return 'bg-green-100 text-green-800';
-    if (difficulty === 'MEDIUM' || difficulty === 'medium') return 'bg-yellow-100 text-yellow-800';
-    if (difficulty === 'HARD' || difficulty === 'hard') return 'bg-red-100 text-red-800';
-    return 'bg-gray-100 text-gray-800';
+  const getDifficultyColor = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
+    if (difficulty === 'EASY') return '#10b981';
+    if (difficulty === 'MEDIUM') return '#f59e0b';
+    if (difficulty === 'HARD') return '#ef4444';
+    switch (difficulty) {
+      case 'easy': return '#10b981';
+      case 'medium': return '#f59e0b';
+      case 'hard': return '#ef4444';
+      default: return '#6b7280';
+    }
   };
 
-  const formatMinutes = (minutes: number) => {
-    if (!minutes || minutes <= 0) return '—';
+  // Конвертируем время из минут в читаемый формат
+  const formatTime = (minutes: number) => {
     if (minutes < 60) return `${minutes} мин`;
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return mins > 0 ? `${hours} ч ${mins} мин` : `${hours} ч`;
   };
 
-  // Источники времени: у формы allTime/cookTime в минутах, у Recipe prep/cook в секундах
-  const totalMinutes = isFormData
-    ? (recipe.allTime || 0)
-    : Math.round(((recipe.prepTime || 0) + (recipe.cookTime || 0)) / 60);
-  const activeMinutes = isFormData
-    ? (recipe.cookTime || 0)
-    : Math.round((recipe.prepTime || 0) / 60);
-  const servingsCount = isFormData ? (recipe.portion || 4) : (recipe.servings || 4);
+  // Логируем входящие данные для отладки
+  console.log('Recipe data:', recipe);
+  console.log('Is form data:', isFormData);
 
-  const title = isFormData ? recipe.name : recipe.title;
-  const difficulty = isFormData ? (recipe.level as any) : (recipe.difficulty as any);
+  // Получаем значения в зависимости от типа данных
+  const prepTime = isFormData ? recipe.allTime : (recipe.prepTime || 0);
+  const cookTime = isFormData ? recipe.cookTime : (recipe.cookTime || 0);
+  const servingsCount = isFormData ? (recipe.portion || 4) : (recipe.servings || 4); // Используем дефолтное значение 4 порции
 
-  const CardInner = (
-    <div className="w-full bg-gray-50 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="px-6 pt-6">
-        <h3 className="text-lg font-semibold text-gray-800 m-0">{title}</h3>
-      </div>
+  console.log('Calculated values:', { prepTime, cookTime, servingsCount });
+  
+  const totalTime = formatTime(prepTime + cookTime);
 
-      <div className="px-6 pb-6 space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="flex items-center gap-2 bg-white p-3 rounded-xl border border-gray-200">
-            <StarIcon className="w-5 h-5 text-gray-600" />
-            <div>
-              <p className="text-xs text-gray-500">Сложность</p>
-              <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${getDifficultyBadgeClasses(difficulty)}`}>
-                {getDifficultyLabel(difficulty)}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white p-3 rounded-xl border border-gray-200">
-            <ClockIcon className="w-5 h-5 text-gray-600" />
-            <div>
-              <p className="text-xs text-gray-500">Всего</p>
-              <p className="font-medium text-gray-800">{formatMinutes(totalMinutes)}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white p-3 rounded-xl border border-gray-200">
-            <ClockIcon className="w-5 h-5 text-gray-600" />
-            <div>
-              <p className="text-xs text-gray-500">Активно</p>
-              <p className="font-medium text-gray-800">{formatMinutes(activeMinutes)}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white p-3 rounded-xl border border-gray-200">
-            <UserIcon className="w-5 h-5 text-gray-600" />
-            <div>
-              <p className="text-xs text-gray-500">Порций</p>
-              <p className="font-medium text-gray-800">{servingsCount}</p>
+  return (
+    <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
+      <Link to={`/recipe/${isFormData ? '' : recipe.id}`} className={styles.cardLink}>
+        <div className={styles.imageContainer}>
+          <img 
+            src={isFormData ? (recipe.photos?.[0] ? `/api/v1/photo/${recipe.photos[0]}` : '/api/placeholder/300/200') : (recipe.image || '/api/placeholder/300/200')}
+            alt={isFormData ? recipe.name : recipe.title}
+            className={styles.image}
+          />
+          <div className={styles.overlay}>
+            <div className={styles.actions}>
+              <button className={styles.actionBtn}>
+                <HeartIcon className={styles.icon} />
+              </button>
+              <button className={styles.actionBtn}>
+                <BookmarkIcon className={styles.icon} />
+              </button>
             </div>
           </div>
         </div>
-
-        {!isFormData && Array.isArray((recipe as Recipe).ingredients) && (recipe as Recipe).ingredients.length > 0 && (
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <h4 className="text-gray-800 mb-3 text-base">Ингредиенты</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {(recipe as Recipe).ingredients.slice(0, 8).map((ingredient, idx) => (
-                <div key={`${ingredient.id}-${idx}`} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">{ingredient.name}</p>
-                    <p className="text-xs text-gray-500">{ingredient.count} {ingredient.measure}</p>
-                  </div>
-                </div>
-              ))}
+        
+        <div className={styles.content}>
+          <h3 className={styles.title}>{isFormData ? recipe.name : recipe.title}</h3>
+          <p className={styles.description}>{recipe.description}</p>
+          
+          <div className={styles.meta}>
+            <div className={styles.metaItem}>
+              <ClockIcon className={styles.metaIcon} />
+              <span>{totalTime}</span>
+            </div>
+            <div className={styles.metaItem}>
+              <UserIcon className={styles.metaIcon} />
+              <span>{servingsCount} порций</span>
+            </div>
+            <div className={styles.metaItem}>
+              <StarIcon 
+                className={styles.metaIcon} 
+                style={{ color: getDifficultyColor(isFormData ? recipe.level : recipe.difficulty) }}
+              />
+              <span>{getDifficultyLabel(isFormData ? recipe.level : recipe.difficulty)}</span>
             </div>
           </div>
-        )}
+          
+          <div className={styles.footer}>
+            {recipe.tags && recipe.tags.length > 0 && (
+              <div className={styles.tags}>
+                {recipe.tags.slice(0, 3).map((tag, index) => (
+                  <span key={index} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))}
+                {recipe.tags.length > 3 && (
+                  <span className={styles.moreTag}>+{recipe.tags.length - 3}</span>
+                )}
+              </div>
+            )}
 
-        {recipe.tags && recipe.tags.length > 0 && (
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <h4 className="text-gray-800 mb-3 text-base">Теги</h4>
-            <div className="flex flex-wrap gap-2">
-              {recipe.tags.slice(0, 10).map((tag, index) => (
-                <span
-                  key={`${tag}-${index}`}
-                  className="bg-gray-100 text-gray-700 hover:bg-gray-200 border-0 rounded-full px-3 py-1 text-xs font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+
           </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const hasId = !isFormData && (recipe as Recipe).id;
-
-  return (
-    <div className={viewMode === 'list' ? 'w-full' : 'w-full'}>
-      {hasId ? (
-        <Link to={`/recipe/${(recipe as Recipe).id}`} className="no-underline text-inherit">
-          {CardInner}
-        </Link>
-      ) : (
-        CardInner
-      )}
+        </div>
+      </Link>
     </div>
   );
 };

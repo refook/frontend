@@ -23,8 +23,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"],
-  "exclude": [
-    "src/components/_New_Design/**"
-  ]
+  "include": ["src"]
 }
