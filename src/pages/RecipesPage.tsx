@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { SparklesIcon } from '@heroicons/react/24/solid';
 import { useAppDispatch, useAppSelector } from '../store';
-import { setPage } from '../store/slices/recipesSlice';
+import { setPage, setFilters, setSort } from '../store/slices/recipesSlice';
+import { QUICK_FILTERS, type QuickFilterId, toggleWithGroups, computeSelection } from '../config/recipeQuickFilters';
+import { QuickFiltersBar } from '../components/QuickFiltersBar';
 import { fetchRecipes } from '../store/thunks';
-import FiltersPanel from '../components/FiltersPanel/FiltersPanel';
 import RecipesList from '../components/RecipesList/RecipesList';
 import LoadMoreButton from '../components/LoadMoreButton/LoadMoreButton';
 import styles from './RecipesPage.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const RecipesPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { items, loading, error, filters, sort, pagination } = useAppSelector(state => state.recipes);
-  const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(filters.search ?? '');
+  const [aiMode, setAiMode] = useState(false);
+  const [showAddFilters, setShowAddFilters] = useState(false);
 
   // Загружаем рецепты при изменении фильтров или сортировки
   useEffect(() => {
@@ -27,70 +33,97 @@ const RecipesPage: React.FC = () => {
     dispatch(setPage(nextPage));
   };
 
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
+  const onSubmitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(setFilters({ ...filters, search: searchQuery }));
   };
+
+  const [activeFilters, setActiveFilters] = useState<Set<QuickFilterId>>(new Set());
+
+  const applyQuickFilter = (type: QuickFilterId) => {
+    const next = toggleWithGroups(activeFilters, type);
+    setActiveFilters(next);
+    const applied = computeSelection(next, { filters, sort });
+    dispatch(setFilters(applied.filters));
+    dispatch(setSort(applied.sort));
+  };
+
+  const resultsText = useMemo(() => {
+    return `Найдено ${pagination.total} рецептов`;
+  }, [pagination.total]);
 
   return (
     <div className={styles.recipesPage}>
       <div className="container">
-        <div className={styles.header}>
-          <h1 className={styles.title}>Все рецепты</h1>
-          <button 
-            className={styles.filtersToggle}
-            onClick={toggleFilters}
-          >
-            <span className={styles.filterIcon}>⚙️</span>
-            Фильтры
-          </button>
+        {/* Центрированный заголовок */}
+        <div className={styles.pageHeader}>
+          <h1 className={styles.pageTitleNew}>Коллекция рецептов</h1>
+          <p className={styles.pageSubtitle}>Откройте для себя удивительные рецепты со всего мира.</p>
         </div>
 
-        <div className={styles.content}>
-          <FiltersPanel 
-            isOpen={showFilters}
-            onClose={() => setShowFilters(false)}
-          />
-          
-          <div className={styles.mainContent}>
-            <div className={styles.resultsHeader}>
-              <p className={styles.resultsCount}>
-                Найдено {pagination.total} рецептов
-              </p>
-              <div className={styles.viewToggle}>
-                <button className={`${styles.viewButton} ${styles.active}`}>
-                  <span>📋</span>
-                </button>
-                <button className={styles.viewButton}>
-                  <span>🔳</span>
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div className={styles.error}>
-                <p>Ошибка загрузки рецептов: {error}</p>
-                <button 
-                  onClick={() => dispatch(fetchRecipes({ page: 1, limit: pagination.limit, filters, sort }))} 
-                  className={styles.retryButton}
-                >
-                  Попробовать снова
-                </button>
-              </div>
-            )}
-
-            <RecipesList 
-              recipes={items}
-              loading={loading}
+        {/* Поисковая панель с кнопкой ИИ */}
+        <form onSubmit={onSubmitSearch} className={styles.searchForm}>
+          <div className={`${aiMode ? styles.searchGroupAi : styles.searchGroup}`}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={aiMode ? 'Опишите блюдо, а мы умно подберем фильтры…' : 'Опишите, что хотите приготовить...'}
+              className={`ui-input ${styles.searchInput} ${aiMode ? styles.searchInputAi : ''}`}
             />
-
-            {pagination.hasMore && (
-              <LoadMoreButton 
-                onClick={loadMoreRecipes}
-                loading={loading}
-              />
-            )}
+            <div className={styles.searchActions}>
+              <button
+                type="button"
+                onClick={() => setAiMode(v => !v)}
+                className={`${styles.aiToggle} ${aiMode ? styles.aiToggleActive : ''}`}
+                aria-label="ИИ поиск"
+                title={aiMode ? 'Отключить ИИ поиск' : 'Включить ИИ поиск'}
+              >
+                <SparklesIcon width={22} height={22} aria-hidden />
+              </button>
+            </div>
           </div>
+        </form>
+
+        {/* Быстрые фильтры */}
+        <QuickFiltersBar
+          activeFilters={activeFilters}
+          filters={filters}
+          sort={sort}
+          onChange={(selected, applied) => {
+            setActiveFilters(selected);
+            dispatch(setFilters(applied.filters));
+            dispatch(setSort(applied.sort));
+          }}
+        />
+
+        <div className={styles.resultsBar}>
+          <p className={styles.resultsTextNew}>{resultsText}</p>
         </div>
+
+        {error && (
+          <div className={styles.error}>
+            <p>Ошибка загрузки рецептов: {error}</p>
+            <button
+              onClick={() => dispatch(fetchRecipes({ page: 1, limit: pagination.limit, filters, sort }))}
+              className={styles.retryButton}
+            >
+              Попробовать снова
+            </button>
+          </div>
+        )}
+
+        <RecipesList
+          recipes={items}
+          loading={loading}
+        />
+
+        {pagination.hasMore && (
+          <LoadMoreButton
+            onClick={loadMoreRecipes}
+            loading={loading}
+          />
+        )}
       </div>
     </div>
   );

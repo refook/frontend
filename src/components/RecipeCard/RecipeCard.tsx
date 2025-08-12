@@ -23,6 +23,17 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
 }) => {
   // Определяем, является ли recipe объектом CreateRecipeDto
   const isFormData = 'portion' in recipe && 'allTime' in recipe;
+  const seedString = isFormData ? (recipe.name ?? '') : (recipe.title ?? '');
+  const foodEmojis = ['🍕','🍔','🍣','🍜','🍩','🍰','🥗','🍤','🍝','🌮','🥞','🍗','🍇','🥑','🥐','🍪','🥙','🍲','🧁','🍓'];
+  const hashString = (s: string) => {
+    let h = 0;
+    for (let i = 0; i < s.length; i += 1) {
+      h = (h << 5) - h + s.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h);
+  };
+  const fallbackEmoji = foodEmojis[hashString(seedString) % foodEmojis.length];
   const getDifficultyLabel = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
     if (difficulty === 'EASY') return 'Легко';
     if (difficulty === 'MEDIUM') return 'Средне';
@@ -72,11 +83,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
     <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
       <Link to={`/recipe/${isFormData ? '' : recipe.id}`} className={styles.cardLink}>
         <div className={styles.imageContainer}>
-          <img 
-            src={isFormData ? (recipe.photos?.[0] ? `/api/v1/photo/${recipe.photos[0]}` : '/api/placeholder/300/200') : (recipe.image || '/api/placeholder/300/200')}
-            alt={isFormData ? recipe.name : recipe.title}
-            className={styles.image}
-          />
+          {(
+            (isFormData && recipe.photos?.[0]) || (!isFormData && (recipe as Recipe).image)
+          ) ? (
+            <img 
+              src={isFormData ? `/api/v1/photo/${(recipe as CreateRecipeDto).photos?.[0]}` : ((recipe as Recipe).image as string)}
+              alt={isFormData ? (recipe as CreateRecipeDto).name : (recipe as Recipe).title}
+              className={styles.image}
+            />
+          ) : (
+            <div className={styles.placeholder} aria-label="placeholder">
+              <span className={styles.placeholderEmoji}>{fallbackEmoji}</span>
+            </div>
+          )}
           <div className={styles.overlay}>
             <div className={styles.actions}>
               <button className={styles.actionBtn}>

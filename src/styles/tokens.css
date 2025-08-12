@@ -1,0 +1,84 @@
+:root {
+  /* Neutral scale */
+  --token-neutral-0: #ffffff;
+  --token-neutral-50: #f9fafb;
+  --token-neutral-100: #f3f4f6;
+  --token-neutral-200: #e5e7eb;
+  --token-neutral-300: #d1d5db;
+  --token-neutral-400: #9ca3af;
+  --token-neutral-500: #6b7280;
+  --token-neutral-600: #4b5563;
+  --token-neutral-700: #374151;
+  --token-neutral-800: #1f2937;
+  --token-neutral-900: #111827;
+
+  /* Accent (indigo) */
+  --token-accent-50: #eef2ff;
+  --token-accent-100: #e0e7ff;
+  --token-accent-200: #c7d2fe;
+  --token-accent-300: #a5b4fc;
+  --token-accent-400: #818cf8;
+  --token-accent-500: #6366f1;
+  --token-accent-600: #4f46e5;
+  --token-accent-700: #4338ca;
+  --token-accent-800: #3730a3;
+  --token-accent-900: #312e81;
+
+  /* Secondary (purple for glow) */
+  --token-purple-300: #d8b4fe;
+  --token-purple-600: #7c3aed;
+
+  /* Spacing scale */
+  --token-space-2: 8px;
+  --token-space-3: 12px;
+  --token-space-4: 16px;
+  --token-space-6: 24px;
+  --token-space-8: 32px;
+
+  /* Radius */
+  --token-radius-sm: 8px;
+  --token-radius-md: 12px;
+  --token-radius-lg: 16px;
+  --token-radius-full: 9999px;
+
+  /* Typography */
+  --token-font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --token-text-sm: 14px;
+  --token-text-base: 16px;
+  --token-text-lg: 18px;
+  --token-text-xl: 20px;
+  --token-text-3xl: 30px;
+  --token-leading-normal: 1.5;
+
+  /* Shadows */
+  --token-shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --token-shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+
+  /* Transitions */
+  --token-duration-fast: 150ms;
+  --token-duration-normal: 300ms;
+
+  /* Semantic tokens */
+  --token-bg: var(--token-neutral-0);
+  --token-surface: var(--token-neutral-50);
+  --token-text: var(--token-neutral-900);
+  --token-muted: var(--token-neutral-600);
+  --token-border: var(--token-neutral-200);
+  --token-accent: var(--token-accent-600);
+  --token-accent-strong: var(--token-accent-700);
+  --token-accent-weak: var(--token-accent-100);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --token-bg: var(--token-neutral-900);
+  --token-surface: var(--token-neutral-800);
+  --token-text: var(--token-neutral-100);
+  --token-muted: var(--token-neutral-400);
+  --token-border: var(--token-neutral-700);
+  --token-accent: var(--token-accent-400);
+  --token-accent-strong: var(--token-accent-500);
+  --token-accent-weak: var(--token-accent-800);
+}
+
+

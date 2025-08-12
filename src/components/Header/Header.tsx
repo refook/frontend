@@ -1,5 +1,5 @@
-import React, {useContext, useState} from 'react';
-import { Link } from 'react-router-dom';
+import React, {useContext, useEffect, useState} from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setTheme } from '../../store/slices/uiSlice';
 import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -9,7 +9,6 @@ import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
 const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useAppSelector((state) => state.ui);
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const context = useContext(KeycloakContext);
@@ -18,18 +17,70 @@ const Header: React.FC = () => {
     throw new Error('KeycloakContext must be used within a KeycloakProvider');
   }
 
-  const {authenticated, user, login, logout, register, keycloak} = context;
+  const { authenticated, user, login, logout, register } = context;
 
   const toggleTheme = () => {
     dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
   };
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen((prev) => !prev);
   };
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  // Close on route change, ESC, and on desktop resize; lock body scroll when open
+  const location = useLocation();
+  useEffect(() => {
+    closeMobileMenu();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeMobileMenu();
+      }
+    };
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        closeMobileMenu();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const body = document.body;
+    if (isMobileMenuOpen) {
+      const previousOverflow = body.style.overflow;
+      body.style.overflow = 'hidden';
+      return () => {
+        body.style.overflow = previousOverflow;
+      };
+    }
+    return;
+  }, [isMobileMenuOpen]);
+
+  const handleLogin = () => {
+    closeMobileMenu();
+    login();
+  };
+
+  const handleRegister = () => {
+    closeMobileMenu();
+    register();
+  };
+
+  const handleLogout = () => {
+    closeMobileMenu();
+    logout();
   };
 
   return (
@@ -82,19 +133,19 @@ const Header: React.FC = () => {
                   className={styles.avatar}
                 />
               )}
-              <div onClick={logout} className={styles.loginButton}>
+              <button onClick={handleLogout} className="ui-btn ui-btn--ghost">
                 Выйти
-              </div>
+              </button>
             </div>
           ) : (
 
             <div className={styles.authButtons}>
-              <div onClick={login} className={styles.loginButton}>
+              <button onClick={handleLogin} className="ui-btn ui-btn--ghost">
                 Войти
-              </div>
-              <div onClick={register} className={styles.registerButton}>
+              </button>
+              <button onClick={handleRegister} className="ui-btn ui-btn--primary">
                 Регистрация
-              </div>
+              </button>
             </div>
           )}
 
@@ -103,6 +154,8 @@ const Header: React.FC = () => {
             className={styles.mobileMenuButton}
             onClick={toggleMobileMenu}
             aria-label={isMobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobileMenu"
           >
             {isMobileMenuOpen ? (
               <XMarkIcon className={styles.icon} />
@@ -114,7 +167,16 @@ const Header: React.FC = () => {
       </div>
 
       {/* Mobile Navigation Menu */}
-      <div className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}>
+      <div
+        id="mobileMenu"
+        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Мобильное меню навигации"
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') closeMobileMenu();
+        }}
+      >
         <nav className={styles.mobileNav}>
           <Link to="/recipes" className={styles.mobileNavLink} onClick={closeMobileMenu}>
             Рецепты
@@ -132,7 +194,7 @@ const Header: React.FC = () => {
 
         {/* Mobile User section */}
         <div className={styles.mobileUserSection}>
-          {isAuthenticated ? (
+          {authenticated ? (
             <div className={styles.mobileUserInfo}>
               <span className={styles.mobileUserName}>{user?.name}</span>
               {user?.avatar && (
@@ -142,19 +204,19 @@ const Header: React.FC = () => {
                   className={styles.mobileAvatar}
                 />
               )}
-              <div onClick={logout} className={styles.loginButton}>
+              <button onClick={handleLogout} className="ui-btn ui-btn--ghost">
                 Выйти
-              </div>
+              </button>
             </div>
           ) : (
-              <div className={styles.authButtons}>
-                <div onClick={login} className={styles.loginButton}>
-                  Войти
-                </div>
-                <div onClick={register} className={styles.registerButton}>
-                  Регистрация
-                </div>
-              </div>
+            <div className={styles.mobileAuthButtons}>
+              <button onClick={handleLogin} className="ui-btn ui-btn--ghost">
+                Войти
+              </button>
+              <button onClick={handleRegister} className="ui-btn ui-btn--primary">
+                Регистрация
+              </button>
+            </div>
           )}
         </div>
       </div>

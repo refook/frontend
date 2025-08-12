@@ -18,7 +18,7 @@ interface Notification {
 }
 
 const initialState: UiState = {
-  theme: 'light',
+  theme: (localStorage.getItem('theme') as ThemeMode) || 'light',
   sidebarOpen: false,
   loading: false,
   notifications: [],
@@ -31,6 +31,7 @@ const uiSlice = createSlice({
     setTheme: (state, action: PayloadAction<ThemeMode>) => {
       state.theme = action.payload;
       document.documentElement.setAttribute('data-theme', action.payload);
+      localStorage.setItem('theme', action.payload);
     },
     toggleSidebar: (state) => {
       state.sidebarOpen = !state.sidebarOpen;
