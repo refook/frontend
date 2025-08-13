@@ -5,6 +5,19 @@ import { KeycloakContext } from '../providers/KeycloakProvider';
 import { useNotification } from '../hooks/useNotification';
 import Notification from '../components/Notification/Notification';
 
+/**
+ * Тип локального драфта профиля, который редактируется на странице.
+ * Значения сохраняются в localStorage как заглушка вместо API.
+ *
+ * @property name Имя пользователя
+ * @property email Email пользователя
+ * @property bio Короткое описание «О себе»
+ * @property location Город/страна
+ * @property website Ссылка на сайт/соцсеть
+ * @property language Язык интерфейса (ru | en)
+ * @property notifications Настройки уведомлений (email/push)
+ * @property avatarUrl Необязательный URL превью аватара (blob URL)
+ */
 type ProfileDraft = {
   name: string;
   email: string;
@@ -18,6 +31,12 @@ type ProfileDraft = {
 
 const STORAGE_KEY = 'refook_user_profile_draft';
 
+/**
+ * Страница ProfilePage — редактирование профиля пользователя.
+ * Реализована как заглушка без бэкенда: состояние хранится и восстанавливается из localStorage.
+ * Поддерживает загрузку аватара (через ImageUpload), основные поля и пользовательские настройки.
+ * Показ уведомлений осуществляется через хук useNotification.
+ */
 const ProfilePage: React.FC = () => {
   const context = useContext(KeycloakContext);
   const { notification, showSuccess, showError, hideNotification } = useNotification();
