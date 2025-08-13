@@ -1,0 +1,27 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--token-bg);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-full);
+  color: var(--token-text);
+}
+
+.emojiWrap {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--token-radius-full);
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  font-size: 14px;
+}
+
+.label { font-size: var(--token-text-sm); color: var(--token-text); }
+.amount { font-size: var(--token-text-sm); color: var(--token-muted); }
+
+

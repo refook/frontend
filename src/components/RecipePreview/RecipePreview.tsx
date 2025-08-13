@@ -10,7 +10,14 @@ import {
   PencilIcon,
   CheckIcon
 } from '@heroicons/react/24/outline';
+import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
+import NutritionInfo from '../NutritionInfo/NutritionInfo';
+import IngredientsSection from '../IngredientsSection/IngredientsSection';
+import HeroCard from '../HeroCard/HeroCard';
+import Chip from '../Chip/Chip';
+import StepsSection from '../StepsSection/StepsSection';
 import styles from './RecipePreview.module.css';
+import InfoCard from '../InfoCard/InfoCard';
 
 interface RecipePreviewProps {
   formData?: CreateRecipeDto;
@@ -75,64 +82,77 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     hard: 'var(--color-danger)'
   };
 
+  // Временные эмодзи для ингредиентов шага (UI-чипов)
+  const stepFoodEmojis = ['🍗','🥖','🍅','🥒','🧅','🧀','🫒','🍋','🍚','🥔','🍄','🥚','🌶️','🧄'];
+  const getEmoji = (key: string): string => {
+    let hash = 0; for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+    return stepFoodEmojis[hash % stepFoodEmojis.length];
+  };
+
+  type NormalizedIngredient = { id: string; name: string; amount: string };
+  const normalizeIngredient = (ingredient: CreateRecipeIngredientDto | RecipeIngredientDto): NormalizedIngredient => {
+    if (isFormData) {
+      const ing = ingredient as CreateRecipeIngredientDto;
+      const ai = availableIngredients.find(i => i.id === ing.id);
+      const name = ai?.name || 'Ингредиент';
+      return { id: `form:${ing.id}:${ing.measure}:${ing.count}`, name, amount: `${ing.count} ${ing.measure.toLowerCase()}` };
+    } else {
+      const ing = ingredient as RecipeIngredientDto;
+      const name = ing.name || 'Ингредиент';
+      return { id: `api:${ing.id}`, name, amount: `${ing.count} ${ing.measure.toLowerCase()}` };
+    }
+  };
+
+  // Локальные состояния для старой реализации ингредиентов больше не используются
+  // Оставлены только для совместимости normalizeIngredient → IngredientsSection
+  const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
+  const recipeTitle = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
+
   return (
     <div className={styles.recipePreview}>
       <div className={styles.previewContainer}>
-        {/* Заголовок */}
-        <div className={styles.header}>
-          <h1 className={styles.title}>
-            {title || 'Название рецепта'}
-          </h1>
-          <p className={styles.description}>
-            {description || 'Описание рецепта'}
-          </p>
-        </div>
+        <HeroCard
+          title={title || 'Название рецепта'}
+          description={description || 'Описание рецепта'}
+          rating={!isFormData && (data as Recipe).stats?.rating ? (data as Recipe).stats!.rating : 4.8}
+          author={(isFormData ? 'Автор рецепта' : (data as Recipe).author?.name) || 'Автор'}
+        />
 
         {/* Основная информация */}
-        <div className={styles.metadata}>
-          <div className={styles.metaItem}>
-            <ClockIcon className={styles.metaIcon} />
-            <span className={styles.metaText}>
-              {totalTime} мин
-            </span>
-          </div>
-          
-          <div className={styles.metaItem}>
-            <UserGroupIcon className={styles.metaIcon} />
-            <span className={styles.metaText}>
-              {servings} порций
-            </span>
-          </div>
-          
-          <div className={styles.metaItem}>
-            <StarIcon 
-              className={styles.metaIcon} 
-              style={{ color: difficultyColor[difficulty] }}
-            />
-            <span className={styles.metaText}>
-              {difficultyMap[difficulty]}
-            </span>
-          </div>
-          
-          {cuisine && (
-            <div className={styles.metaItem}>
-              <span className={styles.cuisine}>
-                {cuisine}
+        <div className={styles.infoGrid}>
+          <InfoCard
+            icon={<StarIcon className={styles.infoIcon} />}
+            label="Сложность"
+            value={
+              <span
+                className={styles.difficultyBadge}
+                style={{
+                  color: difficultyColor[difficulty],
+                  background: `color-mix(in oklab, ${difficultyColor[difficulty]} 18%, transparent)`
+                }}
+              >
+                {difficultyMap[difficulty]}
               </span>
-            </div>
-          )}
+            }
+          />
+          <InfoCard
+            icon={<ClockIcon className={styles.infoIcon} />}
+            label="Общее время"
+            value={<span>{totalTime} мин</span>}
+          />
+          <InfoCard
+            icon={<ClockIcon className={styles.infoIcon} />}
+            label="Активное время"
+            value={<span>{cookTime} мин</span>}
+          />
+          <InfoCard
+            icon={<UserGroupIcon className={styles.infoIcon} />}
+            label="Порции"
+            value={<span>{servings}</span>}
+          />
         </div>
 
-        {/* Изображение */}
-        {photos && photos.length > 0 && (
-          <div className={styles.imageContainer}>
-            <img 
-              src={`/api/v1/photo/${photos[0]}`}
-              alt={title}
-              className={styles.image}
-            />
-          </div>
-        )}
+        
 
         {/* Теги */}
         {tags && tags.length > 0 && (
@@ -150,95 +170,21 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
 
         <div className={styles.contentGrid}>
           {/* Ингредиенты */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              Ингредиенты ({ingredients.length})
-            </h3>
-            {ingredients.length > 0 ? (
-              <ul className={styles.ingredientsList}>
-                {ingredients.map((ingredient, index) => (
-                  <li key={index} className={styles.ingredient}>
-                    <span className={styles.ingredientName}>
-                      {isFormData 
-                        ? availableIngredients.find(i => i.id === (ingredient as CreateRecipeIngredientDto).id)?.name || 'Ингредиент'
-                        : (ingredient as RecipeIngredientDto).name || 'Ингредиент'
-                      }
-                    </span>
-                    <span className={styles.ingredientAmount}>
-                      {isFormData 
-                        ? `${(ingredient as CreateRecipeIngredientDto).count} ${(ingredient as CreateRecipeIngredientDto).measure.toLowerCase()}`
-                        : `${(ingredient as RecipeIngredientDto).count} ${(ingredient as RecipeIngredientDto).measure.toLowerCase()}`
-                      }
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.emptyState}>
-                {isFormData ? 'Добавьте ингредиенты для отображения' : 'Нет ингредиентов'}
-              </p>
-            )}
-          </div>
+          <IngredientsSection
+            title={title || 'Рецепт'}
+            baseServings={Number(servings) || 1}
+            ingredients={ingredients.map((ing: any) => normalizeIngredient(ing))}
+          />
+
+          {/* Пищевая ценность (заглушка) */}
+          <NutritionInfo expanded={showNutritionDetails} onToggle={() => setShowNutritionDetails(v => !v)} />
 
           {/* Шаги приготовления */}
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>
-              Приготовление ({steps.length} шагов)
-            </h3>
-            {steps.length > 0 ? (
-              <div className={styles.steps}>
-                {steps.map((step, index) => (
-                  <div key={index} className={styles.step}>
-                    <div className={styles.stepNumber}>
-                      {index + 1}
-                    </div>
-                    <div className={styles.stepContent}>
-                      {step.name && (
-                        <h4 className={styles.stepTitle}>{step.name}</h4>
-                      )}
-                      <p className={styles.stepDescription}>
-                        {step.description || 'Описание шага'}
-                      </p>
-                      {step.ingredients && step.ingredients.length > 0 && (
-                        <div className={styles.stepIngredients}>
-                          <h5 className={styles.stepIngredientsTitle}>Ингредиенты шага</h5>
-                          <ul className={styles.stepIngredientsList}>
-                            {step.ingredients.map((ing, i) => (
-                              <li key={i} className={styles.stepIngredient}>
-                                <span className={styles.stepIngredientName}>
-                                  {isFormData
-                                    ? (availableIngredients.find(ai => ai.id === (ing as CreateRecipeIngredientDto).id)?.name || 'Ингредиент')
-                                    : (ing as RecipeIngredientDto).name}
-                                </span>
-                                <span className={styles.stepIngredientAmount}>
-                                  {isFormData
-                                    ? `${(ing as CreateRecipeIngredientDto).count} ${(ing as CreateRecipeIngredientDto).measure.toLowerCase()}`
-                                    : `${(ing as RecipeIngredientDto).count} ${(ing as RecipeIngredientDto).measure.toLowerCase()}`}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {step.photos && step.photos.length > 0 && (
-                        <div className={styles.stepImage}>
-                          <img 
-                            src={`/api/v1/photo/${step.photos[0]}`}
-                            alt={`Шаг ${index + 1}`}
-                            className={styles.stepImg}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className={styles.emptyState}>
-                {isFormData ? 'Добавьте шаги приготовления' : 'Нет шагов'}
-              </p>
-            )}
-          </div>
+          <StepsSection
+            steps={steps}
+            isFormData={isFormData}
+            getIngredientName={(id: string) => availableIngredients.find(ai => ai.id === id)?.name}
+          />
         </div>
 
         {/* Дополнительная информация */}
