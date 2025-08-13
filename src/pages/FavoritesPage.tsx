@@ -3,7 +3,7 @@ import styles from './FavoritesPage.module.css';
 import RecipeCard from '../components/RecipeCard/RecipeCard';
 import type { Recipe } from '../types';
 import { initialRecipes } from '../data/initialRecipes';
-import { PlusIcon, PencilSquareIcon, TrashIcon, Squares2X2Icon, ListBulletIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilSquareIcon, TrashIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 
 type FavoriteGroup = {
   id: string;
@@ -17,7 +17,7 @@ const FavoritesPage: React.FC = () => {
   const [groups, setGroups] = useState<FavoriteGroup[]>([]);
   const [activeGroupId, setActiveGroupId] = useState<string>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  // Только режим сетки
   const [selectedToAdd, setSelectedToAdd] = useState<Record<string, boolean>>({});
 
   // Инициализация из localStorage
@@ -126,14 +126,6 @@ const FavoritesPage: React.FC = () => {
       <div className={styles.headerRow}>
         <h1 className={styles.title}>Избранное</h1>
         <div className={styles.headerActions}>
-          <button className="ui-btn" onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}>
-            {viewMode === 'grid' ? <ListBulletIcon className={styles.icon} /> : <Squares2X2Icon className={styles.icon} />}
-            {viewMode === 'grid' ? 'Список' : 'Сетка'}
-          </button>
-          <button className="ui-btn ui-btn--primary" onClick={createGroup}>
-            <PlusIcon className={styles.icon} />
-            Новая группа
-          </button>
           <button className="ui-btn" onClick={openAddModal}>
             <ArrowDownTrayIcon className={styles.icon} />
             Добавить рецепты
@@ -158,12 +150,15 @@ const FavoritesPage: React.FC = () => {
             )}
           </button>
         ))}
+        <button className={styles.groupPill} onClick={createGroup} aria-label="Новая группа">
+          <PlusIcon className={styles.groupIcon} />
+        </button>
       </div>
 
-      <div className={viewMode === 'grid' ? styles.grid : styles.list}>
+      <div className={styles.grid}>
         {(activeGroup?.recipes || []).map((recipe) => (
           <div key={recipe.id} className={styles.recipeItem}>
-            <RecipeCard recipe={recipe} viewMode={viewMode} />
+            <RecipeCard recipe={recipe} />
             <div className={styles.recipeActions}>
               <select
                 className={styles.select}

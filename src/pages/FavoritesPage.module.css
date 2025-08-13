@@ -1,10 +1,10 @@
 .wrapper { max-width: 1200px; margin: 0 auto; padding: var(--spacing-3xl) var(--spacing-lg); }
-.headerRow { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
-.title { margin: 0; font-size: var(--font-size-3xl); color: var(--token-text); }
-.headerActions { display: flex; gap: var(--spacing-md); }
+.headerRow { display: flex; align-items: center; justify-content: center; gap: var(--spacing-lg); margin-bottom: var(--spacing-xl); flex-wrap: wrap; }
+.title { margin: 0; font-size: var(--font-size-3xl); color: var(--token-text); text-align: center; }
+.headerActions { display: flex; gap: var(--spacing-md); justify-content: center; }
 .icon { width: 18px; height: 18px; }
 
-.groupsBar { display: flex; flex-wrap: wrap; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.groupsBar { display: flex; flex-wrap: wrap; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); justify-content: center; }
 .groupPill { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border-radius: var(--token-radius-full); border: 1px solid var(--token-border); background: var(--token-surface); color: var(--token-text); cursor: pointer; transition: background var(--token-duration-fast), border-color var(--token-duration-fast); }
 .groupPill:hover { background: color-mix(in oklab, var(--token-accent-weak) 40%, transparent); }
 .groupPillActive { background: var(--token-accent-weak); border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border)); }
@@ -15,7 +15,6 @@
 .groupIcon:hover { color: var(--token-text); }
 
 .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-xl); }
-.list { display: grid; grid-template-columns: 1fr; gap: var(--spacing-lg); }
 .recipeItem { display: flex; flex-direction: column; gap: var(--spacing-sm); }
 .recipeActions { display: flex; gap: var(--spacing-sm); }
 .select { height: 40px; padding: 0 12px; border-radius: var(--token-radius-full); border: 1px solid var(--token-border); background: var(--token-bg); color: var(--token-text); }
