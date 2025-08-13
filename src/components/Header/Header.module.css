@@ -2,10 +2,16 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-primary);
+  background-color: var(--token-surface);
+  border-bottom: 1px solid var(--token-border);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+  transition: box-shadow var(--token-duration-normal), border-color var(--token-duration-fast), background-color var(--token-duration-fast);
+}
+
+.headerScrolled {
+  box-shadow: var(--token-shadow-md);
+  border-bottom-color: transparent;
 }
 
 .container {
@@ -23,13 +29,13 @@
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: var(--text-primary);
+  color: var(--token-text);
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-xl);
 }
 
 .logoText {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(135deg, var(--token-accent), var(--color-secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -39,36 +45,38 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2xl);
+  gap: var(--token-space-6);
 }
 
 .navLink {
-  color: var(--text-secondary);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: var(--token-radius-full);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-sm);
-  position: relative;
-  transition: color var(--transition-fast);
+  color: var(--token-muted);
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), box-shadow var(--token-duration-fast);
 }
 
 .navLink:hover {
-  color: var(--text-primary);
+  background: color-mix(in oklab, var(--token-accent-weak) 40%, transparent);
+  color: var(--token-text);
 }
 
-.navLink::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -4px;
-  left: 50%;
-  background-color: var(--color-primary);
-  transition: all var(--transition-fast);
+.navLinkActive {
+  background: var(--token-accent-weak);
+  color: var(--token-accent-strong);
+  box-shadow: var(--token-shadow-sm);
 }
 
-.navLink:hover::after {
-  width: 100%;
-  left: 0;
+/* Improve contrast for active nav item in dark theme */
+[data-theme='dark'] .navLinkActive {
+  color: var(--token-neutral-0);
 }
 
 /* Right section */
@@ -78,6 +86,95 @@
   gap: var(--spacing-lg);
 }
 
+/* Profile menu */
+.profile {
+  position: relative;
+}
+
+.avatarButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid var(--token-border);
+  background: var(--token-surface);
+  color: var(--token-muted);
+  cursor: pointer;
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), border-color var(--token-duration-fast);
+}
+
+.avatarButton:hover {
+  background-color: var(--token-accent-weak);
+  color: var(--token-accent-strong);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
+}
+
+.profileMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-lg);
+  box-shadow: var(--token-shadow-md);
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity var(--token-duration-normal), transform var(--token-duration-normal), visibility var(--token-duration-normal);
+}
+
+.profileMenuOpen {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--token-text);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--token-duration-fast), color var(--token-duration-fast);
+}
+
+.menuItem:hover {
+  background: color-mix(in oklab, var(--token-accent-weak) 40%, transparent);
+}
+
+.menuIcon {
+  width: 18px;
+  height: 18px;
+  color: var(--token-muted);
+}
+
+.menuLabel {
+  font-size: var(--token-text-sm);
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--token-border);
+  margin: 6px 8px;
+}
+
 /* Theme toggle */
 .themeToggle {
   display: flex;
@@ -85,17 +182,18 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: none;
-  border-radius: var(--radius-lg);
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-full);
+  background-color: var(--token-surface);
+  color: var(--token-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), border-color var(--token-duration-fast);
 }
 
 .themeToggle:hover {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+  background-color: var(--token-accent-weak);
+  color: var(--token-accent-strong);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
 }
 
 .icon {
@@ -113,7 +211,7 @@
 .userName {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
+  color: var(--token-text);
 }
 
 .avatar {
@@ -121,7 +219,7 @@
   height: 32px;
   border-radius: var(--radius-full);
   object-fit: cover;
-  border: 2px solid var(--border-primary);
+  border: 2px solid var(--token-border);
 }
 
 /* Auth buttons */
@@ -167,17 +265,18 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: none;
-  border-radius: var(--radius-lg);
-  background-color: var(--bg-secondary);
-  color: var(--text-secondary);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-full);
+  background-color: var(--token-surface);
+  color: var(--token-muted);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), border-color var(--token-duration-fast);
 }
 
 .mobileMenuButton:hover {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
+  background-color: var(--token-accent-weak);
+  color: var(--token-accent-strong);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
 }
 
 /* Mobile Menu */
@@ -186,12 +285,12 @@
   top: 64px;
   left: 0;
   right: 0;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-primary);
+  background-color: var(--token-surface);
+  border-bottom: 1px solid var(--token-border);
   transform: translateY(-100%);
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-medium);
+  transition: all var(--transition-normal);
   z-index: var(--z-sticky);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -211,17 +310,17 @@
 }
 
 .mobileNavLink {
-  color: var(--text-secondary);
+  color: var(--token-muted);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-base);
   padding: var(--spacing-md) 0;
   border-bottom: 1px solid var(--border-secondary);
-  transition: color var(--transition-fast);
+  transition: color var(--token-duration-fast);
 }
 
 .mobileNavLink:hover {
-  color: var(--text-primary);
+  color: var(--token-text);
 }
 
 .mobileNavLink:last-child {
@@ -244,7 +343,7 @@
 .mobileUserName {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
+  color: var(--token-text);
 }
 
 .mobileAvatar {
@@ -252,7 +351,7 @@
   height: 40px;
   border-radius: var(--radius-full);
   object-fit: cover;
-  border: 2px solid var(--border-primary);
+  border: 2px solid var(--token-border);
 }
 
 .mobileAuthButtons {
