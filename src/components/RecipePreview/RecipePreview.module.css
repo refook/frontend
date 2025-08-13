@@ -2,17 +2,30 @@
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
-  padding: var(--spacing-3xl);
+  padding: var(--spacing-xl);
+  /* Скрыть визуальную полосу прокрутки, но оставить скролл */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
 
 .previewContainer {
-  max-width: 800px;
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  background-color: var(--bg-primary);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-3xl);
-  box-shadow: var(--shadow-lg);
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
 }
+
+@media (max-width: 768px) {
+  .previewContainer { padding: 0 var(--spacing-sm); }
+}
+@media (max-width: 480px) {
+  .previewContainer { padding: 0 var(--spacing-xs); }
+}
+
+/* heroCard styles moved to components/HeroCard/HeroCard.module.css */
 
 .header {
   margin-bottom: var(--spacing-3xl);
@@ -33,42 +46,31 @@
   margin: 0;
 }
 
-.metadata {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-lg);
-  justify-content: center;
-  margin-bottom: var(--spacing-3xl);
-  padding: var(--spacing-xl);
-  background-color: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--token-space-6);
+  margin: var(--token-space-6) 0;
 }
 
-.metaItem {
-  display: flex;
+.infoIcon { width: 22px; height: 22px; color: var(--token-muted); }
+.infoLabel { color: var(--token-muted); font-size: var(--token-text-base); }
+.infoValue { color: var(--token-text); font-weight: 700; font-size: 22px; }
+
+.difficultyBadge {
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  height: 32px;
+  padding: 0 var(--token-space-4);
+  border-radius: var(--token-radius-full);
+  font-weight: 700;
 }
 
-.metaIcon {
-  width: 20px;
-  height: 20px;
-  color: var(--color-primary);
+@media (max-width: 1100px) {
+  .infoGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-6); }
 }
-
-.metaText {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-}
-
-.cuisine {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background-color: var(--color-primary);
-  color: var(--text-inverse);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+@media (max-width: 650px) {
+  .infoGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-4); }
 }
 
 .imageContainer {
@@ -94,6 +96,7 @@
   color: var(--text-primary);
   margin: 0 0 var(--spacing-lg) 0;
 }
+/* sectionHeader moved to subcomponents; keep if reused elsewhere */
 
 .tags {
   display: flex;
@@ -117,42 +120,21 @@
   gap: var(--spacing-3xl);
   margin-bottom: var(--spacing-3xl);
 }
+/* nutrition styles moved to NutritionInfo.module.css */
+.servingsControl { display: inline-flex; align-items: center; gap: 8px; }
+.servingsLabel { color: var(--token-muted); }
+.servingsBtn { height: 32px; padding: 0 10px; }
+.servingsValue { min-width: 28px; text-align: center; font-weight: 700; }
 
 .section {
-  background-color: var(--bg-secondary);
-  padding: var(--spacing-xl);
-  border-radius: var(--radius-lg);
+  background: var(--token-bg);
+  border: 1px solid var(--token-border);
+  padding: var(--token-space-6);
+  border-radius: var(--token-radius-lg);
+  box-shadow: var(--token-shadow-sm);
 }
 
-.ingredientsList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.ingredient {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--border-primary);
-}
-
-.ingredient:last-child {
-  border-bottom: none;
-}
-
-.ingredientName {
-  font-size: var(--font-size-base);
-  color: var(--text-primary);
-  font-weight: var(--font-weight-medium);
-}
-
-.ingredientAmount {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-}
+/* ingredients styles moved to IngredientsSection.module.css */
 
 .steps {
   display: flex;
@@ -163,6 +145,14 @@
 .step {
   display: flex;
   gap: var(--spacing-md);
+}
+
+/* Блочный вид шага */
+.stepCard {
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-lg);
+  padding: var(--token-space-6);
 }
 
 .stepNumber {
@@ -197,6 +187,16 @@
   margin: 0;
 }
 
+/* Чипы ингредиентов шага */
+.stepChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--token-space-3);
+  margin-top: var(--token-space-4);
+}
+
+/* chip styles moved to Chip.module.css */
+
 .stepIngredients {
   margin-top: var(--spacing-sm);
 }
@@ -207,28 +207,7 @@
   color: var(--text-secondary);
 }
 
-.stepIngredientsList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xs);
-}
-
-.stepIngredient {
-  display: flex;
-  justify-content: space-between;
-  font-size: var(--font-size-sm);
-}
-
-.stepIngredientName {
-  color: var(--text-primary);
-}
-
-.stepIngredientAmount {
-  color: var(--text-secondary);
-}
+/* old list styles removed; replaced by chips */
 
 .stepImage {
   margin-top: var(--spacing-md);
@@ -352,33 +331,21 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Scrollbar styles */
+/* Скрыть скроллбар в WebKit-браузерах */
 .recipePreview::-webkit-scrollbar {
-  width: 8px;
-}
-
-.recipePreview::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-  border-radius: var(--radius-full);
-}
-
-.recipePreview::-webkit-scrollbar-thumb {
-  background: var(--color-gray-400);
-  border-radius: var(--radius-full);
-}
-
-.recipePreview::-webkit-scrollbar-thumb:hover {
-  background: var(--color-gray-500);
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Responsive styles */
 @media (max-width: 768px) {
   .recipePreview {
-    padding: var(--spacing-lg);
+    padding: 0;
   }
 
   .previewContainer {
-    padding: var(--spacing-2xl);
+    padding: 0;
   }
 
   .title {
@@ -416,6 +383,7 @@
 }
 
 @media (max-width: 480px) {
+  .recipePreview { padding: var(--spacing-xs); }
   .stepImg {
     max-width: 150px;
     height: 100px;

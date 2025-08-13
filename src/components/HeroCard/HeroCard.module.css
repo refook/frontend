@@ -1,0 +1,38 @@
+.card {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: var(--token-space-8);
+  background: var(--token-bg);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-lg);
+  padding: var(--token-space-8);
+  box-shadow: var(--token-shadow-md);
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--token-radius-md);
+  background: linear-gradient(135deg, var(--token-accent-600), color-mix(in oklab, var(--token-purple-600) 60%, transparent));
+  filter: saturate(1.1);
+}
+
+.content { display: flex; flex-direction: column; justify-content: center; gap: var(--token-space-6); }
+.title { margin: 0; font-size: clamp(24px, 3.6vw, 40px); line-height: 1.1; color: var(--token-text); letter-spacing: -0.02em; }
+.description { margin: 0; font-size: var(--token-text-lg); line-height: var(--token-leading-normal); color: var(--token-muted); }
+
+.ratingRow { display: flex; align-items: center; gap: var(--token-space-4); }
+.stars { display: inline-flex; gap: 6px; }
+.starIcon { width: 20px; height: 20px; color: #fbbf24; filter: drop-shadow(0 1px 0 rgba(0,0,0,0.05)); }
+.ratingValue { font-weight: 600; color: var(--token-text); }
+
+.author { display: flex; align-items: center; gap: var(--token-space-3); color: var(--token-text); }
+.authorAvatar { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--token-radius-full); background: var(--token-surface); border: 1px solid var(--token-border); }
+.authorText { font-size: var(--token-text-lg); color: var(--token-text); }
+
+@media (max-width: 900px) {
+  .card { grid-template-columns: 1fr; }
+  .image { aspect-ratio: 16 / 9; }
+}
+
+

@@ -1,0 +1,80 @@
+.section {
+  background: var(--token-bg);
+  border: 1px solid var(--token-border);
+  padding: var(--token-space-6);
+  border-radius: var(--token-radius-lg);
+  box-shadow: var(--token-shadow-sm);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--token-space-4);
+  margin-bottom: var(--token-space-6);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--token-space-6);
+  align-items: center;
+}
+
+.card {
+  display: grid;
+  place-items: center;
+  gap: var(--token-space-3);
+}
+
+.iconWrap {
+  width: 84px;
+  height: 84px;
+  border-radius: var(--token-radius-full);
+  display: grid;
+  place-items: center;
+}
+.icon { width: 28px; height: 28px; color: var(--token-text); opacity: 0.8; }
+.calories { background: color-mix(in oklab, #ffedd5 80%, transparent); }
+.proteins { background: color-mix(in oklab, #dbeafe 80%, transparent); }
+.carbs { background: color-mix(in oklab, #dcfce7 80%, transparent); }
+.fats { background: color-mix(in oklab, #fef9c3 80%, transparent); }
+
+.value { font-size: 32px; font-weight: 700; color: var(--token-text); }
+.label { color: var(--token-muted); font-size: var(--token-text-base); }
+
+.details { margin-top: var(--token-space-6); border-top: 1px solid var(--token-border); }
+.row { display: grid; grid-template-columns: 1fr auto auto; gap: var(--token-space-4); padding: 10px 0; border-bottom: 1px solid var(--token-border); }
+.row span:nth-child(2) { font-weight: 600; }
+
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-4); }
+  .card {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    grid-template-areas: 'icon value' 'icon label';
+    gap: 6px 12px;
+    justify-items: start;
+    align-items: center;
+  }
+  .iconWrap { grid-area: icon; justify-self: center; width: 64px; height: 64px; }
+  .value { grid-area: value; font-size: 24px; }
+  .label { grid-area: label; font-size: var(--token-text-sm); }
+}
+
+@media (max-width: 480px) {
+  .section { padding: var(--token-space-3); }
+  .card { grid-template-columns: 48px 1fr; gap: 4px 10px; }
+  .iconWrap { width: 48px; height: 48px; }
+  .icon { width: 22px; height: 22px; }
+  .value { font-size: 18px; }
+}
+
+

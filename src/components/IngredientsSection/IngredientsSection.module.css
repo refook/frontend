@@ -1,0 +1,37 @@
+.section {
+  background: var(--token-bg);
+  border: 1px solid var(--token-border);
+  padding: var(--token-space-6);
+  border-radius: var(--token-radius-lg);
+  box-shadow: var(--token-shadow-sm);
+}
+
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--token-space-4); margin-bottom: var(--spacing-lg); }
+.sectionTitle { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin: 0; }
+
+.ingredientsGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--token-space-4); }
+
+.ingredientCard { display: grid; place-items: center; gap: var(--token-space-2); padding: var(--token-space-4) var(--token-space-3); border: none; border-radius: var(--token-radius-md); background: var(--token-surface); box-shadow: var(--token-shadow-sm); cursor: pointer; transition: transform var(--token-duration-fast), box-shadow var(--token-duration-fast); }
+.ingredientCard:hover { transform: translateY(-2px); box-shadow: var(--token-shadow-md); }
+.ingredientCardSelected { box-shadow: 0 0 0 3px color-mix(in oklab, var(--token-accent) 22%, transparent); }
+
+.ingredientEmojiWrap { width: 52px; height: 52px; border-radius: var(--token-radius-full); background: var(--token-surface); border: 1px solid var(--token-border); display: inline-flex; align-items: center; justify-content: center; }
+.ingredientEmoji { font-size: 26px; }
+.ingredientTitle { font-weight: 700; color: var(--token-text); font-size: var(--token-text-base); }
+.ingredientSubtitle { color: var(--token-muted); font-size: var(--token-text-sm); }
+
+.shoppingBox { margin-top: var(--token-space-8); border: 1px solid color-mix(in oklab, var(--token-accent) 35%, transparent); background: color-mix(in oklab, var(--token-accent) 6%, transparent); border-radius: var(--token-radius-lg); padding: var(--token-space-6); }
+.shoppingHeaderRow { display: flex; align-items: center; gap: var(--token-space-4); margin-bottom: var(--token-space-4); }
+.shoppingTitleInput { width: 100%; max-width: 520px; font-weight: 700; }
+.shoppingChips { display: flex; gap: var(--token-space-3); flex-wrap: wrap; }
+.chip { border: 1px solid var(--token-border); background: var(--token-bg); border-radius: var(--token-radius-full); padding: 6px 12px; cursor: pointer; }
+
+.servingsControl { display: inline-flex; align-items: center; gap: 8px; }
+.servingsLabel { color: var(--token-muted); }
+.servingsBtn { height: 32px; padding: 0 10px; }
+.servingsValue { min-width: 28px; text-align: center; font-weight: 700; }
+
+@media (max-width: 1100px) { .ingredientsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 650px) { .ingredientsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-3); } }
+
+

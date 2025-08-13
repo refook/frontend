@@ -2,7 +2,7 @@ import {Routes, Route} from 'react-router-dom';
 
 
 import Layout from './components/Layout/Layout';
-import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage} from './pages';
+import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage, ProfilePage, FavoritesPage} from './pages';
 import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
@@ -21,6 +21,8 @@ function App() {
                     <Route path="/fridge" element={<FridgePage/>}/>
                     <Route path="/discover" element={<DiscoverPage/>}/>
                     <Route path="/create-recipe" element={<CreateRecipePage/>}/>
+                    <Route path="/profile" element={<ProfilePage/>}/>
+                    <Route path="/favorites" element={<FavoritesPage/>}/>
                 </Routes>
             </Layout>
             <DevTools/>

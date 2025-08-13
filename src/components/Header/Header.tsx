@@ -1,8 +1,8 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setTheme } from '../../store/slices/uiSlice';
-import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, Cog6ToothIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
 
@@ -10,6 +10,9 @@ const Header: React.FC = () => {
   const dispatch = useAppDispatch();
   const { theme } = useAppSelector((state) => state.ui);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   const context = useContext(KeycloakContext);
 
@@ -41,6 +44,7 @@ const Header: React.FC = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         closeMobileMenu();
+        setIsProfileMenuOpen(false);
       }
     };
     const handleResize = () => {
@@ -48,11 +52,26 @@ const Header: React.FC = () => {
         closeMobileMenu();
       }
     };
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 2);
+    };
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!profileMenuRef.current) return;
+      const target = event.target as Node;
+      if (!profileMenuRef.current.contains(target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('mousedown', handleClickOutside);
+    handleScroll();
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -70,21 +89,33 @@ const Header: React.FC = () => {
 
   const handleLogin = () => {
     closeMobileMenu();
+    setIsProfileMenuOpen(false);
     login();
   };
 
   const handleRegister = () => {
     closeMobileMenu();
+    setIsProfileMenuOpen(false);
     register();
   };
 
   const handleLogout = () => {
     closeMobileMenu();
+    setIsProfileMenuOpen(false);
     logout();
   };
 
+  const handleToggleTheme = () => {
+    setIsProfileMenuOpen(false);
+    dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
+  };
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen((prev) => !prev);
+  };
+
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''}`}>
       <div className={styles.container}>
         {/* Logo */}
         <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
@@ -93,59 +124,94 @@ const Header: React.FC = () => {
 
         {/* Desktop Navigation */}
         <nav className={styles.nav}>
-          <Link to="/recipes" className={styles.navLink}>
+          <Link
+            to="/recipes"
+            className={`${styles.navLink} ${location.pathname.startsWith('/recipes') ? styles.navLinkActive : ''}`}
+            aria-current={location.pathname.startsWith('/recipes') ? 'page' : undefined}
+          >
             Рецепты
           </Link>
-          <Link to="/fridge" className={styles.navLink}>
+          <Link
+            to="/fridge"
+            className={`${styles.navLink} ${location.pathname.startsWith('/fridge') ? styles.navLinkActive : ''}`}
+            aria-current={location.pathname.startsWith('/fridge') ? 'page' : undefined}
+          >
             Холодильник
           </Link>
-          <Link to="/discover" className={styles.navLink}>
+          <Link
+            to="/discover"
+            className={`${styles.navLink} ${location.pathname.startsWith('/discover') ? styles.navLinkActive : ''}`}
+            aria-current={location.pathname.startsWith('/discover') ? 'page' : undefined}
+          >
             Discover
           </Link>
-          <Link to="/create-recipe" className={styles.navLink}>
+          <Link
+            to="/create-recipe"
+            className={`${styles.navLink} ${location.pathname.startsWith('/create-recipe') ? styles.navLinkActive : ''}`}
+            aria-current={location.pathname.startsWith('/create-recipe') ? 'page' : undefined}
+          >
             Создать
           </Link>
         </nav>
 
         {/* Right section */}
         <div className={styles.rightSection}>
-          {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            className={styles.themeToggle}
-            aria-label="Переключить тему"
-          >
-            {theme === 'light' ? (
-              <MoonIcon className={styles.icon} />
-            ) : (
-              <SunIcon className={styles.icon} />
-            )}
-          </button>
+          {/* Profile / Auth */}
+          {/* Favorites icon */}
+          <Link to="/favorites" className={styles.iconButton} aria-label="Избранное">
+            <BookmarkIcon className={styles.icon} />
+          </Link>
 
-          {/* Desktop User section */}
           {authenticated ? (
-            <div className={styles.userSection}>
-              <span className={styles.userName}>{user?.name}</span>
-              {user?.avatar && (
-                <img
-                  src={user.avatar}
-                  alt="Avatar"
-                  className={styles.avatar}
-                />
-              )}
-              <button onClick={handleLogout} className="ui-btn ui-btn--ghost">
-                Выйти
+            <div className={styles.profile} ref={profileMenuRef}>
+              <button
+                className={styles.avatarButton}
+                onClick={toggleProfileMenu}
+                aria-label="Открыть меню профиля"
+                aria-expanded={isProfileMenuOpen}
+                aria-haspopup="menu"
+              >
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="Avatar" className={styles.avatar} />
+                ) : (
+                  <UserCircleIcon className={styles.icon} />
+                )}
               </button>
+
+              <div
+                className={`${styles.profileMenu} ${isProfileMenuOpen ? styles.profileMenuOpen : ''}`}
+                role="menu"
+                aria-label="Меню профиля"
+              >
+                <div className={styles.menuList}>
+                  <Link to="/profile" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                    <UserIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Профиль</span>
+                  </Link>
+                  <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                    <Cog6ToothIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Настройки</span>
+                  </button>
+                  <div className={styles.menuDivider} />
+                  <button className={styles.menuItem} role="menuitem" onClick={handleToggleTheme}>
+                    {theme === 'light' ? (
+                      <MoonIcon className={styles.menuIcon} />
+                    ) : (
+                      <SunIcon className={styles.menuIcon} />
+                    )}
+                    <span className={styles.menuLabel}>{theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}</span>
+                  </button>
+                  <div className={styles.menuDivider} />
+                  <button className={styles.menuItem} role="menuitem" onClick={handleLogout}>
+                    <ArrowRightOnRectangleIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Выйти</span>
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
-
             <div className={styles.authButtons}>
-              <button onClick={handleLogin} className="ui-btn ui-btn--ghost">
-                Войти
-              </button>
-              <button onClick={handleRegister} className="ui-btn ui-btn--primary">
-                Регистрация
-              </button>
+              <button onClick={handleLogin} className="ui-btn ui-btn--primary">Войти</button>
             </div>
           )}
 
