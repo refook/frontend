@@ -1,0 +1,50 @@
+.wrapper { margin-top: var(--spacing-2xl); }
+
+.bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--spacing-2xl);
+  align-items: center;
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--token-shadow-sm);
+  padding: var(--spacing-lg) var(--spacing-2xl);
+  width: 100%;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--token-text);
+  cursor: pointer;
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), border-color var(--token-duration-fast);
+  width: 100%;
+  text-align: center;
+  min-width: 0;
+}
+.tab:hover { background: color-mix(in oklab, var(--token-accent-weak) 30%, transparent); }
+
+.tabActive {
+  background: var(--token-accent-weak);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
+}
+
+.icon { width: 18px; height: 18px; color: var(--token-muted); }
+.tabActive .icon { color: var(--token-accent); }
+.label { font-weight: 600; }
+
+@media (max-width: 768px) {
+  .bar { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; overflow: auto; gap: var(--spacing-lg); padding: var(--spacing-md) var(--spacing-lg); }
+  .tab { width: auto; }
+  .label { display: none; }
+}
+
+

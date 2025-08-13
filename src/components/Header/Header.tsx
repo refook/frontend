@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setTheme } from '../../store/slices/uiSlice';
-import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, Cog6ToothIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, BookmarkIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, Cog6ToothIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, BookmarkIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
 
@@ -187,6 +187,10 @@ const Header: React.FC = () => {
                   <Link to="/profile" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <UserIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Профиль</span>
+                  </Link>
+                  <Link to="/profile/advanced" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                    <SparklesIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Продвинутый профиль</span>
                   </Link>
                   <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <Cog6ToothIcon className={styles.menuIcon} />
