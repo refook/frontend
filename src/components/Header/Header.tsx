@@ -156,77 +156,59 @@ const Header: React.FC = () => {
 
         {/* Right section */}
         <div className={styles.rightSection}>
-          {/* Profile menu */}
-          <div className={styles.profile} ref={profileMenuRef}>
-            <button
-              className={styles.avatarButton}
-              onClick={toggleProfileMenu}
-              aria-label="Открыть меню профиля"
-              aria-expanded={isProfileMenuOpen}
-              aria-haspopup="menu"
-            >
-              {authenticated && user?.avatar ? (
-                <img src={user.avatar} alt="Avatar" className={styles.avatar} />
-              ) : (
-                <UserCircleIcon className={styles.icon} />
-              )}
-            </button>
-
-            <div
-              className={`${styles.profileMenu} ${isProfileMenuOpen ? styles.profileMenuOpen : ''}`}
-              role="menu"
-              aria-label="Меню профиля"
-            >
-              <div className={styles.menuList}>
-                {authenticated ? (
-                  <>
-                    <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                      <UserIcon className={styles.menuIcon} />
-                      <span className={styles.menuLabel}>Профиль</span>
-                    </button>
-                    <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                      <Cog6ToothIcon className={styles.menuIcon} />
-                      <span className={styles.menuLabel}>Настройки</span>
-                    </button>
-                    <div className={styles.menuDivider} />
-                    <button className={styles.menuItem} role="menuitem" onClick={handleToggleTheme}>
-                      {theme === 'light' ? (
-                        <MoonIcon className={styles.menuIcon} />
-                      ) : (
-                        <SunIcon className={styles.menuIcon} />
-                      )}
-                      <span className={styles.menuLabel}>{theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}</span>
-                    </button>
-                    <div className={styles.menuDivider} />
-                    <button className={styles.menuItem} role="menuitem" onClick={handleLogout}>
-                      <ArrowRightOnRectangleIcon className={styles.menuIcon} />
-                      <span className={styles.menuLabel}>Выйти</span>
-                    </button>
-                  </>
+          {/* Profile / Auth */}
+          {authenticated ? (
+            <div className={styles.profile} ref={profileMenuRef}>
+              <button
+                className={styles.avatarButton}
+                onClick={toggleProfileMenu}
+                aria-label="Открыть меню профиля"
+                aria-expanded={isProfileMenuOpen}
+                aria-haspopup="menu"
+              >
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="Avatar" className={styles.avatar} />
                 ) : (
-                  <>
-                    <button className={styles.menuItem} role="menuitem" onClick={handleLogin}>
-                      <ArrowLeftOnRectangleIcon className={styles.menuIcon} />
-                      <span className={styles.menuLabel}>Войти</span>
-                    </button>
-                    <button className={styles.menuItem} role="menuitem" onClick={handleRegister}>
-                      <UserIcon className={styles.menuIcon} />
-                      <span className={styles.menuLabel}>Регистрация</span>
-                    </button>
-                    <div className={styles.menuDivider} />
-                    <button className={styles.menuItem} role="menuitem" onClick={handleToggleTheme}>
-                      {theme === 'light' ? (
-                        <MoonIcon className={styles.menuIcon} />
-                      ) : (
-                        <SunIcon className={styles.menuIcon} />
-                      )}
-                      <span className={styles.menuLabel}>{theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}</span>
-                    </button>
-                  </>
+                  <UserCircleIcon className={styles.icon} />
                 )}
+              </button>
+
+              <div
+                className={`${styles.profileMenu} ${isProfileMenuOpen ? styles.profileMenuOpen : ''}`}
+                role="menu"
+                aria-label="Меню профиля"
+              >
+                <div className={styles.menuList}>
+                  <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                    <UserIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Профиль</span>
+                  </button>
+                  <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                    <Cog6ToothIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Настройки</span>
+                  </button>
+                  <div className={styles.menuDivider} />
+                  <button className={styles.menuItem} role="menuitem" onClick={handleToggleTheme}>
+                    {theme === 'light' ? (
+                      <MoonIcon className={styles.menuIcon} />
+                    ) : (
+                      <SunIcon className={styles.menuIcon} />
+                    )}
+                    <span className={styles.menuLabel}>{theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}</span>
+                  </button>
+                  <div className={styles.menuDivider} />
+                  <button className={styles.menuItem} role="menuitem" onClick={handleLogout}>
+                    <ArrowRightOnRectangleIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Выйти</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className={styles.authButtons}>
+              <button onClick={handleLogin} className="ui-btn ui-btn--primary">Войти</button>
+            </div>
+          )}
 
           {/* Mobile menu button */}
           <button
