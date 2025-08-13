@@ -179,10 +179,10 @@ const Header: React.FC = () => {
                 aria-label="Меню профиля"
               >
                 <div className={styles.menuList}>
-                  <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                  <Link to="/profile" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <UserIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Профиль</span>
-                  </button>
+                  </Link>
                   <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <Cog6ToothIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Настройки</span>
