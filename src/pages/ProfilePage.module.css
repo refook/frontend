@@ -1,0 +1,76 @@
+.wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+}
+
+.title {
+  margin: 0 0 var(--spacing-2xl);
+  font-size: var(--font-size-3xl);
+  color: var(--token-text);
+}
+
+.form { display: flex; flex-direction: column; gap: var(--spacing-2xl); }
+
+.card {
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--token-shadow-sm);
+  padding: var(--spacing-2xl);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--spacing-xl);
+  font-size: var(--font-size-xl);
+  color: var(--token-text);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+}
+
+.field { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.fieldFull { grid-column: 1 / -1; display: flex; flex-direction: column; gap: var(--spacing-sm); }
+
+.label { color: var(--token-muted); font-size: var(--font-size-sm); }
+
+.textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border-radius: var(--token-radius-lg);
+  border: 1px solid var(--token-border);
+  background: var(--token-bg);
+  color: var(--token-text);
+  box-shadow: var(--token-shadow-sm);
+  transition: border-color var(--token-duration-fast), box-shadow var(--token-duration-fast);
+  resize: vertical;
+}
+
+.textarea:focus { outline: none; border-color: var(--token-accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--token-accent) 20%, transparent); }
+
+.select {
+  height: 44px;
+  padding: 0 12px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid var(--token-border);
+  background: var(--token-bg);
+  color: var(--token-text);
+  box-shadow: var(--token-shadow-sm);
+}
+
+.switchRow { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.switchLabel { color: var(--token-text); display: flex; align-items: center; gap: var(--spacing-sm); }
+
+.actions { display: flex; gap: var(--spacing-md); }
+
+.notificationWrap { position: fixed; bottom: var(--spacing-2xl); right: var(--spacing-2xl); }
+
+@media (max-width: 768px) {
+  .grid2 { grid-template-columns: 1fr; }
+}
+
+

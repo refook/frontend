@@ -3,3 +3,4 @@ export { default as RecipesPage } from './RecipesPage';
 export { default as CreateRecipePage } from './CreateRecipePage';
 export { default as RecipeDetailPage } from './RecipeDetailPage';
 export { FridgePage } from './FridgePage'; 
+export { default as ProfilePage } from './ProfilePage';
