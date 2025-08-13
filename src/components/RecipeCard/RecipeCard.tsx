@@ -11,6 +11,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import styles from './RecipeCard.module.css';
+import { FOOD_PLACEHOLDER_EMOJIS, hashStringToIndex } from '../../utils/emoji';
 
 interface RecipeCardProps {
   recipe: Recipe | CreateRecipeDto;
@@ -24,16 +25,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   // Определяем, является ли recipe объектом CreateRecipeDto
   const isFormData = 'portion' in recipe && 'allTime' in recipe;
   const seedString = isFormData ? (recipe.name ?? '') : (recipe.title ?? '');
-  const foodEmojis = ['🍕','🍔','🍣','🍜','🍩','🍰','🥗','🍤','🍝','🌮','🥞','🍗','🍇','🥑','🥐','🍪','🥙','🍲','🧁','🍓'];
-  const hashString = (s: string) => {
-    let h = 0;
-    for (let i = 0; i < s.length; i += 1) {
-      h = (h << 5) - h + s.charCodeAt(i);
-      h |= 0;
-    }
-    return Math.abs(h);
-  };
-  const fallbackEmoji = foodEmojis[hashString(seedString) % foodEmojis.length];
+  const fallbackEmoji = FOOD_PLACEHOLDER_EMOJIS[hashStringToIndex(seedString, FOOD_PLACEHOLDER_EMOJIS.length)];
   const getDifficultyLabel = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
     if (difficulty === 'EASY') return 'Легко';
     if (difficulty === 'MEDIUM') return 'Средне';
