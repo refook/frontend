@@ -1,49 +1,25 @@
 import React, { useMemo, useState } from 'react';
 import styles from './IngredientsSection.module.css';
-import { getEmojiByKey } from '../../utils/emoji';
 
-/**
- * Секция ингредиентов рецепта с возможностью:
- * - масштабировать количества под выбранное число порций,
- * - отмечать/снимать ингредиенты и формировать список покупок.
- *
- * Входные данные нормализуются: если количество указано числом и единицей (например, "2,5 кг"),
- * компонент пересчитывает его пропорционально порциям и выводит округлённое значение с запятой.
- */
-
-/**
- * Представление ингредиента.
- * @property id Внутренний идентификатор ингредиента
- * @property name Название ингредиента
- * @property amount Исходное количество и единица измерения (например, "2 шт", "150 г")
- */
 export interface IngredientVM {
   id: string;
   name: string;
   amount: string;
 }
 
-/**
- * Пропсы компонента IngredientsSection.
- * @property title Заголовок секции (например, "Ингредиенты")
- * @property ingredients Массив ингредиентов
- * @property baseServings Базовое число порций, относительно которого считается масштабирование
- */
 interface Props {
   title: string;
   ingredients: IngredientVM[];
   baseServings: number;
 }
 
+const foodEmojis = ['🍗','🥖','🍅','🥒','🧅','🧀','🫒','🍋','🍚','🥔','🍄','🥚','🌶️','🧄'];
+const getEmojiByKey = (key: string): string => {
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  return foodEmojis[hash % foodEmojis.length];
+};
 
-/**
- * Компонент IngredientsSection — выводит список ингредиентов с пересчётом под количество порций
- * и с возможностью отмечать позиции для формирования списка покупок.
- *
- * @param title Заголовок секции
- * @param ingredients Список ингредиентов для отображения
- * @param baseServings Базовое количество порций (используется как точка отсчёта для пересчёта)
- */
 const IngredientsSection: React.FC<Props> = ({ title, ingredients, baseServings }) => {
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [servings, setServings] = useState<number>(Math.max(1, baseServings || 1));

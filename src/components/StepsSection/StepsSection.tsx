@@ -1,35 +1,19 @@
 import React from 'react';
 import styles from './StepsSection.module.css';
 import Chip from '../Chip/Chip';
-import { getEmojiByKey } from '../../utils/emoji';
 import type { CreateRecipeIngredientDto, RecipeIngredientDto, StepResponseDto } from '../../types';
 
-/**
- * Пропсы компонента StepsSection.
- * @property steps Массив шагов приготовления (из API или формы)
- * @property isFormData Флаг, указывающий что шаги/ингредиенты в формате формы (CreateRecipeDto)
- * @property getIngredientName Функция получения названия ингредиента по id (нужна для формата формы)
- */
 interface Props {
   steps: StepResponseDto[] | any[];
   isFormData: boolean;
   getIngredientName: (id: string) => string | undefined;
 }
 
-// Используем единый набор эмодзи для ингредиентов
+const emojis = ['🍗','🥖','🍅','🥒','🧅','🧀','🫒','🍋','🍚','🥔','🍄','🥚','🌶️','🧄'];
+const emojiFor = (key: string): string => {
+  let h = 0; for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0; return emojis[h % emojis.length];
+};
 
-/**
- * Компонент StepsSection — отображает последовательность шагов приготовления рецепта.
- * Для каждого шага выводит номер, заголовок, описание, список ингредиентов‑чипов и, при наличии, фото шага.
- *
- * Поддерживает два источника данных:
- * 1) данные из API (StepResponseDto / RecipeIngredientDto)
- * 2) данные формы создания/редактирования (CreateRecipeDto)
- *
- * @param steps Список шагов приготовления
- * @param isFormData Если true — интерпретировать ингредиенты как CreateRecipeIngredientDto
- * @param getIngredientName Функция для получения имени ингредиента по id (используется при isFormData=true)
- */
 const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName }) => {
   return (
     <div className={styles.section}>
@@ -50,7 +34,7 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName })
                         const amount = isFormData
                           ? `${(ing as CreateRecipeIngredientDto).count} ${(ing as CreateRecipeIngredientDto).measure.toLowerCase()}`
                           : `${(ing as RecipeIngredientDto).count} ${(ing as RecipeIngredientDto).measure.toLowerCase()}`;
-                        return <Chip key={i} emoji={getEmojiByKey(name)} label={name} amount={amount} />;
+                        return <Chip key={i} emoji={emojiFor(name)} label={name} amount={amount} />;
                       })}
                     </div>
                   </div>
