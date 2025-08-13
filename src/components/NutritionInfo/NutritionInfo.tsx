@@ -7,6 +7,13 @@ interface NutritionInfoProps {
   onToggle: () => void;
 }
 
+/**
+ * Компонент NutritionInfo — блок с основной и расширенной информацией о пищевой ценности.
+ * Показывает калории, БЖУ и при раскрытии — дополнительные нутриенты с процентами.
+ *
+ * @param expanded Признак раскрытого состояния (true — показывать подробности).
+ * @param onToggle Обработчик клика по кнопке «Подробнее/Скрыть» для переключения состояния.
+ */
 const NutritionInfo: React.FC<NutritionInfoProps> = ({ expanded, onToggle }) => {
   return (
     <div className={styles.section}>

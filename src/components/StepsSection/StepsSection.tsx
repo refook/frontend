@@ -3,6 +3,12 @@ import styles from './StepsSection.module.css';
 import Chip from '../Chip/Chip';
 import type { CreateRecipeIngredientDto, RecipeIngredientDto, StepResponseDto } from '../../types';
 
+/**
+ * Пропсы компонента StepsSection.
+ * @property steps Массив шагов приготовления (из API или формы)
+ * @property isFormData Флаг, указывающий что шаги/ингредиенты в формате формы (CreateRecipeDto)
+ * @property getIngredientName Функция получения названия ингредиента по id (нужна для формата формы)
+ */
 interface Props {
   steps: StepResponseDto[] | any[];
   isFormData: boolean;
@@ -14,6 +20,18 @@ const emojiFor = (key: string): string => {
   let h = 0; for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0; return emojis[h % emojis.length];
 };
 
+/**
+ * Компонент StepsSection — отображает последовательность шагов приготовления рецепта.
+ * Для каждого шага выводит номер, заголовок, описание, список ингредиентов‑чипов и, при наличии, фото шага.
+ *
+ * Поддерживает два источника данных:
+ * 1) данные из API (StepResponseDto / RecipeIngredientDto)
+ * 2) данные формы создания/редактирования (CreateRecipeDto)
+ *
+ * @param steps Список шагов приготовления
+ * @param isFormData Если true — интерпретировать ингредиенты как CreateRecipeIngredientDto
+ * @param getIngredientName Функция для получения имени ингредиента по id (используется при isFormData=true)
+ */
 const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName }) => {
   return (
     <div className={styles.section}>
