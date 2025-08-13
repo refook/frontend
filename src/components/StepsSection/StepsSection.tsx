@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './StepsSection.module.css';
 import Chip from '../Chip/Chip';
+import { getEmojiByKey } from '../../utils/emoji';
 import type { CreateRecipeIngredientDto, RecipeIngredientDto, StepResponseDto } from '../../types';
 
 /**
@@ -15,10 +16,7 @@ interface Props {
   getIngredientName: (id: string) => string | undefined;
 }
 
-const emojis = ['🍗','🥖','🍅','🥒','🧅','🧀','🫒','🍋','🍚','🥔','🍄','🥚','🌶️','🧄'];
-const emojiFor = (key: string): string => {
-  let h = 0; for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0; return emojis[h % emojis.length];
-};
+// Используем единый набор эмодзи для ингредиентов
 
 /**
  * Компонент StepsSection — отображает последовательность шагов приготовления рецепта.
@@ -52,7 +50,7 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName })
                         const amount = isFormData
                           ? `${(ing as CreateRecipeIngredientDto).count} ${(ing as CreateRecipeIngredientDto).measure.toLowerCase()}`
                           : `${(ing as RecipeIngredientDto).count} ${(ing as RecipeIngredientDto).measure.toLowerCase()}`;
-                        return <Chip key={i} emoji={emojiFor(name)} label={name} amount={amount} />;
+                        return <Chip key={i} emoji={getEmojiByKey(name)} label={name} amount={amount} />;
                       })}
                     </div>
                   </div>

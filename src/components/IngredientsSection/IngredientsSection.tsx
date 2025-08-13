@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import styles from './IngredientsSection.module.css';
+import { getEmojiByKey } from '../../utils/emoji';
 
 /**
  * Секция ингредиентов рецепта с возможностью:
@@ -34,12 +35,6 @@ interface Props {
   baseServings: number;
 }
 
-const foodEmojis = ['🍗','🥖','🍅','🥒','🧅','🧀','🫒','🍋','🍚','🥔','🍄','🥚','🌶️','🧄'];
-const getEmojiByKey = (key: string): string => {
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-  return foodEmojis[hash % foodEmojis.length];
-};
 
 /**
  * Компонент IngredientsSection — выводит список ингредиентов с пересчётом под количество порций

@@ -82,12 +82,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     hard: 'var(--color-danger)'
   };
 
-  // Временные эмодзи для ингредиентов шага (UI-чипов)
-  const stepFoodEmojis = ['🍗','🥖','🍅','🥒','🧅','🧀','🫒','🍋','🍚','🥔','🍄','🥚','🌶️','🧄'];
-  const getEmoji = (key: string): string => {
-    let hash = 0; for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-    return stepFoodEmojis[hash % stepFoodEmojis.length];
-  };
+  // Эмодзи для шагов теперь берутся в дочернем компоненте через utils/emoji
 
   type NormalizedIngredient = { id: string; name: string; amount: string };
   const normalizeIngredient = (ingredient: CreateRecipeIngredientDto | RecipeIngredientDto): NormalizedIngredient => {
