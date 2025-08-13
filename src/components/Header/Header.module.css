@@ -279,6 +279,27 @@
   border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
 }
 
+/* Generic circular icon button (for favorites) */
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-full);
+  background: var(--token-surface);
+  color: var(--token-muted);
+  text-decoration: none;
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), border-color var(--token-duration-fast);
+}
+
+.iconButton:hover {
+  background: var(--token-accent-weak);
+  color: var(--token-accent-strong);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
+}
+
 /* Mobile Menu */
 .mobileMenu {
   position: fixed;

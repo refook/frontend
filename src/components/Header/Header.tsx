@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setTheme } from '../../store/slices/uiSlice';
-import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, Cog6ToothIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon } from '@heroicons/react/24/outline';
+import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, Cog6ToothIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, BookmarkIcon } from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
 
@@ -157,6 +157,11 @@ const Header: React.FC = () => {
         {/* Right section */}
         <div className={styles.rightSection}>
           {/* Profile / Auth */}
+          {/* Favorites icon */}
+          <Link to="/favorites" className={styles.iconButton} aria-label="Избранное">
+            <BookmarkIcon className={styles.icon} />
+          </Link>
+
           {authenticated ? (
             <div className={styles.profile} ref={profileMenuRef}>
               <button
