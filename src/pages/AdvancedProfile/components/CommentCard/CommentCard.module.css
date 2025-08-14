@@ -1,0 +1,31 @@
+.card { background: var(--token-surface); border: none; border-radius: var(--token-radius-lg); box-shadow: var(--token-shadow-md); padding: var(--token-space-6); display: flex; flex-direction: column; gap: var(--token-space-6); }
+
+.header { display: flex; align-items: center; justify-content: space-between; gap: var(--token-space-6); }
+.left { display: grid; grid-template-columns: 48px 1fr; gap: var(--token-space-4); align-items: center; }
+.thumb { width: 48px; height: 48px; border-radius: 10px; overflow: hidden; object-fit: cover; background: var(--token-bg); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.titleWrap { display: flex; flex-direction: column; gap: 4px; }
+.title { margin: 0; font-size: var(--token-text-xl); color: var(--token-text); }
+.author { color: var(--token-muted); }
+
+.date { display: inline-flex; align-items: center; gap: 8px; color: var(--token-muted); white-space: nowrap; }
+.dateIcon { width: 18px; height: 18px; }
+
+.ratingRow { display: flex; align-items: center; gap: 12px; }
+.stars { display: inline-flex; gap: 4px; }
+.star { width: 18px; height: 18px; color: #f59e0b; }
+.verifyChip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 9999px; background: color-mix(in oklab, var(--color-success) 18%, var(--token-bg)); color: var(--color-success); font-weight: 700; }
+
+.commentBox { background: var(--token-bg); border: none; border-radius: 12px; padding: 16px; color: var(--token-text); }
+
+.footer { display: flex; align-items: center; justify-content: space-between; color: var(--token-muted); }
+.footerLeft { display: inline-flex; align-items: center; gap: 18px; }
+.footerItem { display: inline-flex; align-items: center; gap: 6px; }
+.footerIcon { width: 18px; height: 18px; }
+.footerRight { display: inline-flex; align-items: center; gap: 24px; }
+
+@media (max-width: 640px) {
+  .header { flex-direction: column; align-items: flex-start; gap: var(--token-space-4); }
+  .date { align-self: flex-end; }
+}
+
+

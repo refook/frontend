@@ -1,0 +1,7 @@
+.wrapper { margin-top: var(--spacing-2xl); }
+
+.card { background: var(--token-surface); border: none; border-radius: var(--token-radius-lg); box-shadow: var(--token-shadow-md); padding: 0; overflow: hidden; margin-top: var(--spacing-xl); }
+
+/* Row moved into ActivityRow component; file keeps only wrapper/card */
+
+

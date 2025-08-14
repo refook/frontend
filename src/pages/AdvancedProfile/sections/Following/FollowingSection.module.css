@@ -1,0 +1,38 @@
+.wrapper { margin-top: var(--spacing-2xl); }
+.list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-xl); }
+
+.card { background: var(--token-surface); border: none; border-radius: var(--token-radius-lg); box-shadow: var(--token-shadow-md); padding: var(--token-space-6); display: flex; flex-direction: column; gap: var(--token-space-6); }
+.headerTop { display: grid; grid-template-columns: 72px 1fr; gap: var(--token-space-6); align-items: center; }
+.avatar { width: 72px; height: 72px; border-radius: 16px; object-fit: cover; overflow: hidden; background: var(--token-bg); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; }
+
+.content { display: flex; flex-direction: column; gap: 12px; }
+.titleWrap { display: flex; flex-direction: column; gap: 4px; }
+.name { margin: 0; font-size: var(--token-text-xl); color: var(--token-text); }
+.handle { color: var(--token-muted); }
+.bio { margin: 0; color: var(--token-text); }
+.location { display: inline-flex; align-items: center; gap: 6px; color: var(--token-muted); }
+.locationIcon { width: 18px; height: 18px; }
+
+.statsRow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--token-space-6); }
+.stat { background: var(--token-bg); border: none; border-radius: 12px; padding: 16px; text-align: center; }
+.statValueRow { display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+.statValue { font-size: var(--token-text-xl); font-weight: 700; color: var(--token-text); }
+.statLabel { color: var(--token-muted); }
+
+.ratingIcon { width: 18px; height: 18px; color: #f59e0b; }
+
+.tags { display: flex; gap: 10px; flex-wrap: wrap; }
+.tag { background: var(--token-bg); border-radius: 9999px; padding: 8px 12px; color: var(--token-text); }
+
+.cta { margin-top: 8px; }
+.ctaBtn { width: 100%; height: 54px; border: none; border-radius: var(--token-radius-full); background: var(--token-surface); box-shadow: var(--token-shadow-md); display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; }
+.ctaIcon { width: 18px; height: 18px; }
+
+@media (max-width: 1024px) { .list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .list { grid-template-columns: 1fr; }
+  .headerTop { grid-template-columns: 56px 1fr; }
+  .avatar { width: 56px; height: 56px; border-radius: 12px; }
+}
+
+

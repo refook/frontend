@@ -1,0 +1,34 @@
+.card { background: var(--token-surface); border: none; border-radius: var(--token-radius-lg); box-shadow: var(--token-shadow-md); overflow: hidden; display: flex; flex-direction: column; }
+
+.imageWrap { position: relative; width: 100%; aspect-ratio: 16 / 9; background: var(--token-bg); }
+.image { width: 100%; height: 100%; object-fit: cover; display: block; }
+.placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+
+.statusChips { position: absolute; top: 12px; left: 12px; display: inline-flex; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 9999px; background: var(--token-bg); border: none; font-weight: 700; }
+.chip_success { background: color-mix(in oklab, var(--color-success) 18%, var(--token-bg)); color: var(--color-success); }
+.chip_muted { background: var(--token-bg); color: var(--token-muted); }
+
+.content { padding: var(--token-space-6); display: flex; flex-direction: column; gap: 12px; }
+.title { margin: 0; font-size: var(--token-text-xl); color: var(--token-text); }
+.description { margin: 0; color: var(--token-muted); }
+
+.meta { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.metaItem { display: inline-flex; align-items: center; gap: 6px; color: var(--token-muted); }
+.metaIcon { width: 18px; height: 18px; }
+.ratingIcon { width: 18px; height: 18px; color: #f59e0b; }
+
+.stats { display: flex; gap: 16px; align-items: center; color: var(--token-muted); flex-wrap: wrap; }
+.stat { display: inline-flex; align-items: center; gap: 6px; }
+
+.tags { display: flex; gap: 10px; flex-wrap: wrap; }
+.tag { background: var(--token-bg); border-radius: 9999px; padding: 6px 10px; color: var(--token-text); font-size: var(--token-text-sm); }
+
+.footer { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; }
+.date { color: var(--token-muted); }
+.btns { display: inline-flex; gap: 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: var(--token-radius-full); background: var(--token-surface); border: 1px solid var(--token-border); box-shadow: none; cursor: pointer; font-weight: 700; color: var(--token-text); text-decoration: none; line-height: 1; }
+.btn:hover { filter: brightness(0.98); text-decoration: none; }
+.btn:visited { color: var(--token-text); }
+
+
