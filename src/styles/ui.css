@@ -22,7 +22,7 @@
 .ui-btn--primary { background: var(--token-accent); color: var(--token-neutral-0); border-color: transparent; }
 .ui-btn--primary:hover { filter: brightness(0.96); }
 
-.ui-btn--ghost { background: transparent; border-color: var(--token-border); }
+.ui-btn--ghost { background: transparent; border: 1px solid var(--token-border); box-shadow: none; }
 
 .ui-input {
   width: 100%;

@@ -2,7 +2,7 @@ import {Routes, Route} from 'react-router-dom';
 
 
 import Layout from './components/Layout/Layout';
-import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage, ProfilePage, FavoritesPage, AdvancedProfilePage} from './pages';
+import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage, ProfilePage, AdvancedProfilePage} from './pages';
 import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
@@ -22,7 +22,7 @@ function App() {
                     <Route path="/discover" element={<DiscoverPage/>}/>
                     <Route path="/create-recipe" element={<CreateRecipePage/>}/>
                     <Route path="/profile" element={<ProfilePage/>}/>
-                    <Route path="/favorites" element={<FavoritesPage/>}/>
+                    {false && <Route path="/favorites" element={<div />}/>}
                     <Route path="/profile/advanced" element={<AdvancedProfilePage/>}/>
                 </Routes>
             </Layout>

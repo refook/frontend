@@ -1,0 +1,27 @@
+.row { display: grid; grid-template-columns: 48px 1fr 36px; gap: var(--token-space-4); align-items: start; padding: 16px 20px; }
+.row + .row { border-top: 1px solid var(--token-border); }
+
+.thumb { width: 48px; height: 48px; border-radius: 12px; overflow: hidden; background: var(--token-bg); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.title { margin: 0; color: var(--token-text); font-weight: 700; }
+.subtitle { margin: 4px 0 0 0; color: var(--token-muted); }
+
+.timeRow { display: inline-flex; align-items: center; gap: 4px; color: var(--token-muted); margin-top: 6px; font-size: var(--font-size-xs); }
+.timeIcon { width: 14px; height: 14px; }
+
+.rightIcon { width: 36px; height: 36px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; }
+.rightIcon svg { width: 20px; height: 20px; }
+.right_create { background: color-mix(in oklab, var(--token-accent) 20%, var(--token-bg)); color: var(--token-accent); }
+.right_like { background: color-mix(in oklab, var(--color-danger) 18%, var(--token-bg)); color: var(--color-danger); }
+.right_cook { background: color-mix(in oklab, var(--color-success) 18%, var(--token-bg)); color: var(--color-success); }
+.right_follow { background: color-mix(in oklab, var(--token-accent) 10%, var(--token-bg)); color: var(--token-accent); }
+.right_review { background: color-mix(in oklab, var(--token-muted) 12%, var(--token-bg)); color: var(--token-muted); }
+.right_badge { background: color-mix(in oklab, var(--color-warning) 18%, var(--token-bg)); color: var(--color-warning); }
+
+@media (max-width: 640px) {
+  .row { grid-template-columns: 40px 1fr 36px; padding: 14px 16px; }
+  .thumb { width: 40px; height: 40px; border-radius: 10px; font-size: 18px; }
+}
+
+

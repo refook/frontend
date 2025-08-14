@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import styles from './ProfileTabs.module.css';
 import { HeartIcon, ClockIcon, UserGroupIcon, BookOpenIcon, ChatBubbleLeftRightIcon, StarIcon } from '@heroicons/react/24/outline';
 
-type TabId = 'favorites' | 'history' | 'following' | 'recipes' | 'comments' | 'activity';
+export type TabId = 'favorites' | 'history' | 'following' | 'recipes' | 'comments' | 'activity';
 
-export interface ProfileTabsProps {
-  initial?: TabId;
-  onChange?: (tab: TabId) => void;
-}
+/**
+ * Свойства компонентa вкладок профиля.
+ * @param initial Вкладка по умолчанию
+ * @param onChange Колбэк при переключении вкладки
+ */
+export interface ProfileTabsProps { initial?: TabId; onChange?: (tab: TabId) => void; }
 
 const tabs: Array<{ id: TabId; label: string; Icon: React.ComponentType<any> }> = [
   { id: 'favorites', label: 'Favorites', Icon: HeartIcon },
@@ -18,6 +20,14 @@ const tabs: Array<{ id: TabId; label: string; Icon: React.ComponentType<any> }> 
   { id: 'activity', label: 'Activity', Icon: StarIcon },
 ];
 
+/**
+ * Компонент вкладок профиля. Отображает список секций и
+ * управляет выбранной вкладкой локальным состоянием.
+ *
+ * @param props Параметры
+ * @param props.initial Активная вкладка по умолчанию
+ * @param props.onChange Колбэк смены вкладки
+ */
 const ProfileTabs: React.FC<ProfileTabsProps> = ({ initial = 'favorites', onChange }) => {
   const [active, setActive] = useState<TabId>(initial);
 

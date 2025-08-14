@@ -4,6 +4,21 @@ import { MapPinIcon, CalendarDaysIcon, Cog6ToothIcon, StarIcon } from '@heroicon
 
 export type Badge = { id: string; label: string; color: 'gold' | 'blue' | 'purple' };
 
+/**
+ * Расширенная модель пользователя для страницы профиля.
+ * @property name Отображаемое имя
+ * @property username Уникальный ник без символа @
+ * @property avatarUrl URL аватара (опционально)
+ * @property location Город/страна пользователя (опционально)
+ * @property joinedAt Дата регистрации в ISO‑формате
+ * @property bio Описание/био (опционально)
+ * @property stats Сводка числовых показателей
+ * @property stats.recipes Кол-во рецептов
+ * @property stats.followers Кол-во подписчиков
+ * @property stats.following Кол-во подписок
+ * @property stats.likes Суммарные лайки
+ * @property badges Список значков пользователя
+ */
 export type AdvancedProfileUser = {
   name: string;
   username: string;
@@ -21,10 +36,20 @@ function formatJoined(dateIso: string): string {
   return `Joined ${formatter.format(date)}`;
 }
 
-interface ProfileCardProps {
-  user: AdvancedProfileUser;
-}
+/**
+ * Свойства карточки профиля пользователя.
+ * @param user Объект пользователя `AdvancedProfileUser`
+ */
+interface ProfileCardProps { user: AdvancedProfileUser; }
 
+/**
+ * Верхняя карточка профиля с ключевой информацией о пользователе.
+ * Включает настройки, аватар, имя/ник, локацию, дату регистрации,
+ * статблок, био и бейджи.
+ *
+ * @param props Параметры
+ * @param props.user Объект пользователя
+ */
 const ProfileCard: React.FC<ProfileCardProps> = ({ user }) => {
   return (
     <div className={styles.card}>

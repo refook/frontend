@@ -1,7 +1,8 @@
 .wrapper {
-  max-width: 1280px;
+  max-width: 1150px;
   margin: 0 auto;
   padding: var(--spacing-3xl) var(--spacing-lg);
+  background: var(--token-bg);
 }
 
 /* Старые стили удалены — компоненты используют свои модули */

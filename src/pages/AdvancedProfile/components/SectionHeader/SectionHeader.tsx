@@ -7,6 +7,7 @@ export interface SectionStat {
   label: string;
   value: number | string;
   tone?: StatTone;
+  icon?: React.ReactNode;
 }
 
 export interface SectionHeaderProps {
@@ -41,6 +42,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
             <div className={styles.stats} aria-label="Section statistics">
               {stats.map((s, idx) => (
                 <div key={idx} className={`${styles.stat} ${s.tone ? styles[`stat_${s.tone}`] : ''}`}>
+                  {s.icon && <span className={styles.statIcon}>{s.icon}</span>}
                   <span className={styles.statValue}>{s.value}</span>
                   <span className={styles.statLabel}>{s.label}</span>
                 </div>

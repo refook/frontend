@@ -158,7 +158,7 @@ const Header: React.FC = () => {
         <div className={styles.rightSection}>
           {/* Profile / Auth */}
           {/* Favorites icon */}
-          <Link to="/favorites" className={styles.iconButton} aria-label="Избранное">
+          <Link to="/profile/advanced?tab=favorites" className={styles.iconButton} aria-label="Избранное">
             <BookmarkIcon className={styles.icon} />
           </Link>
 

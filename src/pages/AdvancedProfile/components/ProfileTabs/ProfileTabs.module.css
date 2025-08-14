@@ -1,4 +1,4 @@
-.wrapper { margin-top: var(--spacing-2xl); }
+.wrapper { margin-top: var(--spacing-lg); }
 
 .bar {
   display: grid;
@@ -6,10 +6,10 @@
   gap: var(--spacing-2xl);
   align-items: center;
   background: var(--token-surface);
-  border: 1px solid var(--token-border);
+  border: none;
   border-radius: var(--radius-2xl);
-  box-shadow: var(--token-shadow-sm);
-  padding: var(--spacing-lg) var(--spacing-2xl);
+  box-shadow: var(--token-shadow-md);
+  padding: var(--spacing-sm) var(--spacing-2xl);
   width: 100%;
 }
 
@@ -20,8 +20,8 @@
   gap: 10px;
   height: 40px;
   padding: 0 14px;
-  border-radius: var(--token-radius-full);
-  border: 1px solid transparent;
+  border-radius: var(--token-radius-lg);
+  border: none;
   background: transparent;
   color: var(--token-text);
   cursor: pointer;
