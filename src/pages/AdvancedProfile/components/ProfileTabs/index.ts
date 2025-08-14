@@ -1,3 +1,3 @@
-export { default } from './ProfileTabs/ProfileTabs';
+export { default } from './ProfileTabs';
 
 
