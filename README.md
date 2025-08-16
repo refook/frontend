@@ -1,4 +1,4 @@
-# Refook v3 - Кулинарное приложение
+# Refook - refook.ru - Кулинарное приложение
 
 ## 🍳 Описание
 
@@ -10,7 +10,7 @@
 
 Приложение автоматически деплоится на GitHub Pages при push в ветку `v4`:
 
-- **URL**: https://mujlax.github.io/refook_v3/
+- **URL**: refook.ru
 - **Триггер**: Push в ветку `v4`
 - **Workflow**: `.github/workflows/deploy.yml`
 
@@ -62,9 +62,8 @@ src/
 ## 🔧 Настройки
 
 ### Vite Configuration
-- **Base URL**: `/refook_v3/` для GitHub Pages
-- **Proxy**: настроен для development режима
-- **Build**: оптимизирован для production
+- **proxy**: настроен для development режима
+- **build:prod**: оптимизирован для production
 
 ### API Integration
 - **Development**: использует Vite proxy
@@ -82,5 +81,5 @@ src/
 ## 🔗 API
 
 Приложение интегрировано с реальным API ингредиентов:
-- **Endpoint**: `http://82.146.39.131:8080/v1/ingredient/all`
+- **Endpoint**: `https://api.refook.ru/v1/ingredient/all`
 - **Fallback**: Mock данные при недоступности API
