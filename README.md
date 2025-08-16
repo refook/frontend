@@ -10,9 +10,9 @@
 
 Приложение автоматически деплоится на GitHub Pages при push в ветку `v4`:
 
-- **URL**: refook.ru
-- **Триггер**: Push в ветку `v4`
-- **Workflow**: `.github/workflows/deploy.yml`
+- **URL**: https://refook.ru
+- **Триггер**: Ручной запуск
+- **Workflow**: `.github/workflows/deploy-front.yml`
 
 ### API Integration
 
