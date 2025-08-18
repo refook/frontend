@@ -1,24 +1,44 @@
-
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI definition hello",
+    "title": "OpenAPI definition",
     "version": "v0"
   },
   "servers": [
     {
-      "url": "https://refook.ru",
+      "url": "https://api.refook.ru",
       "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
     }
   ],
   "tags": [
     {
-      "name": "Ингредиенты",
-      "description": "Запросы с ингредиентами"
+      "name": "Кухни",
+      "description": "Информация по кухням"
     },
     {
-      "name": "Холодильник",
-      "description": "Запросы работы с холодильником пользователя"
+      "name": "Продкуты",
+      "description": "Запросы с продуктами"
+    },
+    {
+      "name": "Пользователи",
+      "description": "Инфо по пользователям"
+    },
+    {
+      "name": "Продукты холодильника",
+      "description": "Запросы работы с продуктами холодильника пользователя"
+    },
+    {
+      "name": "Холодильник пользователя",
+      "description": "Запросы работы холодильниками пользователя"
+    },
+    {
+      "name": "Тэги рецепта",
+      "description": "Информация по тэгам рецептов"
     },
     {
       "name": "Рецепты",
@@ -26,6 +46,98 @@
     }
   ],
   "paths": {
+    "/v1/tags/{id}": {
+      "get": {
+        "tags": [
+          "Тэги рецепта"
+        ],
+        "summary": "Получение тэга по id",
+        "operationId": "getTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Тэги рецепта"
+        ],
+        "summary": "Обновление тэга",
+        "operationId": "updateTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/recipe/{id}": {
       "put": {
         "tags": [
@@ -111,13 +223,13 @@
         }
       }
     },
-    "/v1/ingredient/{id}": {
+    "/v1/products/{id}": {
       "get": {
         "tags": [
-          "Ингредиенты"
+          "Продкуты"
         ],
-        "summary": "Получение ингредиента по id",
-        "operationId": "getIngredient",
+        "summary": "Получение продукта по id",
+        "operationId": "getProduct",
         "parameters": [
           {
             "name": "id",
@@ -135,7 +247,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IngredientResponseDto"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
@@ -154,10 +266,10 @@
       },
       "put": {
         "tags": [
-          "Ингредиенты"
+          "Продкуты"
         ],
-        "summary": "Обновление ингредиента",
-        "operationId": "updateIngredient",
+        "summary": "Обновление продукта",
+        "operationId": "updateProduct",
         "parameters": [
           {
             "name": "id",
@@ -173,7 +285,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateIngredientDto"
+                "$ref": "#/components/schemas/UpdateProductDto"
               }
             }
           },
@@ -185,7 +297,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IngredientResponseDto"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
@@ -213,16 +325,202 @@
         }
       }
     },
-    "/v1/fridge/{id}": {
-      "put": {
+    "/v1/kitchens/{id}": {
+      "get": {
         "tags": [
-          "Холодильник"
+          "Кухни"
         ],
-        "summary": "Обновление продукта холодильника",
-        "operationId": "updateProduct",
+        "summary": "Получение кухни по id",
+        "operationId": "getKitchen",
         "parameters": [
           {
             "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitchenResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Кухни"
+        ],
+        "summary": "Обновление кухни",
+        "operationId": "updateKitchen",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateKitchenDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitchenResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fridges/{id}": {
+      "put": {
+        "tags": [
+          "Холодильник пользователя"
+        ],
+        "summary": "Обновление холодильника",
+        "operationId": "updateFridge",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFridgeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FridgeResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Холодильник пользователя"
+        ],
+        "summary": "Удаление конкретного холодильника",
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ"
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fridge/{fridgeId}/products/{fridgeProductId}": {
+      "put": {
+        "tags": [
+          "Продукты холодильника"
+        ],
+        "summary": "Обновление продукта холодильника",
+        "operationId": "updateProduct_1",
+        "parameters": [
+          {
+            "name": "fridgeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "fridgeProductId",
             "in": "path",
             "required": true,
             "schema": {
@@ -263,27 +561,35 @@
             }
           }
         }
-      },
-      "delete": {
+      }
+    },
+    "/v1/tags": {
+      "post": {
         "tags": [
-          "Холодильник"
+          "Тэги рецепта"
         ],
-        "summary": "Удаление конкретного продукта по id",
-        "operationId": "deleteProduct",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+        "summary": "Сохранение тэга",
+        "operationId": "createTag",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagDto"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
-            "description": "Успешный ответ"
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TagResponseDto"
+                }
+              }
+            }
           },
           "500": {
             "description": "Критический ответ",
@@ -339,18 +645,63 @@
         }
       }
     },
-    "/v1/ingredient": {
+    "/v1/recipe/{recipeId}/action": {
       "post": {
         "tags": [
-          "Ингредиенты"
+          "Рецепты"
         ],
-        "summary": "Сохранение ингредиента",
-        "operationId": "createIngredient",
+        "summary": "Действие с рецептом",
+        "operationId": "resolveAction",
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateIngredientDto"
+                "$ref": "#/components/schemas/RecipeActionDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ"
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products": {
+      "post": {
+        "tags": [
+          "Продкуты"
+        ],
+        "summary": "Сохранение продукта",
+        "operationId": "createProduct",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductDto"
               }
             }
           },
@@ -362,7 +713,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/IngredientResponseDto"
+                  "$ref": "#/components/schemas/ProductResponseDto"
                 }
               }
             }
@@ -380,13 +731,138 @@
         }
       }
     },
-    "/v1/fridge": {
+    "/v1/kitchens": {
+      "post": {
+        "tags": [
+          "Кухни"
+        ],
+        "summary": "Сохранение тэга",
+        "operationId": "createKitchen",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateKitchenDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KitchenResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fridges": {
       "get": {
         "tags": [
-          "Холодильник"
+          "Холодильник пользователя"
         ],
-        "summary": "Получение всего списка продуктов",
-        "operationId": "getAllProducts",
+        "summary": "Получение всего списка холодильников пользователя",
+        "operationId": "getAllFridgesByUserId",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FridgeResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Холодильник пользователя"
+        ],
+        "summary": "Создание холодильника пользвателя",
+        "operationId": "addFridge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFridgeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FridgeResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fridge/{fridgeId}/products": {
+      "get": {
+        "tags": [
+          "Продукты холодильника"
+        ],
+        "summary": "Получение всего списка продуктов холодильника",
+        "operationId": "getAllProductsByUserId",
+        "parameters": [
+          {
+            "name": "fridgeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Успешный ответ",
@@ -415,15 +891,26 @@
       },
       "post": {
         "tags": [
-          "Холодильник"
+          "Продукты холодильника"
         ],
         "summary": "Создание продукта холодильника",
-        "operationId": "createProduct",
+        "operationId": "addProduct",
+        "parameters": [
+          {
+            "name": "fridgeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateFridgeProductDto"
+                "$ref": "#/components/schemas/AddFridgeProductDto"
               }
             }
           },
@@ -436,6 +923,173 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FridgeProductResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/user/{id}": {
+      "get": {
+        "tags": [
+          "Пользователи"
+        ],
+        "summary": "Получение детальной информации по id пользователю",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfoResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tags/search": {
+      "get": {
+        "tags": [
+          "Тэги рецепта"
+        ],
+        "summary": "Получение тэгов по совпадению",
+        "operationId": "getAllTagsByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2147483647,
+              "minLength": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tags/all": {
+      "get": {
+        "tags": [
+          "Тэги рецепта"
+        ],
+        "summary": "Получение всего списка тэгов",
+        "operationId": "getAllTags",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/recipe/{userId}/all": {
+      "get": {
+        "tags": [
+          "Рецепты"
+        ],
+        "summary": "Получение рецептов, которые создал пользователь",
+        "operationId": "getAllUserRecipes",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecipeShortResponseDto"
+                  }
                 }
               }
             }
@@ -529,13 +1183,25 @@
         }
       }
     },
-    "/v1/ingredient/all": {
+    "/v1/products/search": {
       "get": {
         "tags": [
-          "Ингредиенты"
+          "Продкуты"
         ],
-        "summary": "Получение всего списка ингредиентов",
-        "operationId": "getAllIngredients",
+        "summary": "Получение продуктов по совпадению",
+        "operationId": "getAllProductsByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2147483647,
+              "minLength": 3
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Успешный ответ",
@@ -544,7 +1210,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/IngredientResponseDto"
+                    "$ref": "#/components/schemas/ProductResponseDto"
                   }
                 }
               }
@@ -562,266 +1228,185 @@
           }
         }
       }
+    },
+    "/v1/products/all": {
+      "get": {
+        "tags": [
+          "Продкуты"
+        ],
+        "summary": "Получение всего списка продуктов",
+        "operationId": "getAllProducts",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/kitchens/search": {
+      "get": {
+        "tags": [
+          "Кухни"
+        ],
+        "summary": "Получение кухонь по совпадению",
+        "operationId": "getAllKitchensByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2147483647,
+              "minLength": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KitchenResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/kitchens/all": {
+      "get": {
+        "tags": [
+          "Кухни"
+        ],
+        "summary": "Получение всего списка кухонь",
+        "operationId": "getAllKitchens",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KitchenResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fridge/{fridgeId}/products/{productId}": {
+      "delete": {
+        "tags": [
+          "Продукты холодильника"
+        ],
+        "summary": "Удаление конкретного продукта по id",
+        "operationId": "deleteProduct_1",
+        "parameters": [
+          {
+            "name": "fridgeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ"
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "RecipeIngredientDto": {
+      "TagResponseDto": {
         "type": "object",
-        "description": "Ингредиент рецепта",
+        "description": "Ответ по 1 тэгу",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
-            "description": "id ингредиента",
-            "minLength": 1
+            "description": "id"
           },
           "name": {
             "type": "string",
-            "description": "Название ингредиента",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "description": {
-            "type": "string",
-            "description": "Описание ингредиента"
-          },
-          "count": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Количество ингредиента",
-            "minimum": 1
-          },
-          "measure": {
-            "type": "string",
-            "description": "Мера ингредиента",
-            "enum": [
-              "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
-            ],
-            "examples": [
-              "kg",
-              "gr",
-              "mg"
-            ]
+            "description": "Название"
           }
         },
         "required": [
-          "count",
           "id",
-          "measure",
           "name"
-        ]
-      },
-      "RecipeResponseDto": {
-        "type": "object",
-        "description": "Детальный рецепт",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id рецепта",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "Название рецепта",
-            "maxLength": 64,
-            "minLength": 1
-          },
-          "description": {
-            "type": "string",
-            "description": "Описание рецепта",
-            "maxLength": 1000,
-            "minLength": 0
-          },
-          "kitchen": {
-            "type": "string",
-            "description": "Кухня рецепта",
-            "enum": [
-              "RUSSIAN",
-              "ASIAN"
-            ],
-            "examples": [
-              "RUSSIAN",
-              "ASIAN",
-              "USA"
-            ]
-          },
-          "level": {
-            "type": "string",
-            "description": "Сложность",
-            "enum": [
-              "EASY",
-              "MEDIUM",
-              "HARD"
-            ],
-            "examples": [
-              "easy",
-              "medium",
-              "hard"
-            ]
-          },
-          "steps": {
-            "type": "array",
-            "description": "Шаги рецепта",
-            "items": {
-              "$ref": "#/components/schemas/StepResponseDto"
-            }
-          },
-          "photos": {
-            "type": "array",
-            "description": "url фото рецепта",
-            "items": {
-              "type": "string"
-            }
-          },
-          "tags": {
-            "type": "array",
-            "description": "Список тэгов рецепта",
-            "items": {
-              "type": "string"
-            }
-          },
-          "ingredients": {
-            "type": "array",
-            "description": "Список ингредиентов",
-            "items": {
-              "$ref": "#/components/schemas/RecipeIngredientDto"
-            }
-          },
-          "cookTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Время приготовления (в секундах)",
-            "example": 300
-          },
-          "allTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Общее время приготовления (в секундах)",
-            "example": 1000
-          },
-          "portion": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Изначальное количество порций",
-            "example": 2
-          },
-          "ownerUser": {
-            "$ref": "#/components/schemas/UserInfoResponseDto",
-            "description": "Владелец рецепта"
-          },
-          "lastUpdaterId": {
-            "type": "integer",
-            "format": "int64",
-            "description": "id последнего редактора рецепта"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Время создания рецепта"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Время обновления рецепта"
-          }
-        },
-        "required": [
-          "createdAt",
-          "id",
-          "lastUpdaterId",
-          "level",
-          "name",
-          "ownerUser",
-          "updatedAt"
-        ]
-      },
-      "StepResponseDto": {
-        "type": "object",
-        "description": "Шаг рецепта",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id шага",
-            "minLength": 1
-          },
-          "index": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Индекс шага (для сортировки)",
-            "minimum": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "Название шага",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "description": {
-            "type": "string",
-            "description": "Описание шага",
-            "maxLength": 2000,
-            "minLength": 1
-          },
-          "photos": {
-            "type": "array",
-            "description": "url фото шагов",
-            "items": {
-              "type": "string"
-            }
-          },
-          "ingredients": {
-            "type": "array",
-            "description": "Список ингредиентов для шага",
-            "items": {
-              "$ref": "#/components/schemas/RecipeIngredientDto"
-            }
-          },
-          "time": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Время приготовление шага в секундах"
-          }
-        },
-        "required": [
-          "description",
-          "id",
-          "index"
-        ]
-      },
-      "UserInfoResponseDto": {
-        "type": "object",
-        "description": "Информация о пользователе для разных ответов",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int64",
-            "description": "id пользователя"
-          },
-          "photo": {
-            "type": "string",
-            "description": "фото пользователя"
-          },
-          "username": {
-            "type": "string",
-            "description": "username пользователя",
-            "maxLength": 2147483647,
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "ФИ пользователя (основная информация, иначе берем nickname)"
-          }
-        },
-        "required": [
-          "id",
-          "username"
         ]
       },
       "ErrorDtoRs": {
@@ -892,6 +1477,515 @@
           "description"
         ]
       },
+      "UpdateTagDto": {
+        "type": "object",
+        "description": "Обновление тэга",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "KitchenResponseDto": {
+        "type": "object",
+        "description": "Ответ по 1 кухне",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "MacrosDto": {
+        "type": "object",
+        "description": "КБЖУ",
+        "properties": {
+          "calories": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Ккалории продукта",
+            "example": 300,
+            "maximum": 100000,
+            "minimum": 0
+          },
+          "proteins": {
+            "type": "number",
+            "description": "Белки",
+            "example": 35.1,
+            "maximum": 100,
+            "minimum": 0
+          },
+          "fats": {
+            "type": "number",
+            "description": "Жиры",
+            "example": 5.44,
+            "maximum": 100,
+            "minimum": 0
+          },
+          "carbs": {
+            "type": "number",
+            "description": "Углеводы",
+            "example": 46.1,
+            "maximum": 100,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "calories",
+          "carbs",
+          "fats",
+          "proteins"
+        ]
+      },
+      "RecipeIngredientDto": {
+        "type": "object",
+        "description": "Ингредиент рецепта (детальный)",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id ингредиента",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Название ингредиента",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание ингредиента"
+          },
+          "count": {
+            "type": "number",
+            "description": "Количество ингредиента"
+          },
+          "productUnit": {
+            "type": "string",
+            "description": "Мера ингредиента",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
+          },
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
+          }
+        },
+        "required": [
+          "count",
+          "id",
+          "macros",
+          "name",
+          "productUnit"
+        ]
+      },
+      "RecipeResponseDto": {
+        "type": "object",
+        "description": "Детальный рецепт",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id рецепта",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Название рецепта",
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание рецепта",
+            "maxLength": 1000,
+            "minLength": 0
+          },
+          "kitchens": {
+            "type": "array",
+            "description": "Кухня рецепта",
+            "items": {
+              "$ref": "#/components/schemas/KitchenResponseDto"
+            }
+          },
+          "level": {
+            "type": "string",
+            "description": "Сложность",
+            "enum": [
+              "EASY",
+              "MEDIUM",
+              "HARD"
+            ],
+            "examples": [
+              "easy",
+              "medium",
+              "hard"
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "description": "Шаги рецепта",
+            "items": {
+              "$ref": "#/components/schemas/StepResponseDto"
+            }
+          },
+          "photos": {
+            "type": "array",
+            "description": "url фото рецепта",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Список тэгов рецепта",
+            "items": {
+              "$ref": "#/components/schemas/TagResponseDto"
+            }
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "Список ингредиентов",
+            "items": {
+              "$ref": "#/components/schemas/RecipeIngredientDto"
+            }
+          },
+          "activeTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Время приготовления (в секундах)",
+            "example": 300
+          },
+          "allTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Общее время приготовления (в секундах)",
+            "example": 1000
+          },
+          "baseUnit": {
+            "type": "string",
+            "description": "Базовая мера итогового продукта",
+            "enum": [
+              "ML",
+              "GR"
+            ],
+            "examples": [
+              "ML",
+              "GR"
+            ]
+          },
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес 1 unit",
+            "example": 80
+          },
+          "unit": {
+            "type": "string",
+            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
+          },
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
+          },
+          "statistic": {
+            "$ref": "#/components/schemas/RecipeResponseStatisticDto",
+            "description": "Статистика рецепта"
+          },
+          "ownerUser": {
+            "$ref": "#/components/schemas/UserInfoResponseDto",
+            "description": "Владелец рецепта"
+          },
+          "lastUpdaterId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id последнего редактора рецепта"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Время создания рецепта"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Время обновления рецепта"
+          }
+        },
+        "required": [
+          "avgWeight",
+          "baseUnit",
+          "createdAt",
+          "id",
+          "lastUpdaterId",
+          "level",
+          "macros",
+          "name",
+          "ownerUser",
+          "unit",
+          "updatedAt"
+        ]
+      },
+      "RecipeResponseStatisticDto": {
+        "type": "object",
+        "description": "Статистика рецепта",
+        "properties": {
+          "likesCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Количетсво лайков",
+            "example": 2
+          },
+          "viewsCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Количество просмотров",
+            "example": 33
+          },
+          "avgRating": {
+            "type": "number",
+            "description": "Средний рейтинг",
+            "example": 4.3
+          },
+          "ratingsCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Количетсво проголосовавших",
+            "example": 5
+          },
+          "commentsCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Количетсво комментов",
+            "example": 3
+          },
+          "favoritesCount": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Колчиество добавленных в избранное",
+            "example": 1
+          }
+        },
+        "required": [
+          "avgRating",
+          "commentsCount",
+          "favoritesCount",
+          "likesCount",
+          "ratingsCount",
+          "viewsCount"
+        ]
+      },
+      "StepIngredientDto": {
+        "type": "object",
+        "description": "Ингредиент шага рецепта",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id ингредиента",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Название ингредиента",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание ингредиента"
+          },
+          "count": {
+            "type": "number",
+            "description": "Количество ингредиента"
+          },
+          "productUnit": {
+            "type": "string",
+            "description": "Мера ингредиента",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
+          }
+        },
+        "required": [
+          "count",
+          "id",
+          "name",
+          "productUnit"
+        ]
+      },
+      "StepResponseDto": {
+        "type": "object",
+        "description": "Шаг рецепта",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id шага",
+            "minLength": 1
+          },
+          "index": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Индекс шага (для сортировки)",
+            "minimum": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Название шага",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание шага",
+            "maxLength": 2000,
+            "minLength": 1
+          },
+          "photos": {
+            "type": "array",
+            "description": "url фото шагов",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "Список ингредиентов для шага",
+            "items": {
+              "$ref": "#/components/schemas/StepIngredientDto"
+            }
+          },
+          "time": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Время приготовление шага в секундах"
+          }
+        },
+        "required": [
+          "description",
+          "id",
+          "index"
+        ]
+      },
+      "UserInfoResponseDto": {
+        "type": "object",
+        "description": "Информация о пользователе для разных ответов",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id пользователя"
+          },
+          "photo": {
+            "type": "string",
+            "description": "фото пользователя"
+          },
+          "username": {
+            "type": "string",
+            "description": "username пользователя",
+            "maxLength": 2147483647,
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "ФИ пользователя (основная информация, иначе берем nickname)"
+          }
+        },
+        "required": [
+          "id",
+          "username"
+        ]
+      },
       "UpdateRecipeDto": {
         "type": "object",
         "properties": {
@@ -909,18 +2003,18 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "kitchen": {
-            "type": "string",
+          "kitchens": {
+            "type": "array",
             "description": "Кухня рецепта",
-            "enum": [
-              "RUSSIAN",
-              "ASIAN"
-            ],
             "examples": [
               "RUSSIAN",
               "ASIAN",
               "USA"
-            ]
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "level": {
             "type": "string",
@@ -959,7 +2053,8 @@
             "description": "Список тэгов рецепта",
             "example": null,
             "items": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           },
           "ingredients": {
@@ -969,7 +2064,7 @@
               "$ref": "#/components/schemas/UpdateRecipeIngredientDto"
             }
           },
-          "cookTime": {
+          "activeTime": {
             "type": "integer",
             "format": "int32",
             "description": "Время приготовления (в секундах)",
@@ -981,16 +2076,61 @@
             "description": "Общее время приготовления (в секундах)",
             "example": 1000
           },
-          "portion": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Изначальное количество порций",
-            "example": 2
+          "baseUnit": {
+            "type": "string",
+            "description": "Базовая мера итогового продукта",
+            "enum": [
+              "ML",
+              "GR"
+            ],
+            "examples": [
+              "ML",
+              "GR"
+            ]
+          },
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес 1 unit",
+            "example": 80
+          },
+          "unit": {
+            "type": "string",
+            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
           }
         },
         "required": [
+          "avgWeight",
+          "baseUnit",
           "level",
-          "name"
+          "name",
+          "unit"
         ]
       },
       "UpdateRecipeIngredientDto": {
@@ -1005,32 +2145,46 @@
             "minLength": 1
           },
           "count": {
-            "type": "integer",
-            "format": "int32",
+            "type": "number",
             "description": "Количество ингредиента",
-            "minimum": 1
+            "example": 1
           },
-          "measure": {
+          "productUnit": {
             "type": "string",
             "description": "Мера ингредиента",
             "enum": [
-              "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "MG"
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
             ]
           }
         },
         "required": [
           "count",
           "id",
-          "measure"
+          "productUnit"
         ]
       },
       "UpdateStepDto": {
@@ -1091,55 +2245,83 @@
           "index"
         ]
       },
-      "IngredientResponseDto": {
+      "ProductResponseDto": {
         "type": "object",
-        "description": "Ответ по 1 ингрединету",
+        "description": "Ответ по 1 продукта",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
-            "description": "id ингредиента"
+            "description": "id"
           },
           "name": {
             "type": "string",
-            "description": "Название ингредиента"
+            "description": "Название"
           },
           "description": {
             "type": "string",
-            "description": "Описание ингредиента"
+            "description": "Описание"
           },
-          "measure": {
+          "baseUnit": {
             "type": "string",
-            "description": "Мера ингредиента",
+            "description": "Базовая мера продукта",
             "enum": [
               "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GR"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "MG"
+              "ML",
+              "GR"
             ]
           },
-          "photoId": {
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес",
+            "example": 80
+          },
+          "unit": {
             "type": "string",
-            "description": "url фото ингредиента"
+            "description": "Базовая мера продукта",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
           },
-          "ownerUser": {
-            "$ref": "#/components/schemas/UserInfoResponseDto",
-            "description": "Владелец рецепта"
+          "photo": {
+            "type": "string",
+            "description": "url фото"
           },
-          "lastUpdater": {
-            "$ref": "#/components/schemas/UserInfoResponseDto",
-            "description": "Последний редактор ингредиента"
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
           },
           "createdAt": {
             "type": "string",
             "format": "date-time",
-            "description": "Время создания ингредиента"
+            "description": "Время создания"
           },
           "updatedAt": {
             "type": "string",
@@ -1148,54 +2330,179 @@
           }
         },
         "required": [
+          "avgWeight",
+          "baseUnit",
           "createdAt",
           "id",
-          "lastUpdater",
-          "measure",
+          "macros",
           "name",
-          "ownerUser",
+          "unit",
           "updatedAt"
         ]
       },
-      "UpdateIngredientDto": {
+      "UpdateProductDto": {
         "type": "object",
-        "description": "Запрос обновления ингредиента",
+        "description": "Запрос обновления продукта",
         "properties": {
           "name": {
             "type": "string",
-            "description": "Название ингредиента",
+            "description": "Название",
             "maxLength": 64,
             "minLength": 0
           },
           "description": {
             "type": "string",
-            "description": "Описание ингредиента",
+            "description": "Описание",
             "maxLength": 1000,
             "minLength": 0
           },
-          "measure": {
+          "baseUnit": {
             "type": "string",
-            "description": "Мера ингредиента",
+            "description": "Базовая мера",
             "enum": [
               "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GR"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "MG"
+              "ML",
+              "GR"
             ]
           },
-          "photoId": {
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес",
+            "example": 80
+          },
+          "unit": {
             "type": "string",
-            "description": "base64 фото ингредиента"
+            "description": "Конкретная мера",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
+          },
+          "photo": {
+            "type": "string",
+            "description": "url фото",
+            "maxLength": 2000,
+            "minLength": 0
+          },
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
           }
         },
         "required": [
-          "measure",
+          "avgWeight",
+          "baseUnit",
+          "macros",
+          "name",
+          "unit"
+        ]
+      },
+      "UpdateKitchenDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Русская"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "FridgeResponseDto": {
+        "type": "object",
+        "description": "Ответ холодильник",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название"
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание"
+          },
+          "address": {
+            "type": "string",
+            "description": "Адрес (для точности)"
+          },
+          "ownerUser": {
+            "$ref": "#/components/schemas/UserInfoResponseDto",
+            "description": "Владелец рецепта"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Время создания рецепта"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Время обновления рецепта"
+          }
+        },
+        "required": [
+          "createdAt",
+          "id",
+          "name",
+          "ownerUser",
+          "updatedAt"
+        ]
+      },
+      "UpdateFridgeDto": {
+        "type": "object",
+        "description": "Запрос на обновление холодильника",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание",
+            "maxLength": 1000,
+            "minLength": 0
+          },
+          "address": {
+            "type": "string",
+            "description": "Адрес (для точности)",
+            "maxLength": 1000,
+            "minLength": 0
+          }
+        },
+        "required": [
           "name"
         ]
       },
@@ -1207,7 +2514,7 @@
             "format": "uuid",
             "description": "id продукта холодильника"
           },
-          "ingredientId": {
+          "productId": {
             "type": "string",
             "format": "uuid",
             "description": "id ингредиента"
@@ -1217,27 +2524,52 @@
             "description": "Название ингредиента",
             "minLength": 1
           },
-          "count": {
-            "type": "number",
-            "description": "Описание ингредиента",
-            "example": 0.55,
-            "maximum": 10000,
-            "minimum": 0
-          },
-          "measure": {
+          "baseUnit": {
             "type": "string",
-            "description": "Мера продукта в холодильника",
+            "description": "Базовая мера продукта",
             "enum": [
               "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GR"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "L"
+              "ML",
+              "GR"
+            ]
+          },
+          "count": {
+            "type": "number",
+            "description": "Средний вес/штук",
+            "example": 2
+          },
+          "productUnit": {
+            "type": "string",
+            "description": "Конкретная мера продукта",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
             ]
           },
           "expiryDate": {
@@ -1252,8 +2584,8 @@
             "example": "Открыл вчера"
           },
           "ownerId": {
-            "type": "integer",
-            "format": "int64",
+            "type": "string",
+            "format": "uuid",
             "description": "id владельца"
           },
           "createdAt": {
@@ -1268,13 +2600,14 @@
           }
         },
         "required": [
+          "baseUnit",
           "count",
           "createdAt",
           "id",
-          "ingredientId",
-          "measure",
           "name",
           "ownerId",
+          "productId",
+          "productUnit",
           "updatedAt"
         ]
       },
@@ -1282,32 +2615,57 @@
         "type": "object",
         "description": "Запрос на добавление продукта в холодильник",
         "properties": {
-          "ingredientId": {
+          "productId": {
             "type": "string",
             "format": "uuid",
-            "description": "id ингредиента"
+            "description": "id продукта"
+          },
+          "baseUnit": {
+            "type": "string",
+            "description": "Базовая мера продукта",
+            "enum": [
+              "ML",
+              "GR"
+            ],
+            "examples": [
+              "ML",
+              "GR"
+            ]
           },
           "count": {
             "type": "number",
-            "description": "Описание ингредиента",
-            "example": 0.55,
-            "maximum": 10000,
-            "minimum": 0
+            "description": "Вес или штуки",
+            "example": 80
           },
-          "measure": {
+          "productUnit": {
             "type": "string",
-            "description": "Мера продукта в холодильника",
+            "description": "Конкретная мера продукта",
             "enum": [
-              "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "L"
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
             ]
           },
           "expiryDate": {
@@ -1323,9 +2681,24 @@
           }
         },
         "required": [
+          "baseUnit",
           "count",
-          "ingredientId",
-          "measure"
+          "productId",
+          "productUnit"
+        ]
+      },
+      "CreateTagDto": {
+        "type": "object",
+        "description": "Создание тэга",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Десерт"
+          }
+        },
+        "required": [
+          "name"
         ]
       },
       "CreateRecipeDto": {
@@ -1346,18 +2719,17 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "kitchen": {
-            "type": "string",
-            "description": "Кухня рецепта",
-            "enum": [
-              "RUSSIAN",
-              "ASIAN"
+          "kitchens": {
+            "type": "array",
+            "description": "Список ID кухонь",
+            "example": [
+              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
+              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
             ],
-            "examples": [
-              "RUSSIAN",
-              "ASIAN",
-              "USA"
-            ]
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "level": {
             "type": "string",
@@ -1384,8 +2756,8 @@
             "type": "array",
             "description": "url фото рецепта",
             "example": [
-              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
-              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
+              "https://i.pinimg.com/originals/22/44/2f/22442fb8951b925dbc333e6a384f904c.jpg",
+              "https://kartinkof.club/uploads/posts/2022-04/1649960798_33-kartinkof-club-p-poka-kartinki-prikolnie-50.jpg"
             ],
             "items": {
               "type": "string"
@@ -1393,10 +2765,11 @@
           },
           "tags": {
             "type": "array",
-            "description": "Список тэгов рецепта",
+            "description": "Список ID тэгов рецепта",
             "example": null,
             "items": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           },
           "ingredients": {
@@ -1406,7 +2779,7 @@
               "$ref": "#/components/schemas/CreateRecipeIngredientDto"
             }
           },
-          "cookTime": {
+          "activeTime": {
             "type": "integer",
             "format": "int32",
             "description": "Время приготовления (в секундах)",
@@ -1418,16 +2791,66 @@
             "description": "Общее время приготовления (в секундах)",
             "example": 1000
           },
-          "portion": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Изначальное количество порций",
-            "example": 2
+          "baseUnit": {
+            "type": "string",
+            "description": "Базовая мера итогового продукта",
+            "enum": [
+              "ML",
+              "GR"
+            ],
+            "examples": [
+              "ML",
+              "GR"
+            ]
+          },
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес 1 unit",
+            "example": 80
+          },
+          "unit": {
+            "type": "string",
+            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
+          },
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
           }
         },
         "required": [
+          "avgWeight",
+          "baseUnit",
           "level",
-          "name"
+          "macros",
+          "name",
+          "unit"
         ]
       },
       "CreateRecipeIngredientDto": {
@@ -1442,33 +2865,46 @@
             "minLength": 1
           },
           "count": {
-            "type": "integer",
-            "format": "int32",
+            "type": "number",
             "description": "Количество ингредиента",
-            "maximum": 10000,
-            "minimum": 1
+            "example": 1
           },
-          "measure": {
+          "productUnit": {
             "type": "string",
             "description": "Мера ингредиента",
             "enum": [
-              "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "MG"
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
             ]
           }
         },
         "required": [
           "count",
           "id",
-          "measure"
+          "productUnit"
         ]
       },
       "CreateStepDto": {
@@ -1525,78 +2961,219 @@
           "index"
         ]
       },
-      "CreateIngredientDto": {
+      "RecipeActionDto": {
         "type": "object",
-        "description": "Запрос создания ингредиента",
+        "description": "Действие пользователя",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Действие",
+            "enum": [
+              "LIKE",
+              "FAVORITE",
+              "SET_RATE"
+            ],
+            "examples": [
+              "LIKE",
+              "FAVORITE",
+              "SET_RATE"
+            ]
+          },
+          "value": {
+            "description": "Значение (пара LIKE,FAVORITE = true/false, SET_RATE = 1-5)",
+            "examples": [
+              "true",
+              "false",
+              "1",
+              "2",
+              "3",
+              "4",
+              "5"
+            ]
+          }
+        },
+        "required": [
+          "action",
+          "value"
+        ]
+      },
+      "CreateProductDto": {
+        "type": "object",
+        "description": "Запрос создания продукта",
         "properties": {
           "name": {
             "type": "string",
-            "description": "Название ингредиента",
+            "description": "Название продукта",
             "maxLength": 64,
             "minLength": 1
           },
           "description": {
             "type": "string",
-            "description": "Описание ингредиента",
+            "description": "Описание продукта",
             "maxLength": 1000,
             "minLength": 0
           },
-          "measure": {
+          "baseUnit": {
             "type": "string",
-            "description": "Мера ингредиента",
+            "description": "Базовая мера продукта",
             "enum": [
               "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GR"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "L"
+              "ML",
+              "GR"
             ]
           },
-          "photoId": {
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес",
+            "example": 80
+          },
+          "unit": {
             "type": "string",
-            "description": "base64 фото ингредиента"
+            "description": "Конкретная мера продукта",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
+            ]
+          },
+          "photo": {
+            "type": "string",
+            "description": "url фото",
+            "maxLength": 2000,
+            "minLength": 0
+          },
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
           }
         },
         "required": [
-          "measure",
+          "avgWeight",
+          "baseUnit",
+          "macros",
+          "name",
+          "unit"
+        ]
+      },
+      "CreateKitchenDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Русская"
+          }
+        },
+        "required": [
           "name"
         ]
       },
-      "CreateFridgeProductDto": {
+      "CreateFridgeDto": {
+        "type": "object",
+        "description": "Запрос на создания холодильника",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание",
+            "maxLength": 1000,
+            "minLength": 0
+          },
+          "address": {
+            "type": "string",
+            "description": "Адрес (для точности)",
+            "maxLength": 1000,
+            "minLength": 0
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "AddFridgeProductDto": {
         "type": "object",
         "description": "Запрос на добавление продукта в холодильник",
         "properties": {
-          "ingredientId": {
+          "productId": {
             "type": "string",
             "format": "uuid",
             "description": "id продукта/ингредиента"
           },
-          "count": {
-            "type": "number",
-            "description": "Описание ингредиента",
-            "example": 0.55,
-            "maximum": 10000,
-            "minimum": 0
-          },
-          "measure": {
+          "baseUnit": {
             "type": "string",
-            "description": "Мера продукта в холодильника",
+            "description": "Базовая мера продукта",
             "enum": [
               "ML",
-              "L",
-              "MG",
-              "GR",
-              "KG"
+              "GR"
             ],
             "examples": [
-              "KG",
-              "GR",
-              "L"
+              "ML",
+              "GR"
+            ]
+          },
+          "avgWeight": {
+            "type": "number",
+            "description": "Средний вес",
+            "example": 80
+          },
+          "productUnit": {
+            "type": "string",
+            "description": "Конкретная мера продукта",
+            "enum": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM",
+              "MILLILITER",
+              "LITER",
+              "TEASPOON",
+              "TABLESPOON",
+              "CUP",
+              "PIECE",
+              "PACKAGE",
+              "BUNCH",
+              "SLICE",
+              "LEAF",
+              "PIECE_PART",
+              "PORTION",
+              "PINCH",
+              "HANDFUL",
+              "PLATE",
+              "TO_TASTE",
+              "APPROX"
+            ],
+            "examples": [
+              "GRAM",
+              "KILOGRAM",
+              "MILLIGRAM"
             ]
           },
           "expiryDate": {
@@ -1612,9 +3189,10 @@
           }
         },
         "required": [
-          "count",
-          "ingredientId",
-          "measure"
+          "avgWeight",
+          "baseUnit",
+          "productId",
+          "productUnit"
         ]
       },
       "RecipeShortResponseDto": {
@@ -1639,17 +3217,12 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "kitchen": {
-            "type": "string",
+          "kitchens": {
+            "type": "array",
             "description": "Кухня рецепта",
-            "enum": [
-              "RUSSIAN",
-              "ASIAN"
-            ],
-            "examples": [
-              "RUSSIAN",
-              "ASIAN"
-            ]
+            "items": {
+              "$ref": "#/components/schemas/KitchenResponseDto"
+            }
           },
           "level": {
             "type": "string",
@@ -1676,8 +3249,12 @@
             "type": "array",
             "description": "Список тэгов рецепта",
             "items": {
-              "type": "string"
+              "$ref": "#/components/schemas/TagResponseDto"
             }
+          },
+          "statistic": {
+            "$ref": "#/components/schemas/RecipeResponseStatisticDto",
+            "description": "Статистика рецепта"
           },
           "ownerUser": {
             "$ref": "#/components/schemas/UserInfoResponseDto",
@@ -1696,6 +3273,14 @@
           "ownerUser",
           "updatedAt"
         ]
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "name": "bearerAuth",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AddProductForm } from './AddProductForm';
 import { ProductItem } from './ProductItem';
-import { SuggestProductForm } from './SuggestProductForm';
+ 
 import type { MeasureType } from '../../types/measures.types';
 import type { FridgeProduct } from '../../types/fridge.types';
-import { ingredientsService } from '../../services/ingredientsService';
 import { fridgeApiService } from '../../services/fridgeApiService';
 import styles from './FridgeProducts.module.css';
 
@@ -13,7 +12,6 @@ export const FridgeProducts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showSuggestForm, setShowSuggestForm] = useState(false);
 
   // Загрузка продуктов из API
   const loadFridgeProducts = async () => {
@@ -29,18 +27,7 @@ export const FridgeProducts: React.FC = () => {
     }
   };
 
-  const handleSuggestProduct = async (productData: { name: string; description: string; measure: MeasureType }) => {
-    try {
-      const newIngredient = await ingredientsService.createIngredient(productData);
-      console.log('Продукт успешно предложен:', newIngredient);
-      setShowSuggestForm(false);
-      // Обновляем список продуктов после успешного добавления
-      await loadFridgeProducts();
-    } catch (error) {
-      console.error('Ошибка при предложении продукта:', error);
-      setError('Не удалось предложить продукт');
-    }
-  };
+  // Предложение продукта перенесено в /admin
 
   useEffect(() => {
     loadFridgeProducts();
@@ -113,12 +100,6 @@ export const FridgeProducts: React.FC = () => {
         <h2>Мои продукты</h2>
         <div className={styles.headerButtons}>
           <button 
-            className={styles.suggestButton}
-            onClick={() => setShowSuggestForm(true)}
-          >
-            Предложить продукт
-          </button>
-          <button 
             className={styles.addButton}
             onClick={() => setShowAddForm(true)}
           >
@@ -137,14 +118,7 @@ export const FridgeProducts: React.FC = () => {
         </div>
       )}
 
-      {showSuggestForm && (
-        <div className={styles.addFormContainer}>
-          <SuggestProductForm
-            onSubmit={handleSuggestProduct}
-            onCancel={() => setShowSuggestForm(false)}
-          />
-        </div>
-      )}
+      {/* Форма предложения перенесена в /admin */}
 
       {items.length === 0 ? (
         <div className={styles.empty}>

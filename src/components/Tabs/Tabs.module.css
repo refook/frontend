@@ -2,7 +2,7 @@
 
 .bar {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: var(--spacing-2xl);
   align-items: center;
   background: var(--token-surface);
@@ -32,10 +32,7 @@
 }
 .tab:hover { background: color-mix(in oklab, var(--token-accent-weak) 30%, transparent); }
 
-.tabActive {
-  background: var(--token-accent-weak);
-  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
-}
+.tabActive { background: var(--token-accent-weak); }
 
 .icon { width: 18px; height: 18px; color: var(--token-muted); }
 .tabActive .icon { color: var(--token-accent); }

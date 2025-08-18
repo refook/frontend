@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../store';
-import { ingredientsService } from '../../services/ingredientsService';
+import { API_BASE_URL } from '../../services/api';
 import { MEASURES_ARRAY } from '../../constants/measures';
 import type { ApiIngredient } from '../../types/ingredient.types';
 import styles from './AddProductForm.module.css';
@@ -26,6 +26,22 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
   const [notes, setNotes] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Временная загрузка продуктов через новый эндпоинт products/all
+  const fetchProducts = async (): Promise<ApiIngredient[]> => {
+    const token = localStorage.getItem('authToken');
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const response = await fetch(`${API_BASE_URL}/products/all`, { headers });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const products = await response.json();
+    return products as ApiIngredient[];
+  };
+
   // Загружаем ингредиенты при монтировании компонента
   useEffect(() => {
     const loadIngredients = async () => {
@@ -33,8 +49,8 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
         setIngredientsLoading(true);
         console.log('Начинаем загрузку ингредиентов...');
         
-        // Используем новый API сервис
-        const ingredients = await ingredientsService.getIngredientsForFridge();
+        // Новый эндпоинт: products вместо ingredients
+        const ingredients = await fetchProducts();
         console.log('Загружено ингредиентов:', ingredients.length);
         
         setAvailableIngredients(ingredients);
@@ -42,7 +58,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
       } catch (error) {
         console.error('Ошибка при загрузке ингредиентов:', error);
         // В случае ошибки показываем сообщение пользователю
-        setErrors({ api: 'Ошибка загрузки ингредиентов. Проверьте подключение к интернету.' });
+        setErrors({ api: 'Ошибка загрузки продуктов. Проверьте подключение к интернету.' });
       } finally {
         setIngredientsLoading(false);
       }
@@ -120,13 +136,13 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
                 setErrors(prev => ({ ...prev, api: '' }));
                 setIngredientsLoading(true);
                 try {
-                  const ingredients = await ingredientsService.getIngredientsForFridge();
+                  const ingredients = await fetchProducts();
                   setAvailableIngredients(ingredients);
                   if (ingredients.length === 0) {
-                    setErrors({ api: 'API вернул пустой список. Возможно, данные еще не добавлены в систему.' });
+                    setErrors({ api: 'API вернул пустой список продуктов. Возможно, данные еще не добавлены в систему.' });
                   }
                 } catch (error) {
-                  setErrors({ api: 'Ошибка подключения к API. Проверьте интернет соединение.' });
+                  setErrors({ api: 'Ошибка подключения к API продуктов. Проверьте интернет соединение.' });
                 } finally {
                   setIngredientsLoading(false);
                 }
@@ -139,7 +155,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
 
         {availableIngredients.length === 0 && !ingredientsLoading && !errors.api && (
           <div className={styles.emptyState}>
-            <p>🍽️ Список ингредиентов пуст</p>
+            <p>🍽️ Список продуктов пуст</p>
             <p>Возможно, администратор еще не добавил продукты в систему</p>
           </div>
         )}
@@ -159,7 +175,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
             disabled={ingredientsLoading || !!errors.api}
           >
             <option value="">
-              {ingredientsLoading ? 'Загрузка ингредиентов...' : 
+              {ingredientsLoading ? 'Загрузка продуктов...' : 
                errors.api ? 'Ошибка загрузки...' :
                'Выберите продукт...'}
             </option>

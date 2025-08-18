@@ -2,8 +2,9 @@ import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import styles from './AdvancedProfilePage.module.css';
 import ProfileCard, { type AdvancedProfileUser } from './components/ProfileCard';
-import ProfileTabs, { type TabId } from './components/ProfileTabs/ProfileTabs';
+import Tabs, { type TabId } from '../../components/Tabs/Tabs';
 import SectionHeader from './components/SectionHeader';
+import { HeartIcon, ClockIcon, UserGroupIcon, BookOpenIcon, ChatBubbleLeftRightIcon, StarIcon } from '@heroicons/react/24/outline';
 import FavoritesSection from './sections/Favorites/FavoritesSection';
 import HistorySection from './sections/History/HistorySection';
 import FollowingSection from './sections/Following/FollowingSection';
@@ -45,6 +46,15 @@ const mockUser: AdvancedProfileUser = {
   ]
 };
 
+const profileTabs = [
+  { id: 'favorites', label: 'Favorites', Icon: HeartIcon },
+  { id: 'history', label: 'History', Icon: ClockIcon },
+  { id: 'following', label: 'Following', Icon: UserGroupIcon },
+  { id: 'recipes', label: 'Recipes', Icon: BookOpenIcon },
+  { id: 'comments', label: 'Comments', Icon: ChatBubbleLeftRightIcon },
+  { id: 'activity', label: 'Activity', Icon: StarIcon },
+];
+
 /**
  * Страница расширенного профиля пользователя.
  * Состоит из карточки профиля, вкладок и контента выбранной вкладки:
@@ -79,7 +89,12 @@ const AdvancedProfilePage: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <ProfileCard user={user} />
-      <ProfileTabs initial={activeTab} onChange={setActiveTab} />
+      <Tabs 
+        initial={activeTab} 
+        onChange={setActiveTab} 
+        tabs={profileTabs}
+        ariaLabel="Profile sections"
+      />
       {activeTab === 'favorites' && <FavoritesSection />}
       {activeTab === 'history' && <HistorySection />}
       {activeTab === 'following' && <FollowingSection />}

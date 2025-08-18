@@ -184,6 +184,10 @@ const Header: React.FC = () => {
                 aria-label="Меню профиля"
               >
                 <div className={styles.menuList}>
+                  <Link to="/admin" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                    <SparklesIcon className={styles.menuIcon} />
+                    <span className={styles.menuLabel}>Админ-панель</span>
+                  </Link>
                   <Link to="/profile" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <UserIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Профиль</span>
