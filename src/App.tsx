@@ -3,6 +3,7 @@ import {Routes, Route} from 'react-router-dom';
 
 import Layout from './components/Layout/Layout';
 import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage, ProfilePage, AdvancedProfilePage} from './pages';
+import AdminPage from './pages/Admin/AdminPage';
 import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
@@ -24,6 +25,7 @@ function App() {
                     <Route path="/profile" element={<ProfilePage/>}/>
                     {false && <Route path="/favorites" element={<div />}/>}
                     <Route path="/profile/advanced" element={<AdvancedProfilePage/>}/>
+                    <Route path="/admin" element={<AdminPage/>}/>
                 </Routes>
             </Layout>
             <DevTools/>

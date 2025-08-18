@@ -1,0 +1,80 @@
+.adminPage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--ui-border, #e5e7eb);
+}
+
+.tab {
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--ui-text, #111827);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tabActive {
+  border-bottom-color: var(--ui-primary, #4f46e5);
+  color: var(--ui-primary, #4f46e5);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.card {
+  background: var(--ui-surface, #ffffff);
+  border: 1px solid var(--ui-border, #e5e7eb);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.formGrid {
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+}
+
+.row4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .row4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+
