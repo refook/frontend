@@ -39,8 +39,9 @@
 .label { font-weight: 600; }
 
 @media (max-width: 768px) {
-  .bar { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; overflow: auto; gap: var(--spacing-lg); padding: var(--spacing-md) var(--spacing-lg); }
-  .tab { width: auto; }
+  .bar { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; overflow: auto; gap: var(--spacing-md); padding: var(--spacing-sm) var(--spacing-md); }
+  .tab { width: auto; height: 34px; padding: 0 10px; }
+  .icon { width: 16px; height: 16px; }
   .label { display: none; }
 }
 
