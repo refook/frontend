@@ -1,10 +1,11 @@
-import React, { useState, useRef, type KeyboardEvent } from 'react';
+import React, { useState, useRef, type KeyboardEvent, useEffect } from 'react';
+import { API_BASE_URL } from '../../services/api';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import styles from './TagsInput.module.css';
 
 interface TagsInputProps {
-  tags: string[];
-  onChange: (tags: string[]) => void;
+  tags: { id: string; name: string }[];
+  onChange: (tags: { id: string; name: string }[]) => void;
   placeholder?: string;
   maxTags?: number;
 }
@@ -18,40 +19,50 @@ const TagsInput: React.FC<TagsInputProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [availableTags, setAvailableTags] = useState<Array<{ id: string; name: string }>>([]);
 
-  // Популярные теги для автокомплита
-  const popularTags = [
-    'завтрак', 'обед', 'ужин', 'перекус', 'десерт',
-    'быстро', 'легко', 'здоровое', 'вегетарианское',
-    'острое', 'сладкое', 'горячее', 'холодное',
-    'праздничное', 'детское', 'диетическое'
-  ];
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const resp = await fetch(`${API_BASE_URL}/tags/all`, { headers });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        const normalized = (Array.isArray(data) ? data : []).map((t: any) => ({ id: t.id, name: t.name })).filter((t: any) => t.id && t.name);
+        setAvailableTags(normalized);
+      } catch (e) {
+        setAvailableTags([]);
+      }
+    };
+    loadTags();
+  }, []);
 
-  const suggestions = popularTags.filter(tag => 
-    tag.toLowerCase().includes(inputValue.toLowerCase()) &&
-    !tags.includes(tag) &&
-    inputValue.length > 0
-  );
+  const suggestions = availableTags
+    .filter(t => t.name.toLowerCase().includes(inputValue.toLowerCase()) && !tags.some(x => x.id === t.id))
+    .slice(0, 8);
 
-  const addTag = (tag: string) => {
-    const trimmedTag = tag.trim();
-    if (trimmedTag && !tags.includes(trimmedTag) && tags.length < maxTags) {
-      onChange([...tags, trimmedTag]);
+  const addTagByName = (tagName: string) => {
+    const trimmedTag = tagName.trim();
+    const found = availableTags.find(t => t.name.toLowerCase() === trimmedTag.toLowerCase());
+    if (found && !tags.some(t => t.id === found.id) && tags.length < maxTags) {
+      onChange([...tags, found]);
       setInputValue('');
       setShowSuggestions(false);
     }
   };
 
-  const removeTag = (tagToRemove: string) => {
-    onChange(tags.filter(tag => tag !== tagToRemove));
+  const removeTagById = (id: string) => {
+    onChange(tags.filter(tag => tag.id !== id));
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      addTag(inputValue);
+      addTagByName(inputValue);
     } else if (e.key === 'Backspace' && inputValue === '' && tags.length > 0) {
-      removeTag(tags[tags.length - 1]);
+      removeTagById(tags[tags.length - 1].id);
     } else if (e.key === 'Escape') {
       setShowSuggestions(false);
       inputRef.current?.blur();
@@ -64,8 +75,8 @@ const TagsInput: React.FC<TagsInputProps> = ({
     setShowSuggestions(value.length > 0);
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    addTag(suggestion);
+  const handleSuggestionClick = (name: string) => {
+    addTagByName(name);
   };
 
   const canAddMore = tags.length < maxTags;
@@ -73,14 +84,14 @@ const TagsInput: React.FC<TagsInputProps> = ({
   return (
     <div className={styles.tagsInput}>
       <div className={styles.tagsContainer}>
-        {tags.map((tag, index) => (
-          <span key={index} className={styles.tag}>
-            {tag}
+        {tags.map((tag) => (
+          <span key={tag.id} className={styles.tag}>
+            {tag.name}
             <button
               type="button"
-              onClick={() => removeTag(tag)}
+              onClick={() => removeTagById(tag.id)}
               className={styles.removeTag}
-              title={`Удалить тег "${tag}"`}
+              title={`Удалить тег "${tag.name}"`}
             >
               <XMarkIcon className={styles.removeIcon} />
             </button>
@@ -101,10 +112,10 @@ const TagsInput: React.FC<TagsInputProps> = ({
               className={styles.input}
             />
             
-            {inputValue && (
+            {inputValue && availableTags.some(t => t.name.toLowerCase() === inputValue.trim().toLowerCase()) && (
               <button
                 type="button"
-                onClick={() => addTag(inputValue)}
+                onClick={() => addTagByName(inputValue)}
                 className={styles.addButton}
                 title="Добавить тег"
               >
@@ -114,14 +125,14 @@ const TagsInput: React.FC<TagsInputProps> = ({
             
             {showSuggestions && suggestions.length > 0 && (
               <div className={styles.suggestions}>
-                {suggestions.slice(0, 5).map(suggestion => (
+                {suggestions.map(suggestion => (
                   <button
-                    key={suggestion}
+                    key={suggestion.id}
                     type="button"
-                    onClick={() => handleSuggestionClick(suggestion)}
+                    onClick={() => handleSuggestionClick(suggestion.name)}
                     className={styles.suggestion}
                   >
-                    {suggestion}
+                    {suggestion.name}
                   </button>
                 ))}
               </div>
@@ -137,7 +148,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
       )}
       
       <p className={styles.hint}>
-        Нажмите Enter или запятую для добавления тега
+        Выбирайте теги из списка (ввод произвольных запрещён)
       </p>
     </div>
   );

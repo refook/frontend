@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store';
 import type { CreateRecipeDto } from '../types/recipe.types';
+import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../constants/measures';
 import RecipeForm from '../components/RecipeForm/RecipeForm';
 import RecipePreview from '../components/RecipePreview/RecipePreview';
 import { EyeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
@@ -21,14 +22,18 @@ const CreateRecipePage: React.FC = () => {
     name: '',
     description: '',
     level: 'EASY',
-    kitchen: undefined,
+    kitchens: [],
     cookTime: 0,
     allTime: 0,
     portion: 1,
     photos: [],
     tags: [],
     ingredients: [],
-    steps: []
+    steps: [],
+    baseUnit: 'GR',
+    avgWeight: 100,
+    unit: 'GRAM',
+    macros: { calories: 0, proteins: 0, fats: 0, carbs: 0 }
   });
 
   const handleFormChange = (newFormData: CreateRecipeDto) => {

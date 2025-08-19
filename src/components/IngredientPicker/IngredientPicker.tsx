@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { MeasureType } from '../../types/measures.types';
-import { ingredientsService } from '../../services/ingredientsService';
-import { MEASURES_ARRAY } from '../../constants/measures';
+import type { ProductUnitType } from '../../types/measures.types';
+import { API_BASE_URL } from '../../services/api';
+import { PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
 import type {ApiIngredient, CreateRecipeIngredientDto} from "../../types";
@@ -29,17 +29,24 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Загружаем ингредиенты из API
+  // Загружаем продукты (ингредиенты) из нового API
   useEffect(() => {
     const loadIngredients = async () => {
       try {
         setIngredientsLoading(true);
-        console.log('IngredientPicker: Загрузка ингредиентов из API...');
-        const apiIngredients = await ingredientsService.getIngredientsForFridge();
-        setAvailableIngredients(apiIngredients);
-        console.log(`IngredientPicker: Загружено ${apiIngredients.length} ингредиентов`);
+        console.log('IngredientPicker: Загрузка продуктов из API /products/all ...');
+        const token = localStorage.getItem('authToken');
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const resp = await fetch(`${API_BASE_URL}/products/all`, { headers });
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+        const apiProducts = await resp.json();
+        setAvailableIngredients(apiProducts);
+        console.log(`IngredientPicker: Загружено ${apiProducts.length} продуктов`);
       } catch (error) {
-        console.error('IngredientPicker: Ошибка при загрузке ингредиентов:', error);
+        console.error('IngredientPicker: Ошибка при загрузке продуктов:', error);
         // При ошибке API оставляем пустой массив
         setAvailableIngredients([]);
       } finally {
@@ -50,8 +57,8 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     loadIngredients();
   }, []);
 
-  // Получаем единицы измерения из API
-  const units = MEASURES_ARRAY.map(measure => measure.value);
+  // Список продуктовых единиц измерения
+  const units = PRODUCT_UNITS_ARRAY.map(u => u.value);
 
   const suggestions = availableIngredients.filter(ingredient => 
     ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -64,7 +71,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       const newIngredient: CreateRecipeIngredientDto = {
         id: selectedIngredient.id,
         count: parseInt(amount.trim()) || 0,
-        measure: unit as MeasureType
+        productUnit: unit as ProductUnitType
       };
       
       onChange([...ingredients, newIngredient]);
@@ -94,8 +101,8 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     setSelectedIngredient(ingredient);
     setSearchTerm(ingredient.name);
     // Устанавливаем единицу измерения из API
-    if (ingredient.measure) {
-      setUnit(ingredient.measure);
+    if ((ingredient as any).productUnit || (ingredient as any).measure) {
+      setUnit(((ingredient as any).productUnit || (ingredient as any).measure) as string);
     } else {
       setUnit('GR'); // По умолчанию граммы
     }
@@ -125,7 +132,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                 {availableIngredients.find(i => i.id === ingredient.id)?.name || 'Неизвестный ингредиент'}
               </span>
               <span className={styles.ingredientAmount}>
-                {ingredient.count} {MEASURES_ARRAY.find(m => m.value === ingredient.measure)?.label}
+                {ingredient.count} {PRODUCT_UNITS_ARRAY.find(m => m.value === (ingredient as any).productUnit)?.label}
               </span>
               {errors[`ingredients.${index}.count`] && (
                 <span className={styles.errorText}>
@@ -180,7 +187,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                         onClick={() => handleSuggestionClick(ingredient)}
                         className={styles.suggestion}
                       >
-                        {ingredient.name} <span className={styles.measure}>({MEASURES_ARRAY.find(m => m.value === ingredient.measure)?.label})</span>
+                        {ingredient.name}
                       </button>
                     ))}
                   </div>
@@ -207,9 +214,9 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                 className={styles.select}
               >
                 <option value="">Выберите</option>
-                {MEASURES_ARRAY.map(measure => (
-                  <option key={measure.value} value={measure.value}>
-                    {measure.label}
+                {PRODUCT_UNITS_ARRAY.map(u => (
+                  <option key={u.value} value={u.value}>
+                    {u.label}
                   </option>
                 ))}
               </select>
