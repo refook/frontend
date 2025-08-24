@@ -20,7 +20,7 @@ const Header: React.FC = () => {
     throw new Error('KeycloakContext must be used within a KeycloakProvider');
   }
 
-  const { authenticated, user, login, logout, register } = context;
+  const { authenticated, user, login, logout, register, manageAccount } = context;
 
   const toggleTheme = () => {
     dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
@@ -196,7 +196,7 @@ const Header: React.FC = () => {
                     <SparklesIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Продвинутый профиль</span>
                   </Link>
-                  <button className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                  <button className={styles.menuItem} role="menuitem" onClick={() => { setIsProfileMenuOpen(false); manageAccount(); }}>
                     <Cog6ToothIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Настройки</span>
                   </button>
