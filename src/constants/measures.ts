@@ -55,3 +55,17 @@ export const PRODUCT_UNITS = {
 } as const;
 
 export const PRODUCT_UNITS_ARRAY = Object.values(PRODUCT_UNITS);
+
+// Единицы для итогового продукта рецепта (recipeUnit)
+export const RECIPE_UNITS = {
+  PORTION: { value: 'PORTION', label: 'Порция' },
+  PLATE: { value: 'PLATE', label: 'Тарелка' },
+  CUP: { value: 'CUP', label: 'Стакан' },
+  PIECE: { value: 'PIECE', label: 'Штука' },
+  SLICE: { value: 'SLICE', label: 'Ломтик' },
+  ITEM: { value: 'ITEM', label: 'Предмет' },
+  GR: { value: 'GR', label: 'Грамм' },
+  ML: { value: 'ML', label: 'Миллилитр' }
+} as const;
+
+export const RECIPE_UNITS_ARRAY = Object.values(RECIPE_UNITS);
