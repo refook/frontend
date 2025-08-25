@@ -17,6 +17,14 @@
   filter: saturate(1.1);
 }
 
+.imageTag {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--token-radius-md);
+  object-fit: cover;
+  display: block;
+}
+
 .content { display: flex; flex-direction: column; justify-content: center; gap: var(--token-space-6); }
 .title { margin: 0; font-size: clamp(24px, 3.6vw, 40px); line-height: 1.1; color: var(--token-text); letter-spacing: -0.02em; }
 .description { margin: 0; font-size: var(--token-text-lg); line-height: var(--token-leading-normal); color: var(--token-muted); }
@@ -32,7 +40,7 @@
 
 @media (max-width: 900px) {
   .card { grid-template-columns: 1fr; }
-  .image { aspect-ratio: 16 / 9; }
+  .image, .imageTag { aspect-ratio: 16 / 9; }
 }
 
 

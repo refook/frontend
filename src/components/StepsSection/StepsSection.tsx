@@ -46,10 +46,13 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName })
                   <div>
                     <div className={styles.chips}>
                       {step.ingredients.map((ing: any, i: number) => {
-                        const name = isFormData ? (getIngredientName((ing as CreateRecipeIngredientDto).id) || 'Ингредиент') : (ing as RecipeIngredientDto).name;
-                        const amount = isFormData
-                          ? `${(ing as CreateRecipeIngredientDto).count} ${(ing as CreateRecipeIngredientDto).measure.toLowerCase()}`
-                          : `${(ing as RecipeIngredientDto).count} ${(ing as RecipeIngredientDto).measure.toLowerCase()}`;
+                        const name = isFormData
+                          ? (getIngredientName((ing as CreateRecipeIngredientDto).id) || 'Ингредиент')
+                          : ((ing as RecipeIngredientDto).name || 'Ингредиент');
+                        const unit = isFormData
+                          ? ((ing as any).productUnit || (ing as any).measure || '')
+                          : ((ing as any).productUnit || (ing as any).measure || '');
+                        const amount = `${(ing as any).count} ${String(unit).toLowerCase()}`;
                         return <Chip key={i} emoji={getEmojiByKey(name)} label={name} amount={amount} />;
                       })}
                     </div>

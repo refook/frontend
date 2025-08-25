@@ -290,12 +290,18 @@ class RealRecipesService {
     const prepTimeMinutes = Math.max(0, Math.round((apiRecipe.allTime - apiRecipe.cookTime) / 60));
     const cookTimeMinutes = Math.round(apiRecipe.cookTime / 60);
     
+          const photoList: string[] = (apiRecipe as any)?.metaInfo?.photos || apiRecipe.photos || [];
+
           return {
         id: apiRecipe.id,
         title: apiRecipe.name,
         description: apiRecipe.description,
-        photos: apiRecipe.photos || [],
-        image: apiRecipe.photos?.[0] ? `${API_BASE_URL}/photo/${apiRecipe.photos[0]}` : undefined,
+        photos: photoList,
+        image: (() => {
+          const firstPhoto = photoList?.[0];
+          if (!firstPhoto) return undefined;
+          return /^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`;
+        })(),
         prepTime: prepTimeMinutes, // время подготовки в минутах
         cookTime: cookTimeMinutes, // время готовки в минутах  
         servings: apiRecipe.portion || 4, // количество порций с дефолтным значением

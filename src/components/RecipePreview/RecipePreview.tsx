@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import NutritionInfo from '../NutritionInfo/NutritionInfo';
+import { API_BASE_URL } from '../../services/api';
 import IngredientsSection from '../IngredientsSection/IngredientsSection';
 import HeroCard from '../HeroCard/HeroCard';
 import Chip from '../Chip/Chip';
@@ -42,10 +43,12 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   useEffect(() => {
     const loadIngredients = async () => {
       try {
-        const ingredients = await ingredientsService.getAllIngredients();
+        // Более устойчивый метод: возвращает [] при ошибках (например, 500)
+        const ingredients = await ingredientsService.getIngredientsForFridge();
         setAvailableIngredients(ingredients);
       } catch (error) {
         console.error('Ошибка при загрузке ингредиентов:', error);
+        setAvailableIngredients([]);
       }
     };
     loadIngredients();
@@ -60,13 +63,29 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const description = isFormData ? (data as CreateRecipeDto).description : (data as Recipe).description;
   const prepTime = isFormData ? (data as CreateRecipeDto).allTime : (data as Recipe).prepTime || 0;
   const cookTime = isFormData ? (data as CreateRecipeDto).cookTime : (data as Recipe).cookTime || 0;
-  const servings = isFormData ? (data as CreateRecipeDto).portion : (data as Recipe).servings;
+  const servings = isFormData ? 1 : (data as Recipe).servings;
   const difficulty = isFormData ? (data as CreateRecipeDto).level.toLowerCase() : (data as Recipe).difficulty;
-  const cuisine = isFormData ? (data as CreateRecipeDto).kitchen : (data as Recipe).cuisine;
-  const tags = isFormData ? (data as CreateRecipeDto).tags : (data as Recipe).tags || [];
+  const cuisine = isFormData ? undefined : (data as Recipe).cuisine;
+  const tags: string[] = isFormData
+    ? (((data as CreateRecipeDto).tags ?? []).map((t: any) => (typeof t === 'string' ? t : (t?.name ?? ''))).filter(Boolean))
+    : ((data as Recipe).tags || []);
   const ingredients = isFormData ? (data as CreateRecipeDto).ingredients : (data as Recipe).ingredients;
   const steps = isFormData ? (data as CreateRecipeDto).steps : (data as Recipe).steps;
   const photos = isFormData ? (data as CreateRecipeDto).photos : (data as Recipe).photos;
+  const heroImageUrl = !isFormData
+    ? (() => {
+        const raw = (((data as Recipe).photos?.[0]) || (data as Recipe).image);
+        if (!raw) return undefined;
+        const url = String(raw).trim();
+        if (!url) return undefined;
+        return /^https?:\/\//i.test(url) ? url : `${API_BASE_URL}/photo/${url}`;
+      })()
+    : undefined;
+
+  if (!isFormData) {
+    // Для отладки отображения изображения
+    try { console.debug('RecipePreview heroImageUrl:', heroImageUrl); } catch {}
+  }
   
   const totalTime = prepTime + cookTime;
   
@@ -90,11 +109,13 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       const ing = ingredient as CreateRecipeIngredientDto;
       const ai = availableIngredients.find(i => i.id === ing.id);
       const name = ai?.name || 'Ингредиент';
-      return { id: `form:${ing.id}:${ing.measure}:${ing.count}`, name, amount: `${ing.count} ${ing.measure.toLowerCase()}` };
+      const unit = (ing as any).productUnit || (ing as any).measure || '';
+      return { id: `form:${ing.id}:${unit}:${ing.count}`, name, amount: `${ing.count} ${String(unit).toLowerCase()}` };
     } else {
       const ing = ingredient as RecipeIngredientDto;
       const name = ing.name || 'Ингредиент';
-      return { id: `api:${ing.id}`, name, amount: `${ing.count} ${ing.measure.toLowerCase()}` };
+      const unit = (ing as any).productUnit || (ing as any).measure || '';
+      return { id: `api:${ing.id}`, name, amount: `${ing.count} ${String(unit).toLowerCase()}` };
     }
   };
 
@@ -111,6 +132,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           description={description || 'Описание рецепта'}
           rating={!isFormData && (data as Recipe).stats?.rating ? (data as Recipe).stats!.rating : 4.8}
           author={(isFormData ? 'Автор рецепта' : (data as Recipe).author?.name) || 'Автор'}
+          imageUrl={heroImageUrl}
         />
 
         {/* Основная информация */}
