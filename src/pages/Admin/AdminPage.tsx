@@ -97,26 +97,29 @@ const AdminPage: React.FC = () => {
           <div className={styles.card}>
             <div className={styles.cardTitle}>Создать продукт</div>
             <form onSubmit={handleSubmit} className={styles.formGrid}>
-              <label>
+              <label className={styles.label}>
                 Название*
                 <input
+                  className={styles.input}
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                 />
               </label>
-              <label>
+              <label className={styles.label}>
                 Описание
                 <textarea
+                  className={styles.textarea}
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
               </label>
-              <label>
+              <label className={styles.label}>
                 Базовая мера*
                 <select
+                  className={styles.select}
                   value={formData.baseUnit}
                   onChange={(e) => setFormData({ ...formData, baseUnit: e.target.value as BaseUnitType })}
                   required
@@ -128,9 +131,10 @@ const AdminPage: React.FC = () => {
                   ))}
                 </select>
               </label>
-              <label>
+              <label className={styles.label}>
                 Конкретная мера*
                 <select
+                  className={styles.select}
                   value={formData.unit}
                   onChange={(e) => setFormData({ ...formData, unit: e.target.value as ProductUnitType })}
                   required
@@ -142,9 +146,10 @@ const AdminPage: React.FC = () => {
                   ))}
                 </select>
               </label>
-              <label>
+              <label className={styles.label}>
                 Средний вес (г)*
                 <input
+                  className={styles.input}
                   type="number"
                   min={0}
                   step={1}
@@ -153,21 +158,23 @@ const AdminPage: React.FC = () => {
                   required
                 />
               </label>
-              <label>
+              <label className={styles.label}>
                 URL фото
                 <input
+                  className={styles.input}
                   type="url"
                   value={formData.photo}
                   onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
                   placeholder="https://..."
                 />
               </label>
-              <fieldset className={styles.card}>
-                <legend>КБЖУ*</legend>
+              <fieldset className={styles.fieldset}>
+                <legend className={styles.legend}>КБЖУ*</legend>
                 <div className={styles.row4}>
-                  <label>
+                  <label className={styles.label}>
                     Ккал
                     <input
+                      className={styles.input}
                       type="number"
                       min={0}
                       step={1}
@@ -176,9 +183,10 @@ const AdminPage: React.FC = () => {
                       required
                     />
                   </label>
-                  <label>
+                  <label className={styles.label}>
                     Белки
                     <input
+                      className={styles.input}
                       type="number"
                       min={0}
                       step={0.01}
@@ -187,9 +195,10 @@ const AdminPage: React.FC = () => {
                       required
                     />
                   </label>
-                  <label>
+                  <label className={styles.label}>
                     Жиры
                     <input
+                      className={styles.input}
                       type="number"
                       min={0}
                       step={0.01}
@@ -198,9 +207,10 @@ const AdminPage: React.FC = () => {
                       required
                     />
                   </label>
-                  <label>
+                  <label className={styles.label}>
                     Углеводы
                     <input
+                      className={styles.input}
                       type="number"
                       min={0}
                       step={0.01}
@@ -215,7 +225,14 @@ const AdminPage: React.FC = () => {
                 <button type="submit" className="ui-btn ui-btn--primary" disabled={submitting}>
                   {submitting ? 'Сохранение...' : 'Создать продукт'}
                 </button>
-                {message && <div aria-live="polite">{message}</div>}
+                {message && (
+                  <div
+                    aria-live="polite"
+                    className={`${styles.message} ${message.startsWith('Ошибка') ? styles.messageError : styles.messageSuccess}`}
+                  >
+                    {message}
+                  </div>
+                )}
               </div>
             </form>
           </div>

@@ -39,9 +39,32 @@
 .label { font-weight: 600; }
 
 @media (max-width: 768px) {
-  .bar { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; overflow: auto; gap: var(--spacing-lg); padding: var(--spacing-md) var(--spacing-lg); }
-  .tab { width: auto; }
+  .bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+  .tab {
+    flex: 1 1 calc(33.333% - var(--spacing-sm));
+    min-width: 90px;
+    height: 34px;
+    padding: 0 10px;
+    text-align: center;
+  }
+  .icon { width: 16px; height: 16px; }
   .label { display: none; }
+}
+
+@media (max-width: 400px) {
+  .tab {
+    flex-basis: calc(50% - var(--spacing-sm));
+    height: 30px;
+    padding: 0 8px;
+  }
+  .icon { width: 14px; height: 14px; }
 }
 
 

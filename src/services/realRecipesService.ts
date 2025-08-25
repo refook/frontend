@@ -168,13 +168,18 @@ class RealRecipesService {
       const apiRecipeData = {
         name: formData.name,
         description: formData.description,
-        kitchen: formData.kitchen,
+        kitchens: formData.kitchens,
         level: formData.level,
-        cookTime: formData.cookTime,
+        activeTime: formData.cookTime,
         allTime: formData.allTime,
-        portion: formData.portion,
         photos: formData.photos || [],
-        tags: null, // Временно отправляем null вместо тегов
+        tags: formData.tags && formData.tags.length
+          ? formData.tags.map(t => ({ id: (t as any).id || t, name: (t as any).name || String(t) }))
+          : null,
+        baseUnit: formData.baseUnit,
+        avgWeight: formData.avgWeight,
+        unit: formData.unit,
+        macros: formData.macros,
         ingredients: formData.ingredients || [],
         steps: (formData.steps || []).map(step => ({
           index: step.index,
@@ -224,11 +229,10 @@ class RealRecipesService {
       const apiRecipeData = {
         name: formData.name,
         description: formData.description,
-        kitchen: formData.kitchen,
+        kitchens: formData.kitchens,
         level: formData.level,
-        cookTime: formData.cookTime,
+        activeTime: formData.cookTime,
         allTime: formData.allTime,
-        portion: formData.portion,
         photos: formData.photos || [],
         tags: formData.tags || null,
         ingredients: formData.ingredients || [],

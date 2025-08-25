@@ -1,3 +1,13 @@
+/**
+ * Константы и опции для единиц измерения (UI-слой).
+ *
+ * Назначение файла:
+ * - Экспортирует словари и массивы опций для селектов/контролов UI
+ * - Не объявляет типы (типизацию см. в src/types/measures.types.ts)
+ *
+ * Использование:
+ * - Импортируйте отсюда массивы вида *_ARRAY для рендера списков опций
+ */
 import type { MeasureType, MeasureInfo } from '../types/measures.types';
 
 // Объект с метаданными для каждой единицы измерения
@@ -18,7 +28,6 @@ export const BASE_UNITS = {
   ML: { value: 'ML', label: 'Миллилитры (ML)' }
 } as const;
 
-export type BaseUnitType = typeof BASE_UNITS[keyof typeof BASE_UNITS]['value'];
 export const BASE_UNITS_ARRAY = Object.values(BASE_UNITS);
 
 // Новые продуктовые единицы (CreateProductDto.unit)
@@ -45,5 +54,4 @@ export const PRODUCT_UNITS = {
   APPROX: { value: 'APPROX', label: 'Примерно' }
 } as const;
 
-export type ProductUnitType = typeof PRODUCT_UNITS[keyof typeof PRODUCT_UNITS]['value'];
 export const PRODUCT_UNITS_ARRAY = Object.values(PRODUCT_UNITS);

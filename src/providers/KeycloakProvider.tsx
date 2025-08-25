@@ -11,6 +11,7 @@ interface KeycloakContextType {
     login: () => void;
     logout: () => void;
     register: () => void;
+    manageAccount: () => void;
     isInitialized: boolean;
 }
 
@@ -91,11 +92,17 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
             keycloakInstance?.register()
         }
 
+        const manageAccount = () => {
+            // Открыть страницу управления аккаунтом Keycloak (редактирование профиля)
+            // Keycloak сам обработает редирект обратно, если настроен в клиенте
+            keycloakInstance?.accountManagement();
+        }
+
         if (!isInitialized) {
             return <div>Loading authentication...</div>; // или спиннер
         }
         return (
-            <KeycloakContext.Provider value={{keycloak: keycloakInstance, authenticated, user, login, logout, register, isInitialized}}>
+            <KeycloakContext.Provider value={{keycloak: keycloakInstance, authenticated, user, login, logout, register, manageAccount, isInitialized}}>
                 {children}
             </KeycloakContext.Provider>
         );

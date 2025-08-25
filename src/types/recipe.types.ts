@@ -1,7 +1,13 @@
-import type {FormIngredient, FormStep, Ingredient, MeasureType, Recipe} from "./index.ts";
+import type {FormIngredient, FormStep, Ingredient, Recipe} from "./index.ts";
+import type { BaseUnitType, ProductUnitType } from './measures.types';
 
 export type KitchenType = 'RUSSIAN' | 'ASIAN';
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
+
+export interface TagResponseDto {
+  id: string;
+  name: string;
+}
 
 
 export interface RecipeIngredient {
@@ -31,15 +37,23 @@ export interface CreateRecipeForm {
 export interface CreateRecipeDto {
   name: string;
   description: string;
-  kitchen?: KitchenType;
+  kitchens?: string[];
   level: DifficultyLevel;
-  cookTime: number;
-  allTime: number;
-  portion: number;
+  cookTime: number; // секунды
+  allTime: number; // секунды
   photos?: string[];
-  tags?: string[] | null;
+  tags?: TagResponseDto[] | null;
   ingredients: CreateRecipeIngredientDto[];
   steps: CreateStepDto[];
+  baseUnit?: BaseUnitType;
+  avgWeight?: number;
+  unit?: ProductUnitType;
+  macros?: {
+    calories: number;
+    proteins: number;
+    fats: number;
+    carbs: number;
+  };
 }
 
 // DTO для обновления рецепта (тот же формат, что и создание)
@@ -50,13 +64,12 @@ export interface UpdateStepDto extends CreateStepDto {
 export interface UpdateRecipeDto {
   name: string;
   description: string;
-  kitchen?: KitchenType;
+  kitchens?: string[];
   level: DifficultyLevel;
   cookTime: number;
   allTime: number;
-  portion: number;
   photos?: string[];
-  tags?: string[] | null;
+  tags?: TagResponseDto[] | null;
   ingredients: CreateRecipeIngredientDto[];
   steps: UpdateStepDto[];
 }
@@ -65,7 +78,7 @@ export interface UpdateRecipeDto {
 export interface CreateRecipeIngredientDto {
   id: string;
   count: number;
-  measure: MeasureType;
+  productUnit: ProductUnitType;
 }
 
 // DTO для создания шага
@@ -115,7 +128,7 @@ export interface RecipeIngredientDto {
   name: string;
   description?: string;
   count: number;
-  measure: MeasureType;
+  productUnit?: ProductUnitType;
 }
 
 // DTO для информации о пользователе
