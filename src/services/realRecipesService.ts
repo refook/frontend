@@ -1,5 +1,5 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
-import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel } from '../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
 import { apiLogger } from '../utils/apiLogger';
 
 // Функция для получения авторизационных заголовков
@@ -164,31 +164,43 @@ class RealRecipesService {
       console.log('Создание нового рецепта:', formData.name);
       console.log('📥 Данные из формы:', JSON.stringify(formData, null, 2));
       
-      // Преобразуем данные в правильный формат API (CreateRecipeDto)
-      const apiRecipeData = {
+      // Маппинг локальных данных в формат API CreateRecipeDto
+      const apiRecipeData: ApiCreateRecipeDto = {
         name: formData.name,
         description: formData.description,
-        kitchens: formData.kitchens,
         level: formData.level,
-        activeTime: formData.cookTime,
-        allTime: formData.allTime,
-        photos: formData.photos || [],
-        tags: formData.tags && formData.tags.length
-          ? formData.tags.map(t => ({ id: (t as any).id || t, name: (t as any).name || String(t) }))
-          : null,
-        baseUnit: formData.baseUnit,
-        avgWeight: formData.avgWeight,
-        unit: formData.unit,
-        macros: formData.macros,
-        ingredients: formData.ingredients || [],
-        steps: (formData.steps || []).map(step => ({
-          index: step.index,
-          name: step.name || undefined,
-          description: step.description,
-          photos: step.photos || [],
-          ingredients: step.ingredients || [],
-          time: step.time || 0
-        }))
+        composition: {
+          ingredients: formData.ingredients || [],
+          steps: (formData.steps || []).map(step => ({
+            index: step.index,
+            name: step.name || undefined,
+            description: step.description,
+            photos: step.photos || [],
+            ingredients: step.ingredients || [],
+            time: step.time || 0
+          }))
+        },
+        metaInfo: {
+          kitchens: formData.kitchens || [],
+          tags: null,
+          photos: formData.photos || []
+        },
+        cookingTime: {
+          activeTime: formData.cookTime,
+          allTime: formData.allTime
+        },
+        serving: {
+          baseUnit: (formData.baseUnit as any) || 'GR',
+          totalWeight: Number(formData.avgWeight ?? 0),
+          recipeUnit: (formData.unit as any) || 'GR',
+          unitCount: 1
+        },
+        macros: {
+          calories: Number(formData.macros?.calories ?? 0),
+          proteins: Number(formData.macros?.proteins ?? 0),
+          fats: Number(formData.macros?.fats ?? 0),
+          carbs: Number(formData.macros?.carbs ?? 0)
+        }
       };
 
       console.log('📤 Отправляемые данные на API:', JSON.stringify(apiRecipeData, null, 2));

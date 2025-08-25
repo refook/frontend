@@ -736,7 +736,7 @@
         "tags": [
           "Кухни"
         ],
-        "summary": "Сохранение тэга",
+        "summary": "Сохранение кухни",
         "operationId": "createKitchen",
         "requestBody": {
           "content": {
@@ -1490,6 +1490,24 @@
           "name"
         ]
       },
+      "CookingTimeDto": {
+        "type": "object",
+        "description": "Время готовки",
+        "properties": {
+          "activeTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Время приготовления (в секундах)",
+            "example": 300
+          },
+          "allTime": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Общее время приготовления (в секундах)",
+            "example": 1000
+          }
+        }
+      },
       "KitchenResponseDto": {
         "type": "object",
         "description": "Ответ по 1 кухне",
@@ -1525,21 +1543,21 @@
             "type": "number",
             "description": "Белки",
             "example": 35.1,
-            "maximum": 100,
+            "maximum": 100.00,
             "minimum": 0
           },
           "fats": {
             "type": "number",
             "description": "Жиры",
             "example": 5.44,
-            "maximum": 100,
+            "maximum": 100.00,
             "minimum": 0
           },
           "carbs": {
             "type": "number",
             "description": "Углеводы",
             "example": 46.1,
-            "maximum": 100,
+            "maximum": 100.00,
             "minimum": 0
           }
         },
@@ -1548,6 +1566,29 @@
           "carbs",
           "fats",
           "proteins"
+        ]
+      },
+      "RecipeCompositionResponseDto": {
+        "type": "object",
+        "description": "Состав рецепта",
+        "properties": {
+          "steps": {
+            "type": "array",
+            "description": "Шаги рецепта",
+            "items": {
+              "$ref": "#/components/schemas/StepResponseDto"
+            }
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "Список ингредиентов",
+            "items": {
+              "$ref": "#/components/schemas/RecipeIngredientDto"
+            }
+          }
+        },
+        "required": [
+          "ingredients"
         ]
       },
       "RecipeIngredientDto": {
@@ -1618,6 +1659,33 @@
           "productUnit"
         ]
       },
+      "RecipeMetaInfoResponseDto": {
+        "type": "object",
+        "description": "Мета информация дто",
+        "properties": {
+          "kitchens": {
+            "type": "array",
+            "description": "Кухня рецепта",
+            "items": {
+              "$ref": "#/components/schemas/KitchenResponseDto"
+            }
+          },
+          "photos": {
+            "type": "array",
+            "description": "url фото рецепта",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Список тэгов рецепта",
+            "items": {
+              "$ref": "#/components/schemas/TagResponseDto"
+            }
+          }
+        }
+      },
       "RecipeResponseDto": {
         "type": "object",
         "description": "Детальный рецепт",
@@ -1640,13 +1708,6 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "kitchens": {
-            "type": "array",
-            "description": "Кухня рецепта",
-            "items": {
-              "$ref": "#/components/schemas/KitchenResponseDto"
-            }
-          },
           "level": {
             "type": "string",
             "description": "Сложность",
@@ -1661,93 +1722,21 @@
               "hard"
             ]
           },
-          "steps": {
-            "type": "array",
-            "description": "Шаги рецепта",
-            "items": {
-              "$ref": "#/components/schemas/StepResponseDto"
-            }
+          "composition": {
+            "$ref": "#/components/schemas/RecipeCompositionResponseDto",
+            "description": "Состав рецепта"
           },
-          "photos": {
-            "type": "array",
-            "description": "url фото рецепта",
-            "items": {
-              "type": "string"
-            }
+          "metaInfo": {
+            "$ref": "#/components/schemas/RecipeMetaInfoResponseDto",
+            "description": "Дополнительная информация о рецепте"
           },
-          "tags": {
-            "type": "array",
-            "description": "Список тэгов рецепта",
-            "items": {
-              "$ref": "#/components/schemas/TagResponseDto"
-            }
+          "cookingTime": {
+            "$ref": "#/components/schemas/CookingTimeDto",
+            "description": "Время готовки"
           },
-          "ingredients": {
-            "type": "array",
-            "description": "Список ингредиентов",
-            "items": {
-              "$ref": "#/components/schemas/RecipeIngredientDto"
-            }
-          },
-          "activeTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Время приготовления (в секундах)",
-            "example": 300
-          },
-          "allTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Общее время приготовления (в секундах)",
-            "example": 1000
-          },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера итогового продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
-          },
-          "avgWeight": {
-            "type": "number",
-            "description": "Средний вес 1 unit",
-            "example": 80
-          },
-          "unit": {
-            "type": "string",
-            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+          "serving": {
+            "$ref": "#/components/schemas/RecipeServingDto",
+            "description": "Описание порций и их веса"
           },
           "macros": {
             "$ref": "#/components/schemas/MacrosDto",
@@ -1778,8 +1767,7 @@
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
+          "composition",
           "createdAt",
           "id",
           "lastUpdaterId",
@@ -1787,7 +1775,7 @@
           "macros",
           "name",
           "ownerUser",
-          "unit",
+          "serving",
           "updatedAt"
         ]
       },
@@ -1838,6 +1826,62 @@
           "likesCount",
           "ratingsCount",
           "viewsCount"
+        ]
+      },
+      "RecipeServingDto": {
+        "type": "object",
+        "description": "Описание порций и их веса",
+        "properties": {
+          "baseUnit": {
+            "type": "string",
+            "description": "Базовая мера итогового продукта",
+            "enum": [
+              "ML",
+              "GR"
+            ],
+            "examples": [
+              "ML",
+              "GR"
+            ]
+          },
+          "totalWeight": {
+            "type": "number",
+            "description": "Итоговый вес baseUnit",
+            "example": 80.0
+          },
+          "recipeUnit": {
+            "type": "string",
+            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
+            "enum": [
+              "PORTION",
+              "PLATE",
+              "CUP",
+              "PIECE",
+              "SLICE",
+              "ITEM",
+              "GR",
+              "ML"
+            ],
+            "examples": [
+              "PORTION",
+              "PLATE",
+              "CUP",
+              "PIECE",
+              "SLICE",
+              "ITEM"
+            ]
+          },
+          "unitCount": {
+            "type": "number",
+            "description": "Количество типов",
+            "example": 80.0
+          }
+        },
+        "required": [
+          "baseUnit",
+          "recipeUnit",
+          "totalWeight",
+          "unitCount"
         ]
       },
       "StepIngredientDto": {
@@ -1986,8 +2030,70 @@
           "username"
         ]
       },
+      "RecipeCompositionDto": {
+        "type": "object",
+        "description": "Состав рецепта",
+        "properties": {
+          "steps": {
+            "type": "array",
+            "description": "Шаги рецепта",
+            "items": {
+              "$ref": "#/components/schemas/UpdateStepDto"
+            }
+          },
+          "ingredients": {
+            "type": "array",
+            "description": "Список ингредиентов",
+            "items": {
+              "$ref": "#/components/schemas/UpdateRecipeIngredientDto"
+            }
+          }
+        },
+        "required": [
+          "ingredients"
+        ]
+      },
+      "UpdateMetaInfoDto": {
+        "type": "object",
+        "description": "Дополнительная информация о рецепте",
+        "properties": {
+          "kitchens": {
+            "type": "array",
+            "description": "Список ID кухонь",
+            "example": [
+              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
+              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Список ID тэгов рецепта",
+            "example": null,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "photos": {
+            "type": "array",
+            "description": "url фото рецепта",
+            "example": [
+              "https://i.pinimg.com/originals/22/44/2f/22442fb8951b925dbc333e6a384f904c.jpg",
+              "https://kartinkof.club/uploads/posts/2022-04/1649960798_33-kartinkof-club-p-poka-kartinki-prikolnie-50.jpg"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "UpdateRecipeDto": {
         "type": "object",
+        "description": "Обновление рецепта",
         "properties": {
           "name": {
             "type": "string",
@@ -2003,19 +2109,6 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "kitchens": {
-            "type": "array",
-            "description": "Кухня рецепта",
-            "examples": [
-              "RUSSIAN",
-              "ASIAN",
-              "USA"
-            ],
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           "level": {
             "type": "string",
             "description": "Сложность",
@@ -2030,107 +2123,33 @@
               "HARD"
             ]
           },
-          "steps": {
-            "type": "array",
-            "description": "Шаги рецепта",
-            "items": {
-              "$ref": "#/components/schemas/UpdateStepDto"
-            }
+          "composition": {
+            "$ref": "#/components/schemas/RecipeCompositionDto",
+            "description": "Состав рецепта"
           },
-          "photos": {
-            "type": "array",
-            "description": "url фото рецепта",
-            "example": [
-              "11fcd2f5-f976-44bc-bd33-c495a8daff34",
-              "22bd2a15-dc26-43a7-ae92-f7c62b9edc21"
-            ],
-            "items": {
-              "type": "string"
-            }
+          "metaInfo": {
+            "$ref": "#/components/schemas/UpdateMetaInfoDto",
+            "description": "Дополнительная информация о рецепте"
           },
-          "tags": {
-            "type": "array",
-            "description": "Список тэгов рецепта",
-            "example": null,
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
+          "cookingTime": {
+            "$ref": "#/components/schemas/CookingTimeDto",
+            "description": "Состав рецепта"
           },
-          "ingredients": {
-            "type": "array",
-            "description": "Список ингредиентов",
-            "items": {
-              "$ref": "#/components/schemas/UpdateRecipeIngredientDto"
-            }
+          "serving": {
+            "$ref": "#/components/schemas/RecipeServingDto",
+            "description": "Описание порций и их веса"
           },
-          "activeTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Время приготовления (в секундах)",
-            "example": 300
-          },
-          "allTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Общее время приготовления (в секундах)",
-            "example": 1000
-          },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера итогового продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
-          },
-          "avgWeight": {
-            "type": "number",
-            "description": "Средний вес 1 unit",
-            "example": 80
-          },
-          "unit": {
-            "type": "string",
-            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
+          "composition",
           "level",
+          "macros",
           "name",
-          "unit"
+          "serving"
         ]
       },
       "UpdateRecipeIngredientDto": {
@@ -2147,7 +2166,7 @@
           "count": {
             "type": "number",
             "description": "Количество ингредиента",
-            "example": 1
+            "example": 1.0
           },
           "productUnit": {
             "type": "string",
@@ -2206,6 +2225,7 @@
           "name": {
             "type": "string",
             "description": "Название шага",
+            "example": "Выбор картошки",
             "maxLength": 255,
             "minLength": 0
           },
@@ -2220,8 +2240,8 @@
             "type": "array",
             "description": "url фото шага",
             "example": [
-              "11fcd2f5-f976-44bc-bd33-c495a8daff34",
-              "22bd2a15-dc26-43a7-ae92-f7c62b9edc21"
+              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
+              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
             ],
             "items": {
               "type": "string"
@@ -2277,7 +2297,7 @@
           "avgWeight": {
             "type": "number",
             "description": "Средний вес",
-            "example": 80
+            "example": 80.0
           },
           "unit": {
             "type": "string",
@@ -2371,7 +2391,7 @@
           "avgWeight": {
             "type": "number",
             "description": "Средний вес",
-            "example": 80
+            "example": 80.0
           },
           "unit": {
             "type": "string",
@@ -2539,7 +2559,7 @@
           "count": {
             "type": "number",
             "description": "Средний вес/штук",
-            "example": 2
+            "example": 2.0
           },
           "productUnit": {
             "type": "string",
@@ -2635,7 +2655,7 @@
           "count": {
             "type": "number",
             "description": "Вес или штуки",
-            "example": 80
+            "example": 80.0
           },
           "productUnit": {
             "type": "string",
@@ -2701,9 +2721,47 @@
           "name"
         ]
       },
+      "CreateMetaInfoDto": {
+        "type": "object",
+        "description": "Дополнительная информация о рецепте",
+        "properties": {
+          "kitchens": {
+            "type": "array",
+            "description": "Список ID кухонь",
+            "example": [
+              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
+              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "description": "Список ID тэгов рецепта",
+            "example": null,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "photos": {
+            "type": "array",
+            "description": "url фото рецепта",
+            "example": [
+              "https://i.pinimg.com/originals/22/44/2f/22442fb8951b925dbc333e6a384f904c.jpg",
+              "https://kartinkof.club/uploads/posts/2022-04/1649960798_33-kartinkof-club-p-poka-kartinki-prikolnie-50.jpg"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "CreateRecipeDto": {
         "type": "object",
-        "description": "ДТО создания рецепта ",
+        "description": "ДТО создания рецепта",
         "properties": {
           "name": {
             "type": "string",
@@ -2719,18 +2777,6 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "kitchens": {
-            "type": "array",
-            "description": "Список ID кухонь",
-            "example": [
-              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
-              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
-            ],
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
           "level": {
             "type": "string",
             "description": "Сложность",
@@ -2745,99 +2791,21 @@
               "HARD"
             ]
           },
-          "steps": {
-            "type": "array",
-            "description": "Шаги рецепта",
-            "items": {
-              "$ref": "#/components/schemas/CreateStepDto"
-            }
+          "composition": {
+            "$ref": "#/components/schemas/RecipeCompositionDto",
+            "description": "Состав рецепта"
           },
-          "photos": {
-            "type": "array",
-            "description": "url фото рецепта",
-            "example": [
-              "https://i.pinimg.com/originals/22/44/2f/22442fb8951b925dbc333e6a384f904c.jpg",
-              "https://kartinkof.club/uploads/posts/2022-04/1649960798_33-kartinkof-club-p-poka-kartinki-prikolnie-50.jpg"
-            ],
-            "items": {
-              "type": "string"
-            }
+          "metaInfo": {
+            "$ref": "#/components/schemas/CreateMetaInfoDto",
+            "description": "Дополнительная информация о рецепте"
           },
-          "tags": {
-            "type": "array",
-            "description": "Список ID тэгов рецепта",
-            "example": null,
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
+          "cookingTime": {
+            "$ref": "#/components/schemas/CookingTimeDto",
+            "description": "Состав рецепта"
           },
-          "ingredients": {
-            "type": "array",
-            "description": "Список ингредиентов",
-            "items": {
-              "$ref": "#/components/schemas/CreateRecipeIngredientDto"
-            }
-          },
-          "activeTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Время приготовления (в секундах)",
-            "example": 300
-          },
-          "allTime": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Общее время приготовления (в секундах)",
-            "example": 1000
-          },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера итогового продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
-          },
-          "avgWeight": {
-            "type": "number",
-            "description": "Средний вес 1 unit",
-            "example": 80
-          },
-          "unit": {
-            "type": "string",
-            "description": "Конкретная мера рецепта (Штуки, граммы и т.п.)",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+          "serving": {
+            "$ref": "#/components/schemas/RecipeServingDto",
+            "description": "Описание порций и их веса"
           },
           "macros": {
             "$ref": "#/components/schemas/MacrosDto",
@@ -2845,120 +2813,11 @@
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
+          "composition",
           "level",
           "macros",
           "name",
-          "unit"
-        ]
-      },
-      "CreateRecipeIngredientDto": {
-        "type": "object",
-        "description": "Ингредиент рецепта",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id ингредиента",
-            "example": "fc01f44c-cc90-44c9-b0f4-53f586f41e30",
-            "minLength": 1
-          },
-          "count": {
-            "type": "number",
-            "description": "Количество ингредиента",
-            "example": 1
-          },
-          "productUnit": {
-            "type": "string",
-            "description": "Мера ингредиента",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
-          }
-        },
-        "required": [
-          "count",
-          "id",
-          "productUnit"
-        ]
-      },
-      "CreateStepDto": {
-        "type": "object",
-        "description": "Шаг рецепта",
-        "properties": {
-          "index": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Индекс шага (для сортировки)",
-            "maximum": 100,
-            "minimum": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "Название шага",
-            "example": "Выбор картошки",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "description": {
-            "type": "string",
-            "description": "Описание шага",
-            "example": "Привет, меня зовут описание говна",
-            "maxLength": 2000,
-            "minLength": 1
-          },
-          "photos": {
-            "type": "array",
-            "description": "url фото шага",
-            "example": [
-              "12fcd2f5-f976-44bc-bd33-c495a8daff34",
-              "a3bd2a15-dc26-43a7-ae92-f7c62b9edc21"
-            ],
-            "items": {
-              "type": "string"
-            }
-          },
-          "ingredients": {
-            "type": "array",
-            "description": "Список ингредиентов для шага",
-            "items": {
-              "$ref": "#/components/schemas/CreateRecipeIngredientDto"
-            }
-          },
-          "time": {
-            "type": "integer",
-            "format": "int32",
-            "description": "Время приготовление шага в секундах"
-          }
-        },
-        "required": [
-          "description",
-          "index"
+          "serving"
         ]
       },
       "RecipeActionDto": {
@@ -3028,7 +2887,7 @@
           "avgWeight": {
             "type": "number",
             "description": "Средний вес",
-            "example": 80
+            "example": 80.0
           },
           "unit": {
             "type": "string",
@@ -3143,7 +3002,7 @@
           "avgWeight": {
             "type": "number",
             "description": "Средний вес",
-            "example": 80
+            "example": 80.0
           },
           "productUnit": {
             "type": "string",
