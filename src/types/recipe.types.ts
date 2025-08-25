@@ -56,6 +56,50 @@ export interface CreateRecipeDto {
   };
 }
 
+/**
+ * API-DTO согласно components.schemas.CreateRecipeDto из dataApi.json
+ */
+export interface ApiCreateRecipeDto {
+  name: string;
+  description?: string;
+  level: DifficultyLevel;
+  composition: ApiRecipeCompositionDto;
+  metaInfo?: ApiCreateMetaInfoDto;
+  cookingTime?: ApiCookingTimeDto;
+  serving: ApiRecipeServingDto;
+  macros: MacrosDto;
+}
+
+export interface ApiRecipeCompositionDto {
+  steps?: ApiUpdateStepDto[];
+  ingredients: CreateRecipeIngredientDto[];
+}
+
+export interface ApiCreateMetaInfoDto {
+  kitchens?: string[]; // array of UUIDs
+  tags?: string[] | null; // array of UUIDs
+  photos?: string[];
+}
+
+export interface ApiCookingTimeDto {
+  activeTime?: number; // секунды
+  allTime?: number; // секунды
+}
+
+export interface ApiRecipeServingDto {
+  baseUnit: 'ML' | 'GR';
+  totalWeight: number;
+  recipeUnit: 'PORTION' | 'PLATE' | 'CUP' | 'PIECE' | 'SLICE' | 'ITEM' | 'GR' | 'ML';
+  unitCount: number;
+}
+
+export interface MacrosDto {
+  calories: number;
+  proteins: number;
+  fats: number;
+  carbs: number;
+}
+
 // DTO для обновления рецепта (тот же формат, что и создание)
 export interface UpdateStepDto extends CreateStepDto {
   id?: string;
@@ -89,6 +133,10 @@ export interface CreateStepDto {
   photos?: string[];
   ingredients?: CreateRecipeIngredientDto[];
   time?: number;
+}
+
+export interface ApiUpdateStepDto extends CreateStepDto {
+  id?: string;
 }
 
 // DTO для ответа от API
