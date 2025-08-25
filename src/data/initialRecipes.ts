@@ -459,7 +459,7 @@ export const initialRecipes: Recipe[] = [
     id: 'recipe-6',
     title: 'Тирамису',
     description: 'Классический итальянский десерт с сыром и молоком',
-    image: 'https://images.steamusercontent.com/ugc/17854221424440595525/543783B601D5A853E3F50907B9722A314DFD92B6/?imw=512&amp;imh=320&amp;ima=fit&amp;impolicy=Letterbox&amp;imcolor=%23000000&amp;letterbox=true',
+    image: 'https://images.steamusercontent.com/ugc/17854221424440595525/543783B601D5A853E3F50907B9722A314DFD92B6/?imw=512&imh=320&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true',
     prepTime: 45,
     cookTime: 0,
     servings: 8,
@@ -471,25 +471,25 @@ export const initialRecipes: Recipe[] = [
         id: 'ing-6-1',
         name: "asdasd",
         count: 500,
-        measure: "L"
+        productUnit: "LITER"
       },
       {
         id: 'ing-6-2',
         name: "ds",
         count: 500,
-        measure: "L"
+        productUnit: "LITER"
       },
       {
         id: 'ing-6-3',
         name: "ad",
         count: 2,
-        measure: "L"
+        productUnit: "LITER"
       },
       {
         id: 'ing-6-4',
         name: "qa",
         count: 123,
-        measure: "L"
+        productUnit: "LITER"
       },
     ],
     steps: [
@@ -503,7 +503,7 @@ export const initialRecipes: Recipe[] = [
             id: 'ing-6-1',
             name: "asdasd",
             count: 500,
-            measure: "L"
+            productUnit: "LITER"
           },
         ],
         time: 25
@@ -518,7 +518,7 @@ export const initialRecipes: Recipe[] = [
             id: 'ing-6-1',
             name: "asdasd",
             count: 500,
-            measure: "L"
+            productUnit: "LITER"
           },
         ],
         time: 25

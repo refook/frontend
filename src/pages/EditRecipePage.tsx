@@ -26,31 +26,29 @@ const EditRecipePage: React.FC = () => {
       return {
         name: '',
         description: '',
-        kitchen: undefined,
         level: 'EASY',
+        kitchens: [],
         cookTime: 0,
         allTime: 0,
-        portion: 1,
         photos: [],
         tags: [],
         ingredients: [],
         steps: [],
-      };
+      } as any;
     }
     return {
       name: currentRecipe.title,
       description: currentRecipe.description,
-      kitchen: currentRecipe.cuisine,
       level: currentRecipe.difficulty.toUpperCase() as any,
-      cookTime: currentRecipe.cookTime * 60, // локальная модель в минутах, API в секундах
-      allTime: currentRecipe.prepTime * 60 + currentRecipe.cookTime * 60,
-      portion: currentRecipe.servings,
+      kitchens: currentRecipe.cuisine ? [currentRecipe.cuisine] : [],
+      cookTime: currentRecipe.cookTime * 60,
+      allTime: (currentRecipe.prepTime + currentRecipe.cookTime) * 60,
       photos: currentRecipe.photos || [],
-      tags: currentRecipe.tags || [],
+      tags: (currentRecipe.tags || []) as any,
       ingredients: (currentRecipe.ingredients || []).map((ing) => ({
         id: ing.id,
         count: ing.count,
-        measure: ing.measure,
+        productUnit: (ing as any).productUnit || (ing as any).measure,
       })),
       steps: (currentRecipe.steps || []).map((s) => ({
         id: s.id,
@@ -61,7 +59,7 @@ const EditRecipePage: React.FC = () => {
         ingredients: s.ingredients || [],
         time: s.time || 0,
       })),
-    };
+    } as any;
   }, [currentRecipe]);
 
   const onChange = (data: CreateRecipeDto) => {

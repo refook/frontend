@@ -240,7 +240,7 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
                 category: { id: 'api', name: 'Из API', color: '#4f46e5' }
               },
               amount: ingr.count,
-              unit: ingr.measure,
+              unit: (ingr as any).productUnit || (ingr as any).measure,
             }) as RecipeIngredient);
           
           return (

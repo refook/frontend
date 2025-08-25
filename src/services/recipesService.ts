@@ -174,9 +174,7 @@ export class RecipesService {
       errors.push('Время готовки не может быть отрицательным');
     }
 
-    if (formData.portion < 1) {
-      errors.push('Количество порций должно быть больше 0');
-    }
+    // portion больше не используется в форме; unitCount устанавливается на бэке
 
     if (!formData.ingredients?.length) {
       errors.push('Добавьте хотя бы один ингредиент');
