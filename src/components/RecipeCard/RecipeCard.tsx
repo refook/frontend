@@ -23,8 +23,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   viewMode = 'grid'
 }) => {
   // Определяем, является ли recipe объектом CreateRecipeDto
-  const isFormData = 'portion' in recipe && 'allTime' in recipe;
-  const seedString = isFormData ? (recipe.name ?? '') : (recipe.title ?? '');
+  const isFormData = 'allTime' in recipe && 'level' in recipe && 'ingredients' in recipe;
+  const seedString = isFormData ? ((recipe as CreateRecipeDto).name ?? '') : ((recipe as Recipe).title ?? '');
   const fallbackEmoji = FOOD_PLACEHOLDER_EMOJIS[hashStringToIndex(seedString, FOOD_PLACEHOLDER_EMOJIS.length)];
   const getDifficultyLabel = (difficulty: Recipe['difficulty'] | CreateRecipeDto['level']) => {
     if (difficulty === 'EASY') return 'Легко';
@@ -63,9 +63,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   console.log('Is form data:', isFormData);
 
   // Получаем значения в зависимости от типа данных
-  const prepTime = isFormData ? recipe.allTime : (recipe.prepTime || 0);
-  const cookTime = isFormData ? recipe.cookTime : (recipe.cookTime || 0);
-  const servingsCount = isFormData ? (recipe.portion || 4) : (recipe.servings || 4); // Используем дефолтное значение 4 порции
+  const prepTime = isFormData ? (recipe as CreateRecipeDto).allTime : ((recipe as Recipe).prepTime || 0);
+  const cookTime = isFormData ? (recipe as CreateRecipeDto).cookTime : ((recipe as Recipe).cookTime || 0);
+  const servingsCount = isFormData ? 1 : ((recipe as Recipe).servings || 4);
 
   console.log('Calculated values:', { prepTime, cookTime, servingsCount });
   
@@ -73,10 +73,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
 
   return (
     <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
-      <Link to={`/recipe/${isFormData ? '' : recipe.id}`} className={styles.cardLink}>
+      <Link to={`/recipe/${isFormData ? '' : (recipe as Recipe).id}`} className={styles.cardLink}>
         <div className={styles.imageContainer}>
           {(
-            (isFormData && recipe.photos?.[0]) || (!isFormData && (recipe as Recipe).image)
+            (isFormData && (recipe as CreateRecipeDto).photos?.[0]) || (!isFormData && (recipe as Recipe).image)
           ) ? (
             <img 
               src={isFormData ? `/api/v1/photo/${(recipe as CreateRecipeDto).photos?.[0]}` : ((recipe as Recipe).image as string)}
@@ -101,8 +101,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         </div>
         
         <div className={styles.content}>
-          <h3 className={styles.title}>{isFormData ? recipe.name : recipe.title}</h3>
-          <p className={styles.description}>{recipe.description}</p>
+          <h3 className={styles.title}>{isFormData ? (recipe as CreateRecipeDto).name : (recipe as Recipe).title}</h3>
+          <p className={styles.description}>{isFormData ? (recipe as CreateRecipeDto).description : (recipe as Recipe).description}</p>
           
           <div className={styles.meta}>
             <div className={styles.metaItem}>
@@ -116,22 +116,22 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
             <div className={styles.metaItem}>
               <StarIcon 
                 className={styles.metaIcon} 
-                style={{ color: getDifficultyColor(isFormData ? recipe.level : recipe.difficulty) }}
+                style={{ color: getDifficultyColor(isFormData ? (recipe as CreateRecipeDto).level : (recipe as Recipe).difficulty) }}
               />
-              <span>{getDifficultyLabel(isFormData ? recipe.level : recipe.difficulty)}</span>
+              <span>{getDifficultyLabel(isFormData ? (recipe as CreateRecipeDto).level : (recipe as Recipe).difficulty)}</span>
             </div>
           </div>
           
           <div className={styles.footer}>
-            {recipe.tags && recipe.tags.length > 0 && (
+            {((isFormData ? (recipe as CreateRecipeDto).tags : (recipe as Recipe).tags) as any)?.length > 0 && (
               <div className={styles.tags}>
-                {recipe.tags.slice(0, 3).map((tag, index) => (
+                {((isFormData ? (recipe as CreateRecipeDto).tags : (recipe as Recipe).tags) as any).slice(0, 3).map((tag: any, index: number) => (
                   <span key={index} className={styles.tag}>
-                    {tag}
+                    {typeof tag === 'string' ? tag : (tag?.name ?? '')}
                   </span>
                 ))}
-                {recipe.tags.length > 3 && (
-                  <span className={styles.moreTag}>+{recipe.tags.length - 3}</span>
+                {(((isFormData ? (recipe as CreateRecipeDto).tags : (recipe as Recipe).tags) as any).length > 3) && (
+                  <span className={styles.moreTag}>+{((isFormData ? (recipe as CreateRecipeDto).tags : (recipe as Recipe).tags) as any).length - 3}</span>
                 )}
               </div>
             )}

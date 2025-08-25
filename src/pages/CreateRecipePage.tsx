@@ -25,7 +25,7 @@ const CreateRecipePage: React.FC = () => {
     kitchens: [],
     cookTime: 0,
     allTime: 0,
-    portion: 1,
+    // portion убран из DTO — используем serving.unitCount на бэке
     photos: [],
     tags: [],
     ingredients: [],
