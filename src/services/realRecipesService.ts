@@ -192,7 +192,7 @@ class RealRecipesService {
         serving: {
           baseUnit: (formData.baseUnit as any) || 'GR',
           totalWeight: Number(formData.avgWeight ?? 0),
-          recipeUnit: (formData.unit as any) || 'GR',
+          recipeUnit: (formData.recipeUnit as any) || 'PORTION',
           unitCount: 1
         },
         macros: {
@@ -303,7 +303,7 @@ class RealRecipesService {
         cuisine: apiRecipe.kitchen,
         tags: apiRecipe.tags || [],
         ingredients: apiRecipe.ingredients || [],
-        steps: apiRecipe.steps.map(step => ({
+        steps: (apiRecipe.steps || []).map(step => ({
           ...step,
           photos: step.photos || [],
           ingredients: step.ingredients || []

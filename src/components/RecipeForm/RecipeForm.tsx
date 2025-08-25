@@ -285,18 +285,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                 onChange={(e) => updateField('avgWeight', Number(e.target.value) || 0)}
               />
             </div>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Конкретная мера</label>
-              <select
-                className={styles.select}
-                value={formData.unit || 'GRAM'}
-                onChange={(e) => updateField('unit', e.target.value as any)}
-              >
-                {PRODUCT_UNITS_ARRAY.map(u => (
-                  <option key={u.value} value={u.value}>{u.label}</option>
-                ))}
-              </select>
-            </div>
+            {/* Убрано: конкретная мера. Используем recipeUnit вместо unit */}
             <div className={styles.formGroup}>
               <label className={styles.label}>Единица рецепта</label>
               <select
