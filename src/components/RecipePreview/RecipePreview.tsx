@@ -19,6 +19,7 @@ import Chip from '../Chip/Chip';
 import StepsSection from '../StepsSection/StepsSection';
 import styles from './RecipePreview.module.css';
 import InfoCard from '../InfoCard/InfoCard';
+import RecipeTags from '../RecipeTags/RecipeTags';
 
 interface RecipePreviewProps {
   formData?: CreateRecipeDto;
@@ -68,7 +69,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const cuisine = isFormData ? undefined : (data as Recipe).cuisine;
   const tags: string[] = isFormData
     ? (((data as CreateRecipeDto).tags ?? []).map((t: any) => (typeof t === 'string' ? t : (t?.name ?? ''))).filter(Boolean))
-    : ((data as Recipe).tags || []);
+    : ((((data as any).tags ?? []).map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))).filter((s: any) => Boolean(s)) as string[]);
   const ingredients = isFormData ? (data as CreateRecipeDto).ingredients : (data as Recipe).ingredients;
   const steps = isFormData ? (data as CreateRecipeDto).steps : (data as Recipe).steps;
   const photos = isFormData ? (data as CreateRecipeDto).photos : (data as Recipe).photos;
@@ -172,18 +173,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
         
 
         {/* Теги */}
-        {tags && tags.length > 0 && (
-          <div className={styles.tagsSection}>
-            <h3 className={styles.sectionTitle}>Теги</h3>
-            <div className={styles.tags}>
-              {tags.map((tag, index) => (
-                <span key={index} className={styles.tag}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        <RecipeTags tags={tags} />
 
         <div className={styles.contentGrid}>
           {/* Ингредиенты */}

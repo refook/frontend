@@ -182,7 +182,11 @@ class RealRecipesService {
         },
         metaInfo: {
           kitchens: formData.kitchens || [],
-          tags: null,
+          tags: Array.isArray(formData.tags)
+            ? (formData.tags as any[])
+                .map((t) => (typeof t === 'string' ? t : (t?.id ?? t?.name ?? '')))
+                .filter((v) => typeof v === 'string' && v.length > 0)
+            : [],
           photos: formData.photos || []
         },
         cookingTime: {
@@ -291,6 +295,10 @@ class RealRecipesService {
     const cookTimeMinutes = Math.round(apiRecipe.cookTime / 60);
     
           const photoList: string[] = (apiRecipe as any)?.metaInfo?.photos || apiRecipe.photos || [];
+          const rawTags: any[] = (apiRecipe as any)?.metaInfo?.tags || (apiRecipe as any)?.tags || [];
+          const tagsList: string[] = (Array.isArray(rawTags) ? rawTags : [])
+            .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
+            .filter((s: any) => typeof s === 'string' && s.length > 0);
 
           return {
         id: apiRecipe.id,
@@ -307,7 +315,7 @@ class RealRecipesService {
         servings: apiRecipe.portion || 4, // количество порций с дефолтным значением
         difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
         cuisine: apiRecipe.kitchen,
-        tags: apiRecipe.tags || [],
+        tags: tagsList,
         ingredients: apiRecipe.ingredients || [],
         steps: (apiRecipe.steps || []).map(step => ({
           ...step,
