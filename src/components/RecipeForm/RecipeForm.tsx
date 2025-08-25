@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../../services/api';
-import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../../constants/measures';
+import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY, RECIPE_UNITS_ARRAY } from '../../constants/measures';
 import type { CreateRecipeDto, KitchenType, DifficultyLevel } from '../../types/recipe.types';
 import IngredientPicker from '../IngredientPicker/IngredientPicker';
 import StepsEditor from '../StepsEditor/StepsEditor';
@@ -38,7 +38,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     baseUnit: initialData.baseUnit || 'GR',
     avgWeight: initialData.avgWeight || 100,
     unit: initialData.unit || 'GRAM',
-    macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 }
+    macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 },
+    recipeUnit: initialData.recipeUnit || 'PORTION'
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -59,7 +60,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       baseUnit: initialData.baseUnit || 'GR',
       avgWeight: initialData.avgWeight || 100,
       unit: initialData.unit || 'GRAM',
-      macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 }
+      macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 },
+      recipeUnit: initialData.recipeUnit || 'PORTION'
     });
   }, [initialData]);
 
@@ -256,9 +258,9 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
           <TagsInput tags={(formData.tags as any) || []} onChange={(selected) => updateField('tags', selected as any)} placeholder="Выберите тег из списка" />
         </section>
 
-        {/* Единицы итогового продукта (заглушка) */}
+        {/* Единицы итогового продукта */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Единицы рецепта (заглушка)</h2>
+          <h2 className={styles.sectionTitle}>Единицы рецепта</h2>
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
               <label className={styles.label}>Базовая мера</label>
@@ -283,14 +285,15 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                 onChange={(e) => updateField('avgWeight', Number(e.target.value) || 0)}
               />
             </div>
+            {/* Убрано: конкретная мера. Используем recipeUnit вместо unit */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>Конкретная мера</label>
+              <label className={styles.label}>Единица рецепта</label>
               <select
                 className={styles.select}
-                value={formData.unit || 'GRAM'}
-                onChange={(e) => updateField('unit', e.target.value as any)}
+                value={formData.recipeUnit || 'PORTION'}
+                onChange={(e) => updateField('recipeUnit', e.target.value as any)}
               >
-                {PRODUCT_UNITS_ARRAY.map(u => (
+                {RECIPE_UNITS_ARRAY.map(u => (
                   <option key={u.value} value={u.value}>{u.label}</option>
                 ))}
               </select>

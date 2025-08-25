@@ -7,6 +7,7 @@ interface Props {
   description?: string;
   rating?: number;
   author?: string;
+  imageUrl?: string;
 }
 
 /**
@@ -19,10 +20,14 @@ interface Props {
  * @param rating Необязательный рейтинг по 5‑балльной шкале (по умолчанию 4.8).
  * @param author Необязательное имя автора (по умолчанию «Автор»).
  */
-const HeroCard: React.FC<Props> = ({ title, description, rating = 4.8, author = 'Автор' }) => {
+const HeroCard: React.FC<Props> = ({ title, description, rating = 4.8, author = 'Автор', imageUrl }) => {
   return (
     <div className={styles.card}>
-      <div className={styles.image} />
+      {imageUrl ? (
+        <img className={styles.imageTag} src={imageUrl} alt={title} />
+      ) : (
+        <div className={styles.image} />
+      )}
       <div className={styles.content}>
         <h1 className={styles.title}>{title}</h1>
         {description && <p className={styles.description}>{description}</p>}
