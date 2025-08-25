@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import styles from './AdminPage.module.css';
 import Tabs from '../../components/Tabs/Tabs';
-import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon } from '@heroicons/react/24/outline';
 import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
+import TagSubTabs from './components/TagSubTabs/TagSubTabs';
 
 /**
  * Тип ключей доступных вкладок админ-панели
- * @typedef {'products' | 'recipes' | 'users' | 'settings'} TabKey
+ * @typedef {'products' | 'recipes' | 'tags' | 'users' | 'settings'} TabKey
  */
-type TabKey = 'products' | 'recipes' | 'users' | 'settings';
+type TabKey = 'products' | 'recipes' | 'tags' | 'users' | 'settings';
 
 /**
  * Главная страница админ-панели с управлением системными функциями.
  * 
  * Предоставляет централизованный интерфейс для администрирования различных
- * разделов приложения: продукты, рецепты, пользователи и настройки.
+ * разделов приложения: продукты, рецепты, теги, пользователи и настройки.
  * 
  * @component
  * @example
@@ -32,6 +33,7 @@ type TabKey = 'products' | 'recipes' | 'users' | 'settings';
  * @sections
  * - **Продукты**: Полнофункциональный раздел с подвкладками (создание, предложения)
  * - **Рецепты**: Заглушка для будущего управления рецептами
+ * - **Теги**: Полнофункциональный раздел для управления тегами (создание, управление)
  * - **Пользователи**: Заглушка для управления пользователями
  * - **Настройки**: Заглушка для системных настроек
  * 
@@ -60,6 +62,7 @@ const AdminPage: React.FC = () => {
         tabs={[
           { id: 'products', label: 'Продукты', Icon: Squares2X2Icon },
           { id: 'recipes', label: 'Рецепты', Icon: BookOpenIcon },
+          { id: 'tags', label: 'Теги', Icon: TagIcon },
           { id: 'users', label: 'Пользователи', Icon: UserGroupIcon },
           { id: 'settings', label: 'Настройки', Icon: Cog6ToothIcon },
         ]}
@@ -79,6 +82,11 @@ const AdminPage: React.FC = () => {
             <div className={styles.cardTitle}>Рецепты (скоро)</div>
             <p>Здесь появится управление рецептами.</p>
           </div>
+        )}
+        
+        {/* Раздел "Теги" - полнофункциональный с подвкладками */}
+        {activeTab === 'tags' && (
+          <TagSubTabs />
         )}
         
         {/* Раздел "Пользователи" - заглушка для управления пользователями */}
