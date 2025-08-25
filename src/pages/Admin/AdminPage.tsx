@@ -1,86 +1,59 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../../services/api';
-import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 import styles from './AdminPage.module.css';
 import Tabs from '../../components/Tabs/Tabs';
 import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
-import CreateProductForm from './components/CreateProductForm/CreateProductForm';
+import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
 
-type BaseUnitType = (typeof BASE_UNITS_ARRAY)[number]['value'];
-type ProductUnitType = (typeof PRODUCT_UNITS_ARRAY)[number]['value'];
-
-interface CreateProductDtoForm {
-  name: string;
-  description: string;
-  baseUnit: BaseUnitType;
-  avgWeight: number;
-  unit: ProductUnitType;
-  photo: string;
-  macros: {
-    calories: number;
-    proteins: number;
-    fats: number;
-    carbs: number;
-  };
-}
-
+/**
+ * Тип ключей доступных вкладок админ-панели
+ * @typedef {'products' | 'recipes' | 'users' | 'settings'} TabKey
+ */
 type TabKey = 'products' | 'recipes' | 'users' | 'settings';
 
+/**
+ * Главная страница админ-панели с управлением системными функциями.
+ * 
+ * Предоставляет централизованный интерфейс для администрирования различных
+ * разделов приложения: продукты, рецепты, пользователи и настройки.
+ * 
+ * @component
+ * @example
+ * // Использование в роутинге
+ * <Route path="/admin" element={<AdminPage />} />
+ * 
+ * @features
+ * - Табованная навигация между разделами
+ * - Вложенные компоненты для каждого раздела
+ * - Responsive дизайн
+ * - Поддержка темной темы
+ * - Иконки для навигации
+ * - Заглушки для будущих функций
+ * 
+ * @sections
+ * - **Продукты**: Полнофункциональный раздел с подвкладками (создание, предложения)
+ * - **Рецепты**: Заглушка для будущего управления рецептами
+ * - **Пользователи**: Заглушка для управления пользователями
+ * - **Настройки**: Заглушка для системных настроек
+ * 
+ * @since 1.0.0
+ * @author Frontend Team
+ */
 const AdminPage: React.FC = () => {
-  const [formData, setFormData] = useState<CreateProductDtoForm>({
-    name: '',
-    description: '',
-    baseUnit: 'GR',
-    avgWeight: 100,
-    unit: 'GRAM',
-    photo: '',
-    macros: { calories: 0, proteins: 0, fats: 0, carbs: 0 },
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  /**
+   * Состояние активной вкладки админ-панели
+   * @type {TabKey}
+   * @default 'products'
+   */
   const [activeTab, setActiveTab] = useState<TabKey>('products');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setMessage(null);
-    try {
-      const token = localStorage.getItem('authToken');
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch(`${API_BASE_URL}/products`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-      setMessage('Продукт успешно создан');
-      setFormData({
-        name: '',
-        description: '',
-        baseUnit: 'GR',
-        avgWeight: 100,
-        unit: 'GRAM',
-        photo: '',
-        macros: { calories: 0, proteins: 0, fats: 0, carbs: 0 },
-      });
-    } catch (err) {
-      setMessage(`Ошибка: ${err instanceof Error ? err.message : 'Не удалось создать продукт'}`);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <div className={styles.adminPage}>
+      {/* Заголовок админ-панели */}
       <div className={styles.header}>
         <h1 className={styles.title}>Админ-панель</h1>
       </div>
 
+      {/* Основная навигация по разделам */}
       <Tabs
         initial={activeTab}
         onChange={(t) => setActiveTab(t as TabKey)}
@@ -93,26 +66,30 @@ const AdminPage: React.FC = () => {
         ariaLabel="Admin sections"
       />
 
+      {/* Контентная область с содержимым выбранной вкладки */}
       <div className={styles.content}>
+        {/* Раздел "Продукты" - полнофункциональный с подвкладками */}
         {activeTab === 'products' && (
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Создать продукт</div>
-            <CreateProductForm />
-          </div>
+          <ProductSubTabs />
         )}
 
+        {/* Раздел "Рецепты" - заглушка для будущей функциональности */}
         {activeTab === 'recipes' && (
           <div className={styles.card}>
             <div className={styles.cardTitle}>Рецепты (скоро)</div>
             <p>Здесь появится управление рецептами.</p>
           </div>
         )}
+        
+        {/* Раздел "Пользователи" - заглушка для управления пользователями */}
         {activeTab === 'users' && (
           <div className={styles.card}>
             <div className={styles.cardTitle}>Пользователи (скоро)</div>
             <p>Здесь появится управление пользователями.</p>
           </div>
         )}
+        
+        {/* Раздел "Настройки" - заглушка для системных настроек */}
         {activeTab === 'settings' && (
           <div className={styles.card}>
             <div className={styles.cardTitle}>Настройки (скоро)</div>
