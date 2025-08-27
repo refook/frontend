@@ -165,6 +165,11 @@ export class RecipesService {
     return realRecipesService.aiSearch(prompt);
   }
 
+  // Избранные рецепты пользователя (по токену)
+  static async getFavorites(): Promise<Recipe[]> {
+    return realRecipesService.getUserFavorites();
+  }
+
   // Добавить/убрать из избранного
   static async toggleFavorite(recipeId: string, favorite: boolean): Promise<void> {
     return realRecipesService.setRecipeAction(recipeId, 'FAVORITE', favorite);
