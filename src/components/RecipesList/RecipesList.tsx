@@ -4,56 +4,25 @@ import RecipeCard from '../RecipeCard/RecipeCard';
 import RecipeCardSkeleton from '../RecipeCard/RecipeCardSkeleton';
 import styles from './RecipesList.module.css';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useMemo, useState } from 'react';
-import { RecipesService } from '../../services/recipesService';
+import { useState } from 'react';
 
 interface RecipesListProps {
   recipes: Recipe[];
   loading: boolean;
   viewMode?: 'grid' | 'list';
-  aiPrompt?: string; // промт для ИИ-поиска
-  onAiFilter?: (filter: any) => void; // колбэк для применения фильтра из ответа
+  overrideRecipes?: Recipe[] | null; // данные из ИИ-поиска
+  loadingOverride?: boolean; // внешний индикатор загрузки
 }
 
 const RecipesList: React.FC<RecipesListProps> = ({
   recipes,
   loading,
   viewMode = 'grid',
-  aiPrompt,
-  onAiFilter
+  overrideRecipes,
+  loadingOverride
 }) => {
   const navigate = useNavigate();
-  const [aiLoading, setAiLoading] = useState<boolean>(false);
-  const [aiRecipes, setAiRecipes] = useState<Recipe[] | null>(null);
-  const effectiveLoading = loading || aiLoading;
-
-  useEffect(() => {
-    let cancelled = false;
-    const runAiSearch = async () => {
-      if (!aiPrompt || aiPrompt.trim().length < 3) {
-        setAiRecipes(null);
-        return;
-      }
-      setAiLoading(true);
-      try {
-        const { filter, recipes } = await RecipesService.aiSearchRecipes(aiPrompt.trim());
-        if (!cancelled) {
-          setAiRecipes(recipes);
-          onAiFilter && onAiFilter(filter);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setAiRecipes([]);
-        }
-        // eslint-disable-next-line no-console
-        console.error('Ошибка ИИ-поиска:', e);
-      } finally {
-        if (!cancelled) setAiLoading(false);
-      }
-    };
-    runAiSearch();
-    return () => { cancelled = true; };
-  }, [aiPrompt, onAiFilter]);
+  const effectiveLoading = loadingOverride ?? loading;
 
   const handleRandomRecipe = () => {
     if (!recipes || recipes.length === 0) return;
@@ -62,7 +31,8 @@ const RecipesList: React.FC<RecipesListProps> = ({
       navigate(`/recipe/${random.id}`);
     }
   };
-  if (effectiveLoading && (aiRecipes == null ? recipes.length === 0 : aiRecipes.length === 0)) {
+  const dataSource = overrideRecipes ?? recipes;
+  if (effectiveLoading && dataSource.length === 0) {
     return (
       <div className={`${styles.recipesList} ${styles[viewMode]}`}>
         {Array.from({ length: 12 }).map((_, index) => (
@@ -72,7 +42,6 @@ const RecipesList: React.FC<RecipesListProps> = ({
     );
   }
 
-  const dataSource = aiRecipes ?? recipes;
   if (dataSource.length === 0) {
     return (
       <div className={styles.emptyState}>

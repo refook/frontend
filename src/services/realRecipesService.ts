@@ -139,24 +139,39 @@ class RealRecipesService {
    */
   async aiSearch(prompt: string): Promise<{ filter: any; recipes: Recipe[] }> {
     try {
-      const url = `${API_BASE_URL}/recipe/ai-search`;
+      // Контракт: GET /v1/recipe/ai-search?promt=...
+      const url = `${API_BASE_URL}/recipe/ai-search?promt=${encodeURIComponent(prompt)}`;
       const headers = getAuthHeaders();
-      apiLogger.logRequest(url, 'POST', headers, { prompt });
+      apiLogger.logRequest(url, 'GET', headers, undefined);
       const res = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ prompt })
+        method: 'GET',
+        headers
       });
       if (!res.ok) {
         const text = await res.text().catch(() => '');
         throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
       }
       const data = await res.json();
-      const shortList: any[] = Array.isArray(data?.recipes) ? data.recipes : [];
-      return {
-        filter: data?.filter ?? null,
-        recipes: shortList.map((it) => this.transformShortApiRecipeToLocal(it))
-      };
+      try { console.debug('AI search raw response:', data); } catch {}
+      // Возможные варианты ответа:
+      // 1) Array<RecipeShortResponseDto>
+      // 2) Array<AiRecipeSearchResponseDto> где элемент = { filter, recipes: RecipeShortResponseDto[] }
+      let mapped: Recipe[] = [];
+      if (Array.isArray(data)) {
+        if (data.length > 0 && Array.isArray((data[0] as any)?.recipes)) {
+          // Вариант 2
+          mapped = (data as any[])
+            .flatMap((entry: any) => Array.isArray(entry.recipes) ? entry.recipes : [])
+            .map((it: any) => this.transformShortApiRecipeToLocal(it));
+        } else {
+          // Вариант 1
+          mapped = (data as any[]).map((it: any) => this.transformShortApiRecipeToLocal(it));
+        }
+      } else if (data && Array.isArray((data as any).recipes)) {
+        // Вариант 3: объект с полем recipes
+        mapped = ((data as any).recipes as any[]).map((it: any) => this.transformShortApiRecipeToLocal(it));
+      }
+      return { filter: null, recipes: mapped };
     } catch (error) {
       console.error('Ошибка при ИИ-поиске рецептов:', error);
       return { filter: null, recipes: [] };
