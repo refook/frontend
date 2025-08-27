@@ -134,6 +134,29 @@ class RealRecipesService {
   }
 
   /**
+   * Выполнить действие над рецептом (LIKE, FAVORITE, SET_RATE)
+   */
+  async setRecipeAction(recipeId: string, action: 'LIKE' | 'FAVORITE' | 'SET_RATE', value: boolean | number): Promise<void> {
+    try {
+      const url = `${API_BASE_URL}/recipe/${recipeId}/action`;
+      const headers = getAuthHeaders();
+      const body = { action, value } as any;
+      apiLogger.logRequest(url, 'POST', headers, body);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении действия над рецептом:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Получить рецепты с пагинацией и фильтрами
    */
   async getRecipes(

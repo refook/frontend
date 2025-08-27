@@ -160,6 +160,11 @@ export class RecipesService {
     }
   }
 
+  // Лайкнуть/снять лайк у рецепта
+  static async toggleLike(recipeId: string, like: boolean): Promise<void> {
+    return realRecipesService.setRecipeAction(recipeId, 'LIKE', like);
+  }
+
   // Проверка валидности формы рецепта
   static validateRecipeForm(formData: CreateRecipeDto): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];

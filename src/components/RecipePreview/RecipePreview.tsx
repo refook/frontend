@@ -8,7 +8,8 @@ import {
   UserGroupIcon, 
   StarIcon,
   PencilIcon,
-  CheckIcon
+  CheckIcon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import NutritionInfo from '../NutritionInfo/NutritionInfo';
@@ -20,6 +21,7 @@ import StepsSection from '../StepsSection/StepsSection';
 import styles from './RecipePreview.module.css';
 import InfoCard from '../InfoCard/InfoCard';
 import RecipeTags from '../RecipeTags/RecipeTags';
+import { RecipesService } from '../../services/recipesService';
 
 interface RecipePreviewProps {
   formData?: CreateRecipeDto;
@@ -125,6 +127,31 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
   const recipeTitle = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
 
+  // Лайки
+  const initialLikes = !isFormData ? ((data as Recipe).stats?.likes ?? 0) : 0;
+  const [likesCount, setLikesCount] = useState<number>(initialLikes);
+  const [liked, setLiked] = useState<boolean>(false);
+  const [likeLoading, setLikeLoading] = useState<boolean>(false);
+
+  const handleToggleLike = async () => {
+    if (isFormData || !(data as Recipe).id) return;
+    if (likeLoading) return;
+    const next = !liked;
+    setLiked(next);
+    setLikesCount((c) => c + (next ? 1 : -1));
+    setLikeLoading(true);
+    try {
+      await RecipesService.toggleLike((data as Recipe).id, next);
+    } catch (e) {
+      // откат
+      setLiked(!next);
+      setLikesCount((c) => c + (next ? -1 : 1));
+      console.error('Не удалось выполнить действие LIKE:', e);
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
   return (
     <div className={styles.recipePreview}>
       <div className={styles.previewContainer}>
@@ -168,9 +195,25 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             label="Порции"
             value={<span>{servings}</span>}
           />
+          {!isFormData && (
+            <InfoCard
+              icon={<HeartIcon className={styles.infoIcon} />}
+              label="Лайки"
+              value={
+                <button
+                  type="button"
+                  onClick={handleToggleLike}
+                  disabled={likeLoading}
+                  className="ui-btn ui-btn--ghost"
+                  aria-pressed={liked}
+                  aria-label={liked ? 'Убрать лайк' : 'Поставить лайк'}
+                >
+                  {liked ? 'Убрать лайк' : 'Лайк'} ({likesCount})
+                </button>
+              }
+            />
+          )}
         </div>
-
-        
 
         {/* Теги */}
         <RecipeTags tags={tags} />
