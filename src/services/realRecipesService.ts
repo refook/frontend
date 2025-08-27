@@ -112,6 +112,28 @@ class RealRecipesService {
   }
 
   /**
+   * Получить короткий список рецептов пользователя
+   */
+  async getUserShortRecipes(userId: string): Promise<Recipe[]> {
+    try {
+      const url = `${API_BASE_URL}/recipe/${userId}/all`;
+      console.log(`Загрузка рецептов пользователя: ${url}`);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const list: any[] = await response.json();
+      return (list || []).map((it) => this.transformShortApiRecipeToLocal(it));
+    } catch (error) {
+      console.error('Ошибка при загрузке рецептов пользователя:', error);
+      return [];
+    }
+  }
+
+  /**
    * Получить рецепты с пагинацией и фильтрами
    */
   async getRecipes(
@@ -337,6 +359,47 @@ class RealRecipesService {
         createdAt: apiRecipe.createdAt,
         updatedAt: apiRecipe.updatedAt
     };
+  }
+
+  /**
+   * Трансформировать короткий рецепт (RecipeShortResponseDto) в локальный формат Recipe
+   */
+  private transformShortApiRecipeToLocal(short: any): Recipe {
+    const photoList: string[] = short?.photos || short?.metaInfo?.photos || [];
+    const firstPhoto: string | undefined = photoList?.[0];
+    const tagsList: string[] = (Array.isArray(short?.tags) ? short.tags : [])
+      .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
+      .filter((s: any) => typeof s === 'string' && s.length > 0);
+
+    return {
+      id: short.id,
+      title: short.name,
+      description: short.description ?? '',
+      photos: photoList,
+      image: firstPhoto ? (/^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`) : undefined,
+      prepTime: 0,
+      cookTime: 0,
+      servings: 4,
+      difficulty: String(short.level || 'EASY').toLowerCase() as any,
+      cuisine: (short.kitchens && short.kitchens[0]?.name) || undefined,
+      tags: tagsList,
+      ingredients: [],
+      steps: [],
+      author: short.ownerUser ? {
+        id: String(short.ownerUser.id),
+        name: short.ownerUser.name || short.ownerUser.username,
+        avatar: short.ownerUser.photo || undefined
+      } : undefined,
+      stats: {
+        views: short?.statistic?.viewsCount ?? 0,
+        likes: short?.statistic?.likesCount ?? 0,
+        saves: short?.statistic?.favoritesCount ?? 0,
+        rating: short?.statistic?.avgRating ?? 0,
+        reviewsCount: short?.statistic?.commentsCount ?? 0
+      },
+      createdAt: short.updatedAt,
+      updatedAt: short.updatedAt
+    } as Recipe;
   }
 
   /**

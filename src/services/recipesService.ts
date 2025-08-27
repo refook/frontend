@@ -150,6 +150,16 @@ export class RecipesService {
     }
   }
 
+  // Получить рецепты конкретного пользователя (короткие карточки)
+  static async getUserRecipes(userId: string): Promise<Recipe[]> {
+    try {
+      return await realRecipesService.getUserShortRecipes(userId);
+    } catch (error: any) {
+      console.error('Ошибка при получении рецептов пользователя:', error);
+      return [];
+    }
+  }
+
   // Проверка валидности формы рецепта
   static validateRecipeForm(formData: CreateRecipeDto): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];

@@ -5,6 +5,14 @@
   background: var(--token-bg);
 }
 
+/* Более широкая обёртка для полноэкранных режимов (напр. создание рецепта) */
+.wrapperWide {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: var(--spacing-3xl) var(--spacing-lg);
+  background: var(--token-bg);
+}
+
 /* Старые стили удалены — компоненты используют свои модули */
 
 

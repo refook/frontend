@@ -11,6 +11,7 @@ import FollowingSection from './sections/Following/FollowingSection';
 import RecipesSection from './sections/Recipes/RecipesSection';
 import CommentsSection from './sections/Comments/CommentsSection';
 import ActivitySection from './sections/Activity/ActivitySection';
+import CreateRecipePage from '../CreateRecipePage';
 
 /**
  * Демонстрационные данные пользователя для «Advanced Profile».
@@ -68,6 +69,7 @@ const AdvancedProfilePage: React.FC = () => {
 
   const [activeTab, setActiveTab] = React.useState<TabId>('favorites');
   const [searchParams, setSearchParams] = useSearchParams();
+  const isCreateMode = searchParams.get('mode') === 'create' && (searchParams.get('tab') === 'recipes' || activeTab === 'recipes');
 
   React.useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -85,6 +87,27 @@ const AdvancedProfilePage: React.FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  if (isCreateMode) {
+    return (
+      <div className={styles.wrapperWide}>
+        <div style={{ marginBottom: 16 }}>
+          <button
+            className="ui-btn ui-btn--ghost"
+            onClick={() => {
+              const next = new URLSearchParams(searchParams);
+              next.delete('mode');
+              next.set('tab', 'recipes');
+              setSearchParams(next, { replace: true });
+            }}
+          >
+            ← Назад к рецептам
+          </button>
+        </div>
+        <CreateRecipePage fullWidth />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.wrapper}>
