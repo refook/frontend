@@ -35,6 +35,12 @@ export interface Recipe extends BaseEntity {
     name: string;
     avatar?: string;
   };
+  macros?: {
+    calories: number;
+    proteins: number;
+    fats: number;
+    carbs: number;
+  };
   stats: {
     views: number;
     likes: number;

@@ -4,19 +4,25 @@ import RecipeCard from '../RecipeCard/RecipeCard';
 import RecipeCardSkeleton from '../RecipeCard/RecipeCardSkeleton';
 import styles from './RecipesList.module.css';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 interface RecipesListProps {
   recipes: Recipe[];
   loading: boolean;
   viewMode?: 'grid' | 'list';
+  overrideRecipes?: Recipe[] | null; // данные из ИИ-поиска
+  loadingOverride?: boolean; // внешний индикатор загрузки
 }
 
 const RecipesList: React.FC<RecipesListProps> = ({
   recipes,
   loading,
-  viewMode = 'grid'
+  viewMode = 'grid',
+  overrideRecipes,
+  loadingOverride
 }) => {
   const navigate = useNavigate();
+  const effectiveLoading = loadingOverride ?? loading;
 
   const handleRandomRecipe = () => {
     if (!recipes || recipes.length === 0) return;
@@ -25,7 +31,8 @@ const RecipesList: React.FC<RecipesListProps> = ({
       navigate(`/recipe/${random.id}`);
     }
   };
-  if (loading && recipes.length === 0) {
+  const dataSource = overrideRecipes ?? recipes;
+  if (effectiveLoading && dataSource.length === 0) {
     return (
       <div className={`${styles.recipesList} ${styles[viewMode]}`}>
         {Array.from({ length: 12 }).map((_, index) => (
@@ -35,7 +42,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
     );
   }
 
-  if (recipes.length === 0) {
+  if (dataSource.length === 0) {
     return (
       <div className={styles.emptyState}>
         <div className={styles.emptyIcon}>🔍</div>
@@ -51,7 +58,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
   const elements: React.ReactNode[] = [];
   let rowIndex = 0;
 
-  recipes.forEach((recipe, index) => {
+  dataSource.forEach((recipe, index) => {
     elements.push(
       <RecipeCard
         key={recipe.id}
@@ -84,7 +91,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
   return (
     <div className={`${styles.recipesList} ${styles[viewMode]}`}>
       {elements}
-      {loading && (
+      {effectiveLoading && (
         <>
           {Array.from({ length: 6 }).map((_, index) => (
             <RecipeCardSkeleton key={`skeleton-${index}`} />

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ingredientsService } from '../../services/ingredientsService';
 import type { Recipe } from '../../types';
 import type { CreateRecipeDto, CreateRecipeIngredientDto, RecipeIngredientDto } from '../../types/recipe.types';
@@ -8,7 +8,8 @@ import {
   UserGroupIcon, 
   StarIcon,
   PencilIcon,
-  CheckIcon
+  CheckIcon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import NutritionInfo from '../NutritionInfo/NutritionInfo';
@@ -20,6 +21,9 @@ import StepsSection from '../StepsSection/StepsSection';
 import styles from './RecipePreview.module.css';
 import InfoCard from '../InfoCard/InfoCard';
 import RecipeTags from '../RecipeTags/RecipeTags';
+import { RecipesService } from '../../services/recipesService';
+import { KeycloakContext } from '../../providers/KeycloakProvider';
+import CommentCard, { type CommentItem } from '../../pages/AdvancedProfile/components/CommentCard';
 
 interface RecipePreviewProps {
   formData?: CreateRecipeDto;
@@ -125,6 +129,37 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
   const recipeTitle = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
 
+  // Лайки
+  const initialLikes = !isFormData ? ((data as Recipe).stats?.likes ?? 0) : 0;
+  const [likesCount, setLikesCount] = useState<number>(initialLikes);
+  const [liked, setLiked] = useState<boolean>(false);
+  const [likeLoading, setLikeLoading] = useState<boolean>(false);
+  const keycloakCtx = useContext(KeycloakContext);
+  const isAuthenticated = !!keycloakCtx?.authenticated;
+
+  const handleToggleLike = async () => {
+    if (isFormData || !(data as Recipe).id) return;
+    if (!isAuthenticated) {
+      console.warn('Действие LIKE недоступно: пользователь не авторизован');
+      return;
+    }
+    if (likeLoading) return;
+    const next = !liked;
+    setLiked(next);
+    setLikesCount((c) => c + (next ? 1 : -1));
+    setLikeLoading(true);
+    try {
+      await RecipesService.toggleLike((data as Recipe).id, next);
+    } catch (e) {
+      // откат
+      setLiked(!next);
+      setLikesCount((c) => c + (next ? -1 : 1));
+      console.error('Не удалось выполнить действие LIKE:', e);
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
   return (
     <div className={styles.recipePreview}>
       <div className={styles.previewContainer}>
@@ -168,9 +203,25 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             label="Порции"
             value={<span>{servings}</span>}
           />
+          {!isFormData && (
+            <InfoCard
+              icon={<HeartIcon className={styles.infoIcon} />}
+              label="Лайки"
+              value={
+                <button
+                  type="button"
+                  onClick={handleToggleLike}
+                  disabled={likeLoading || !isAuthenticated}
+                  className="ui-btn ui-btn--ghost"
+                  aria-pressed={liked}
+                  aria-label={liked ? 'Убрать лайк' : 'Поставить лайк'}
+                >
+                  {liked ? 'Убрать лайк' : 'Лайк'} ({likesCount})
+                </button>
+              }
+            />
+          )}
         </div>
-
-        
 
         {/* Теги */}
         <RecipeTags tags={tags} />
@@ -183,8 +234,15 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             ingredients={ingredients.map((ing: any) => normalizeIngredient(ing))}
           />
 
-          {/* Пищевая ценность (заглушка) */}
-          <NutritionInfo expanded={showNutritionDetails} onToggle={() => setShowNutritionDetails(v => !v)} />
+            {/* Пищевая ценность (на порцию) */}
+          <NutritionInfo 
+            expanded={showNutritionDetails} 
+            onToggle={() => setShowNutritionDetails(v => !v)}
+            calories={!isFormData ? (data as Recipe).macros?.calories : (data as CreateRecipeDto).macros?.calories}
+            proteins={!isFormData ? (data as Recipe).macros?.proteins : (data as CreateRecipeDto).macros?.proteins}
+            fats={!isFormData ? (data as Recipe).macros?.fats : (data as CreateRecipeDto).macros?.fats}
+            carbs={!isFormData ? (data as Recipe).macros?.carbs : (data as CreateRecipeDto).macros?.carbs}
+          />
 
           {/* Шаги приготовления */}
           <StepsSection
@@ -205,6 +263,45 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Комментарии (заглушка) */}
+        {!isFormData && (
+          <div style={{ marginTop: '24px' }}>
+            <h3 style={{ margin: '0 0 16px 0' }}>Комментарии</h3>
+            {(
+              [
+                {
+                  id: 'c1',
+                  recipeTitle: title || 'Рецепт',
+                  recipeAuthor: (data as Recipe).author?.name || 'Автор',
+                  recipeImage: (data as Recipe).image,
+                  rating: Math.max(0, Math.min(5, Math.round(((data as Recipe).stats?.rating ?? 4.8)))) || 4,
+                  verified: true,
+                  text: 'Очень вкусно! Обязательно приготовлю ещё раз.',
+                  likes: 3,
+                  replies: 1,
+                  dateISO: new Date().toISOString(),
+                },
+                {
+                  id: 'c2',
+                  recipeTitle: title || 'Рецепт',
+                  recipeAuthor: (data as Recipe).author?.name || 'Автор',
+                  recipeImage: (data as Recipe).image,
+                  rating: 5,
+                  verified: false,
+                  text: 'Спасибо за рецепт, получилось отлично!',
+                  likes: 1,
+                  replies: 0,
+                  dateISO: new Date(Date.now() - 86400000).toISOString(),
+                },
+              ] as CommentItem[]
+            ).map((c) => (
+              <div key={c.id} style={{ marginBottom: '12px' }}>
+                <CommentCard item={c} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Действия */}

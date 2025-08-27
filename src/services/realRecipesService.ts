@@ -112,6 +112,104 @@ class RealRecipesService {
   }
 
   /**
+   * Получить короткий список рецептов пользователя
+   */
+  async getUserShortRecipes(userId: string): Promise<Recipe[]> {
+    try {
+      const url = `${API_BASE_URL}/recipe/${userId}/all`;
+      console.log(`Загрузка рецептов пользователя: ${url}`);
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const list: any[] = await response.json();
+      return (list || []).map((it) => this.transformShortApiRecipeToLocal(it));
+    } catch (error) {
+      console.error('Ошибка при загрузке рецептов пользователя:', error);
+      return [];
+    }
+  }
+
+  /**
+   * ИИ-поиск рецептов по промту пользователя
+   * Возвращает { filter, recipes[] } где recipes — короткие карточки
+   */
+  async aiSearch(prompt: string): Promise<{ filter: any; recipes: Recipe[] }> {
+    try {
+      // Контракт: GET /v1/recipe/ai-search?promt=...
+      const url = `${API_BASE_URL}/recipe/ai-search?promt=${encodeURIComponent(prompt)}`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'GET', headers, undefined);
+      const res = await fetch(url, {
+        method: 'GET',
+        headers
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
+      }
+      const data = await res.json();
+      try { console.debug('AI search raw response:', data); } catch {}
+      // Возможные варианты ответа:
+      // 1) Array<RecipeShortResponseDto>
+      // 2) Array<AiRecipeSearchResponseDto> где элемент = { filter, recipes: RecipeShortResponseDto[] }
+      let mapped: Recipe[] = [];
+      if (Array.isArray(data)) {
+        if (data.length > 0 && Array.isArray((data[0] as any)?.recipes)) {
+          // Вариант 2
+          mapped = (data as any[])
+            .flatMap((entry: any) => Array.isArray(entry.recipes) ? entry.recipes : [])
+            .map((it: any) => this.transformShortApiRecipeToLocal(it));
+        } else {
+          // Вариант 1
+          mapped = (data as any[]).map((it: any) => this.transformShortApiRecipeToLocal(it));
+        }
+      } else if (data && Array.isArray((data as any).recipes)) {
+        // Вариант 3: объект с полем recipes
+        mapped = ((data as any).recipes as any[]).map((it: any) => this.transformShortApiRecipeToLocal(it));
+      }
+      return { filter: null, recipes: mapped };
+    } catch (error) {
+      console.error('Ошибка при ИИ-поиске рецептов:', error);
+      return { filter: null, recipes: [] };
+    }
+  }
+
+  /**
+   * Выполнить действие над рецептом (LIKE, FAVORITE, SET_RATE)
+   */
+  async setRecipeAction(recipeId: string, action: 'LIKE' | 'FAVORITE' | 'SET_RATE', value: boolean | number | string): Promise<void> {
+    try {
+      const url = `${API_BASE_URL}/recipe/${recipeId}/action`;
+      const headers = getAuthHeaders();
+      // Передаём значение как boolean для LIKE (или конвертируем типы в boolean)
+      const normalizedValue = ((): boolean | number => {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value === 1;
+        if (typeof value === 'string') return value.toLowerCase() === 'true';
+        return Boolean(value);
+      })();
+      const body = { action, value: normalizedValue } as any;
+      apiLogger.logRequest(url, 'POST', headers, body);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
+      }
+    } catch (error) {
+      console.error('Ошибка при выполнении действия над рецептом:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Получить рецепты с пагинацией и фильтрами
    */
   async getRecipes(
@@ -322,21 +420,68 @@ class RealRecipesService {
           photos: step.photos || [],
           ingredients: step.ingredients || []
         })) || [],
+        macros: (apiRecipe as any)?.macros ? {
+          calories: Number((apiRecipe as any).macros?.calories ?? 0),
+          proteins: Number((apiRecipe as any).macros?.proteins ?? 0),
+          fats: Number((apiRecipe as any).macros?.fats ?? 0),
+          carbs: Number((apiRecipe as any).macros?.carbs ?? 0),
+        } : undefined,
         author: {
           id: apiRecipe.ownerUser.id.toString(),
           name: apiRecipe.ownerUser.name,
           avatar: apiRecipe.ownerUser.photo || undefined
         },
         stats: {
-          views: 0,
-          likes: 0,
-          saves: 0,
-          rating: 0,
-          reviewsCount: 0
+          views: (apiRecipe as any)?.statistic?.viewsCount ?? 0,
+          likes: (apiRecipe as any)?.statistic?.likesCount ?? 0,
+          saves: (apiRecipe as any)?.statistic?.favoritesCount ?? 0,
+          rating: (apiRecipe as any)?.statistic?.avgRating ?? 0,
+          reviewsCount: (apiRecipe as any)?.statistic?.commentsCount ?? 0
         },
         createdAt: apiRecipe.createdAt,
         updatedAt: apiRecipe.updatedAt
     };
+  }
+
+  /**
+   * Трансформировать короткий рецепт (RecipeShortResponseDto) в локальный формат Recipe
+   */
+  private transformShortApiRecipeToLocal(short: any): Recipe {
+    const photoList: string[] = short?.photos || short?.metaInfo?.photos || [];
+    const firstPhoto: string | undefined = photoList?.[0];
+    const tagsList: string[] = (Array.isArray(short?.tags) ? short.tags : [])
+      .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
+      .filter((s: any) => typeof s === 'string' && s.length > 0);
+
+    return {
+      id: short.id,
+      title: short.name,
+      description: short.description ?? '',
+      photos: photoList,
+      image: firstPhoto ? (/^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`) : undefined,
+      prepTime: 0,
+      cookTime: 0,
+      servings: 4,
+      difficulty: String(short.level || 'EASY').toLowerCase() as any,
+      cuisine: (short.kitchens && short.kitchens[0]?.name) || undefined,
+      tags: tagsList,
+      ingredients: [],
+      steps: [],
+      author: short.ownerUser ? {
+        id: String(short.ownerUser.id),
+        name: short.ownerUser.name || short.ownerUser.username,
+        avatar: short.ownerUser.photo || undefined
+      } : undefined,
+      stats: {
+        views: short?.statistic?.viewsCount ?? 0,
+        likes: short?.statistic?.likesCount ?? 0,
+        saves: short?.statistic?.favoritesCount ?? 0,
+        rating: short?.statistic?.avgRating ?? 0,
+        reviewsCount: short?.statistic?.commentsCount ?? 0
+      },
+      createdAt: short.updatedAt,
+      updatedAt: short.updatedAt
+    } as Recipe;
   }
 
   /**

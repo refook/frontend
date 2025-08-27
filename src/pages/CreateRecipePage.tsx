@@ -11,7 +11,9 @@ import { useNotification } from '../hooks/useNotification';
 import Notification from '../components/Notification';
 import styles from './CreateRecipePage.module.css';
 
-const CreateRecipePage: React.FC = () => {
+interface CreateRecipePageProps { fullWidth?: boolean }
+
+const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ fullWidth = false }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { notification, showSuccess, showError, hideNotification } = useNotification();
@@ -66,7 +68,7 @@ const CreateRecipePage: React.FC = () => {
 
   return (
     <div className={styles.createRecipePage}>
-      <div className="container">
+      <div className={fullWidth ? styles.fullWidthContainer : 'container'}>
         <div className={styles.header}>
           <h1 className={styles.title}>Создать рецепт</h1>
           <p className={styles.subtitle}>

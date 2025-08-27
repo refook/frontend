@@ -150,6 +150,26 @@ export class RecipesService {
     }
   }
 
+  // Получить рецепты конкретного пользователя (короткие карточки)
+  static async getUserRecipes(userId: string): Promise<Recipe[]> {
+    try {
+      return await realRecipesService.getUserShortRecipes(userId);
+    } catch (error: any) {
+      console.error('Ошибка при получении рецептов пользователя:', error);
+      return [];
+    }
+  }
+
+  // ИИ-поиск рецептов по промту
+  static async aiSearchRecipes(prompt: string): Promise<{ filter: any; recipes: Recipe[] }> {
+    return realRecipesService.aiSearch(prompt);
+  }
+
+  // Лайкнуть/снять лайк у рецепта
+  static async toggleLike(recipeId: string, like: boolean): Promise<void> {
+    return realRecipesService.setRecipeAction(recipeId, 'LIKE', like);
+  }
+
   // Проверка валидности формы рецепта
   static validateRecipeForm(formData: CreateRecipeDto): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];

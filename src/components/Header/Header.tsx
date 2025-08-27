@@ -145,13 +145,6 @@ const Header: React.FC = () => {
           >
             Discover
           </Link>
-          <Link
-            to="/create-recipe"
-            className={`${styles.navLink} ${location.pathname.startsWith('/create-recipe') ? styles.navLinkActive : ''}`}
-            aria-current={location.pathname.startsWith('/create-recipe') ? 'page' : undefined}
-          >
-            Создать
-          </Link>
         </nav>
 
         {/* Right section */}
@@ -260,9 +253,6 @@ const Header: React.FC = () => {
           </Link>
           <Link to="/discover" className={styles.mobileNavLink} onClick={closeMobileMenu}>
             Discover
-          </Link>
-          <Link to="/create-recipe" className={styles.mobileNavLink} onClick={closeMobileMenu}>
-            Создать
           </Link>
         </nav>
 

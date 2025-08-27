@@ -5,6 +5,10 @@ import { FireIcon, BeakerIcon, Squares2X2Icon, SparklesIcon } from '@heroicons/r
 interface NutritionInfoProps {
   expanded: boolean;
   onToggle: () => void;
+  calories?: number;
+  proteins?: number;
+  fats?: number;
+  carbs?: number;
 }
 
 /**
@@ -14,7 +18,7 @@ interface NutritionInfoProps {
  * @param expanded Признак раскрытого состояния (true — показывать подробности).
  * @param onToggle Обработчик клика по кнопке «Подробнее/Скрыть» для переключения состояния.
  */
-const NutritionInfo: React.FC<NutritionInfoProps> = ({ expanded, onToggle }) => {
+const NutritionInfo: React.FC<NutritionInfoProps> = ({ expanded, onToggle, calories, proteins, fats, carbs }) => {
   return (
     <div className={styles.section}>
       <div className={styles.header}>
@@ -27,22 +31,22 @@ const NutritionInfo: React.FC<NutritionInfoProps> = ({ expanded, onToggle }) => 
       <div className={styles.grid}>
         <div className={styles.card}>
           <span className={`${styles.iconWrap} ${styles.calories}`}><FireIcon className={styles.icon} /></span>
-          <div className={styles.value}>425</div>
+          <div className={styles.value}>{typeof calories === 'number' ? Math.round(calories) : 425}</div>
           <div className={styles.label}>Калории</div>
         </div>
         <div className={styles.card}>
           <span className={`${styles.iconWrap} ${styles.proteins}`}><SparklesIcon className={styles.icon} /></span>
-          <div className={styles.value}>32 г</div>
+          <div className={styles.value}>{typeof proteins === 'number' ? `${proteins} г` : '32 г'}</div>
           <div className={styles.label}>Белки</div>
         </div>
         <div className={styles.card}>
           <span className={`${styles.iconWrap} ${styles.carbs}`}><Squares2X2Icon className={styles.icon} /></span>
-          <div className={styles.value}>28 г</div>
+          <div className={styles.value}>{typeof carbs === 'number' ? `${carbs} г` : '28 г'}</div>
           <div className={styles.label}>Углеводы</div>
         </div>
         <div className={styles.card}>
           <span className={`${styles.iconWrap} ${styles.fats}`}><BeakerIcon className={styles.icon} /></span>
-          <div className={styles.value}>18 г</div>
+          <div className={styles.value}>{typeof fats === 'number' ? `${fats} г` : '18 г'}</div>
           <div className={styles.label}>Жиры</div>
         </div>
       </div>
