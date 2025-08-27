@@ -4,19 +4,56 @@ import RecipeCard from '../RecipeCard/RecipeCard';
 import RecipeCardSkeleton from '../RecipeCard/RecipeCardSkeleton';
 import styles from './RecipesList.module.css';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { RecipesService } from '../../services/recipesService';
 
 interface RecipesListProps {
   recipes: Recipe[];
   loading: boolean;
   viewMode?: 'grid' | 'list';
+  aiPrompt?: string; // промт для ИИ-поиска
+  onAiFilter?: (filter: any) => void; // колбэк для применения фильтра из ответа
 }
 
 const RecipesList: React.FC<RecipesListProps> = ({
   recipes,
   loading,
-  viewMode = 'grid'
+  viewMode = 'grid',
+  aiPrompt,
+  onAiFilter
 }) => {
   const navigate = useNavigate();
+  const [aiLoading, setAiLoading] = useState<boolean>(false);
+  const [aiRecipes, setAiRecipes] = useState<Recipe[] | null>(null);
+  const effectiveLoading = loading || aiLoading;
+
+  useEffect(() => {
+    let cancelled = false;
+    const runAiSearch = async () => {
+      if (!aiPrompt || aiPrompt.trim().length < 3) {
+        setAiRecipes(null);
+        return;
+      }
+      setAiLoading(true);
+      try {
+        const { filter, recipes } = await RecipesService.aiSearchRecipes(aiPrompt.trim());
+        if (!cancelled) {
+          setAiRecipes(recipes);
+          onAiFilter && onAiFilter(filter);
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setAiRecipes([]);
+        }
+        // eslint-disable-next-line no-console
+        console.error('Ошибка ИИ-поиска:', e);
+      } finally {
+        if (!cancelled) setAiLoading(false);
+      }
+    };
+    runAiSearch();
+    return () => { cancelled = true; };
+  }, [aiPrompt, onAiFilter]);
 
   const handleRandomRecipe = () => {
     if (!recipes || recipes.length === 0) return;
@@ -25,7 +62,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
       navigate(`/recipe/${random.id}`);
     }
   };
-  if (loading && recipes.length === 0) {
+  if (effectiveLoading && (aiRecipes == null ? recipes.length === 0 : aiRecipes.length === 0)) {
     return (
       <div className={`${styles.recipesList} ${styles[viewMode]}`}>
         {Array.from({ length: 12 }).map((_, index) => (
@@ -35,7 +72,8 @@ const RecipesList: React.FC<RecipesListProps> = ({
     );
   }
 
-  if (recipes.length === 0) {
+  const dataSource = aiRecipes ?? recipes;
+  if (dataSource.length === 0) {
     return (
       <div className={styles.emptyState}>
         <div className={styles.emptyIcon}>🔍</div>
@@ -51,7 +89,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
   const elements: React.ReactNode[] = [];
   let rowIndex = 0;
 
-  recipes.forEach((recipe, index) => {
+  dataSource.forEach((recipe, index) => {
     elements.push(
       <RecipeCard
         key={recipe.id}
@@ -84,7 +122,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
   return (
     <div className={`${styles.recipesList} ${styles[viewMode]}`}>
       {elements}
-      {loading && (
+      {effectiveLoading && (
         <>
           {Array.from({ length: 6 }).map((_, index) => (
             <RecipeCardSkeleton key={`skeleton-${index}`} />

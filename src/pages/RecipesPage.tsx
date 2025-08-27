@@ -116,6 +116,16 @@ const RecipesPage: React.FC = () => {
         <RecipesList
           recipes={items}
           loading={loading}
+          aiPrompt={aiMode ? searchQuery : undefined}
+          onAiFilter={(filter) => {
+            if (!filter) return;
+            // Применяем фильтр ИИ к redux-фильтрам частично: поисковую строку и, при наличии, сложность/кухню
+            const next = { ...filters } as any;
+            if (filter?.search) next.search = filter.search;
+            if (Array.isArray(filter?.difficulty) && filter.difficulty.length > 0) next.difficulty = filter.difficulty;
+            if (Array.isArray(filter?.cuisine) && filter.cuisine.length > 0) next.cuisine = filter.cuisine;
+            dispatch(setFilters(next));
+          }}
         />
 
         {pagination.hasMore && (

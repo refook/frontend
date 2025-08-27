@@ -134,6 +134,36 @@ class RealRecipesService {
   }
 
   /**
+   * ИИ-поиск рецептов по промту пользователя
+   * Возвращает { filter, recipes[] } где recipes — короткие карточки
+   */
+  async aiSearch(prompt: string): Promise<{ filter: any; recipes: Recipe[] }> {
+    try {
+      const url = `${API_BASE_URL}/recipe/ai-search`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'POST', headers, { prompt });
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ prompt })
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
+      }
+      const data = await res.json();
+      const shortList: any[] = Array.isArray(data?.recipes) ? data.recipes : [];
+      return {
+        filter: data?.filter ?? null,
+        recipes: shortList.map((it) => this.transformShortApiRecipeToLocal(it))
+      };
+    } catch (error) {
+      console.error('Ошибка при ИИ-поиске рецептов:', error);
+      return { filter: null, recipes: [] };
+    }
+  }
+
+  /**
    * Выполнить действие над рецептом (LIKE, FAVORITE, SET_RATE)
    */
   async setRecipeAction(recipeId: string, action: 'LIKE' | 'FAVORITE' | 'SET_RATE', value: boolean | number | string): Promise<void> {

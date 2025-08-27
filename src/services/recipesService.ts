@@ -160,6 +160,11 @@ export class RecipesService {
     }
   }
 
+  // ИИ-поиск рецептов по промту
+  static async aiSearchRecipes(prompt: string): Promise<{ filter: any; recipes: Recipe[] }> {
+    return realRecipesService.aiSearch(prompt);
+  }
+
   // Лайкнуть/снять лайк у рецепта
   static async toggleLike(recipeId: string, like: boolean): Promise<void> {
     return realRecipesService.setRecipeAction(recipeId, 'LIKE', like);
