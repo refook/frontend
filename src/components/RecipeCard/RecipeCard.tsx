@@ -105,12 +105,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <p className={styles.description}>{isFormData ? (recipe as CreateRecipeDto).description : (recipe as Recipe).description}</p>
           
           <div className={styles.meta}>
-            {false && (
-              <div className={styles.metaItem}>
-                <ClockIcon className={styles.metaIcon} />
-                <span>{totalTime}</span>
-              </div>
-            )}
+            <div className={styles.metaItem}>
+              <ClockIcon className={styles.metaIcon} />
+              <span>{totalTime}</span>
+            </div>
             {false && (
               <div className={styles.metaItem}>
                 <UserIcon className={styles.metaIcon} />

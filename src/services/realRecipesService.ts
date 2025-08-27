@@ -412,10 +412,11 @@ class RealRecipesService {
    * Преобразовать API рецепт в локальный формат
    */
   transformApiRecipeToLocal(apiRecipe: RecipeResponseDto): Recipe {
-    // Вычисляем время подготовки как разность общего времени и времени готовки
-    // Конвертируем из секунд в минуты для отображения
-    const prepTimeMinutes = Math.max(0, Math.round((apiRecipe.allTime - apiRecipe.cookTime) / 60));
-    const cookTimeMinutes = Math.round(apiRecipe.cookTime / 60);
+    // Время из API: cookingTime { activeTime, allTime } — в секундах
+    const activeSeconds = Number(((apiRecipe as any)?.cookingTime?.activeTime) ?? 0);
+    const allSeconds = Number(((apiRecipe as any)?.cookingTime?.allTime) ?? activeSeconds);
+    const cookTimeMinutes = Math.max(0, Math.round(activeSeconds / 60));
+    const prepTimeMinutes = Math.max(0, Math.round((allSeconds - activeSeconds) / 60));
     
           const photoList: string[] = (apiRecipe as any)?.metaInfo?.photos || apiRecipe.photos || [];
           const rawTags: any[] = (apiRecipe as any)?.metaInfo?.tags || (apiRecipe as any)?.tags || [];
@@ -435,7 +436,7 @@ class RealRecipesService {
         })(),
         prepTime: prepTimeMinutes, // время подготовки в минутах
         cookTime: cookTimeMinutes, // время готовки в минутах  
-        servings: apiRecipe.portion || 4, // количество порций с дефолтным значением
+        servings: (apiRecipe as any)?.serving?.unitCount || 4,
         difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
         cuisine: apiRecipe.kitchen,
         tags: tagsList,
@@ -472,6 +473,10 @@ class RealRecipesService {
    * Трансформировать короткий рецепт (RecipeShortResponseDto) в локальный формат Recipe
    */
   private transformShortApiRecipeToLocal(short: any): Recipe {
+    const activeSeconds = Number(short?.cookingTime?.activeTime ?? 0);
+    const allSeconds = Number(short?.cookingTime?.allTime ?? activeSeconds);
+    const cookTimeMinutes = Math.max(0, Math.round(activeSeconds / 60));
+    const prepTimeMinutes = Math.max(0, Math.round((allSeconds - activeSeconds) / 60));
     const photoList: string[] = short?.photos || short?.metaInfo?.photos || [];
     const firstPhoto: string | undefined = photoList?.[0];
     const tagsList: string[] = (Array.isArray(short?.tags) ? short.tags : [])
@@ -484,8 +489,8 @@ class RealRecipesService {
       description: short.description ?? '',
       photos: photoList,
       image: firstPhoto ? (/^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`) : undefined,
-      prepTime: 0,
-      cookTime: 0,
+      prepTime: prepTimeMinutes,
+      cookTime: cookTimeMinutes,
       servings: 4,
       difficulty: String(short.level || 'EASY').toLowerCase() as any,
       cuisine: (short.kitchens && short.kitchens[0]?.name) || undefined,
