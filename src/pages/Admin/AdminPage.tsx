@@ -4,12 +4,13 @@ import Tabs from '../../components/Tabs/Tabs';
 import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon } from '@heroicons/react/24/outline';
 import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
 import TagSubTabs from './components/TagSubTabs/TagSubTabs';
+import KitchenSubTabs from './components/KitchenSubTabs/KitchenSubTabs';
 
 /**
  * Тип ключей доступных вкладок админ-панели
  * @typedef {'products' | 'recipes' | 'tags' | 'users' | 'settings'} TabKey
  */
-type TabKey = 'products' | 'recipes' | 'tags' | 'users' | 'settings';
+type TabKey = 'products' | 'recipes' | 'tags' | 'users' | 'settings' | 'kitchens';
 
 /**
  * Главная страница админ-панели с управлением системными функциями.
@@ -63,6 +64,7 @@ const AdminPage: React.FC = () => {
           { id: 'products', label: 'Продукты', Icon: Squares2X2Icon },
           { id: 'recipes', label: 'Рецепты', Icon: BookOpenIcon },
           { id: 'tags', label: 'Теги', Icon: TagIcon },
+          { id: 'kitchens', label: 'Кухни', Icon: Squares2X2Icon },
           { id: 'users', label: 'Пользователи', Icon: UserGroupIcon },
           { id: 'settings', label: 'Настройки', Icon: Cog6ToothIcon },
         ]}
@@ -87,6 +89,11 @@ const AdminPage: React.FC = () => {
         {/* Раздел "Теги" - полнофункциональный с подвкладками */}
         {activeTab === 'tags' && (
           <TagSubTabs />
+        )}
+
+        {/* Раздел "Кухни" - создание и управление */}
+        {activeTab === 'kitchens' && (
+          <KitchenSubTabs />
         )}
         
         {/* Раздел "Пользователи" - заглушка для управления пользователями */}

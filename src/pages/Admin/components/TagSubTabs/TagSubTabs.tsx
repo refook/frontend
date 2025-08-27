@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Tabs from '../../../../components/Tabs/Tabs';
 import CreateTagForm from '../CreateTagForm/CreateTagForm';
 import styles from './TagSubTabs.module.css';
+import AdminCard from '../AdminCard/AdminCard';
 import TagManager from '../TagManager/TagManager';
 
 /**
@@ -52,21 +53,27 @@ const TagSubTabs: React.FC = () => {
       <div className={styles.content}>
         {/* Контент вкладки "Создать тег" */}
         {active === 'create' && (
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Создать тег</div>
-            <div className={styles.cardDescription}>
-              Создайте новый тег для категоризации рецептов. Теги помогают пользователям быстро находить нужные рецепты.
-            </div>
-            <CreateTagForm />
-          </div>
+          <AdminCard
+            title="Создать тег"
+            description="Создайте новый тег для категоризации рецептов. Теги помогают пользователям быстро находить нужные рецепты."
+          >
+            <CreateTagForm
+              apiUrl={`${import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1'}/tags`}
+              titleLabel="Название тега*"
+              placeholder="Например: Десерт, Завтрак, Веганское..."
+              submitLabel="Создать тег"
+              successMessage="Тег успешно создан"
+            />
+          </AdminCard>
         )}
         
         {/* Контент вкладки "Управление тегами" */}
         {active === 'manage' && (
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Управление тегами</div>
+          <AdminCard
+            title="Управление тегами"
+          >
             <TagManager />
-          </div>
+          </AdminCard>
         )}
       </div>
     </div>

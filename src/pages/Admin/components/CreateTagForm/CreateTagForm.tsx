@@ -35,7 +35,23 @@ interface CreateTagDtoForm {
  * @since 1.0.0
  * @author Frontend Team
  */
-const CreateTagForm: React.FC = () => {
+interface CreateEntityFormProps {
+  apiUrl: string;
+  titleLabel: string;
+  placeholder: string;
+  submitLabel: string;
+  successMessage: string;
+  onCreated?: () => void;
+}
+
+const CreateTagForm: React.FC<CreateEntityFormProps> = ({
+  apiUrl,
+  titleLabel,
+  placeholder,
+  submitLabel,
+  successMessage,
+  onCreated,
+}) => {
   /**
    * Состояние данных формы
    * @type {CreateTagDtoForm}
@@ -82,7 +98,7 @@ const CreateTagForm: React.FC = () => {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       // Отправка данных на сервер
-      const response = await fetch(`${API_BASE_URL}/tags`, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(formData),
@@ -94,10 +110,11 @@ const CreateTagForm: React.FC = () => {
       }
       
       // Успешное создание - показать сообщение и сбросить форму
-      setMessage('Тег успешно создан');
+      setMessage(successMessage);
       setFormData({
         name: '',
       });
+      onCreated?.();
     } catch (err) {
       // Обработка ошибок
       setMessage(`Ошибка: ${err instanceof Error ? err.message : 'Не удалось создать тег'}`);
@@ -110,13 +127,13 @@ const CreateTagForm: React.FC = () => {
     <form onSubmit={handleSubmit} className={styles.formGrid}>
       {/* Основная информация о теге */}
       <label className={styles.label}>
-        Название тега*
+        {titleLabel}
         <input
           className={styles.input}
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Например: Десерт, Завтрак, Веганское..."
+          placeholder={placeholder}
           required
           minLength={1}
           maxLength={64}
@@ -126,7 +143,7 @@ const CreateTagForm: React.FC = () => {
       {/* Действия и результат */}
       <div className={styles.actions}>
         <button type="submit" className="ui-btn ui-btn--primary" disabled={submitting}>
-          {submitting ? 'Сохранение...' : 'Создать тег'}
+          {submitting ? 'Сохранение...' : submitLabel}
         </button>
         {message && (
           <div

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { API_BASE_URL } from '../../../../services/api';
 import styles from './TagManager.module.css';
+import EditableTable, { type EditableRow } from '../EditableTable/EditableTable';
 
 interface TagResponseDto {
   id: string;
@@ -115,52 +116,17 @@ const TagManager: React.FC = () => {
 
       {error && <div className={styles.error}>{error}</div>}
 
-      <div className={styles.table}>
-        <div className={`${styles.row} ${styles.header}`}>
-          <div className={styles.colId}>ID</div>
-          <div className={styles.colName}>Название</div>
-          <div className={styles.colActions}>Действия</div>
-        </div>
-        {loading ? (
-          <div className={styles.loading}>Загрузка...</div>
-        ) : (
-          tags.map((tag) => (
-            <div className={styles.row} key={tag.id}>
-              <div className={styles.colId} title={tag.id}>
-                <button
-                  type="button"
-                  className={styles.idButton}
-                  onClick={() => handleCopyId(tag.id)}
-                  aria-label={`Скопировать ID ${tag.id}`}
-                  title={copiedId === tag.id ? 'Скопировано!' : 'Скопировать ID'}
-                >
-                  <span className={styles.idText}>{tag.id}</span>
-                </button>
-              </div>
-              <div className={styles.colName}>
-                <input
-                  className={styles.input}
-                  type="text"
-                  value={editing[tag.id] ?? tag.name}
-                  onChange={(e) => setEditing((prev) => ({ ...prev, [tag.id]: e.target.value }))}
-                />
-              </div>
-              <div className={styles.colActions}>
-                <button
-                  className="ui-btn ui-btn--primary"
-                  onClick={() => update(tag.id)}
-                  disabled={updatingId === tag.id}
-                >
-                  {updatingId === tag.id ? 'Сохранение...' : 'Сохранить'}
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-        {!loading && tags.length === 0 && (
-          <div className={styles.empty}>Теги не найдены</div>
-        )}
-      </div>
+      <EditableTable
+        rows={tags as unknown as EditableRow[]}
+        editing={editing}
+        setEditing={(updater) => setEditing((prev) => updater(prev))}
+        updatingId={updatingId}
+        onSave={update}
+        loading={loading}
+        emptyText="Теги не найдены"
+        enableCopyId
+        onCopyId={handleCopyId}
+      />
     </div>
   );
 };

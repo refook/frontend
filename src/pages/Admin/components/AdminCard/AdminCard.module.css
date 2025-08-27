@@ -1,0 +1,6 @@
+.card { border: 1px solid var(--token-border); border-radius: 12px; padding: 16px; background: var(--token-bg); box-shadow: var(--token-shadow-sm); }
+.cardTitle { font-weight: 700; margin-bottom: 6px; }
+.cardDescription { color: var(--token-muted); margin-bottom: 12px; }
+.cardBody {}
+
+
