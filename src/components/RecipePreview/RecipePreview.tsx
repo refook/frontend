@@ -9,7 +9,8 @@ import {
   StarIcon,
   PencilIcon,
   CheckIcon,
-  HeartIcon
+  HeartIcon,
+  BookmarkIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import NutritionInfo from '../NutritionInfo/NutritionInfo';
@@ -134,6 +135,10 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const [likesCount, setLikesCount] = useState<number>(initialLikes);
   const [liked, setLiked] = useState<boolean>(false);
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
+  const [favorite, setFavorite] = useState<boolean>(false);
+  const [favoriteLoading, setFavoriteLoading] = useState<boolean>(false);
+  const [rating, setRating] = useState<number>(Math.round((!isFormData ? ((data as Recipe).stats?.rating ?? 0) : 0)) || 0);
+  const [ratingLoading, setRatingLoading] = useState<boolean>(false);
   const keycloakCtx = useContext(KeycloakContext);
   const isAuthenticated = !!keycloakCtx?.authenticated;
 
@@ -157,6 +162,40 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       console.error('Не удалось выполнить действие LIKE:', e);
     } finally {
       setLikeLoading(false);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (isFormData || !(data as Recipe).id) return;
+    if (!isAuthenticated) return;
+    if (favoriteLoading) return;
+    const next = !favorite;
+    setFavorite(next);
+    setFavoriteLoading(true);
+    try {
+      await RecipesService.toggleFavorite((data as Recipe).id, next);
+    } catch (e) {
+      setFavorite(!next);
+      console.error('Не удалось выполнить действие FAVORITE:', e);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
+  const handleSetRating = async (value: number) => {
+    if (isFormData || !(data as Recipe).id) return;
+    if (!isAuthenticated) return;
+    if (ratingLoading) return;
+    const prev = rating;
+    setRating(value);
+    setRatingLoading(true);
+    try {
+      await RecipesService.setRating((data as Recipe).id, value);
+    } catch (e) {
+      setRating(prev);
+      console.error('Не удалось выполнить действие SET_RATE:', e);
+    } finally {
+      setRatingLoading(false);
     }
   };
 
@@ -204,22 +243,61 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             value={<span>{servings}</span>}
           />
           {!isFormData && (
-            <InfoCard
-              icon={<HeartIcon className={styles.infoIcon} />}
-              label="Лайки"
-              value={
-                <button
-                  type="button"
-                  onClick={handleToggleLike}
-                  disabled={likeLoading || !isAuthenticated}
-                  className="ui-btn ui-btn--ghost"
-                  aria-pressed={liked}
-                  aria-label={liked ? 'Убрать лайк' : 'Поставить лайк'}
-                >
-                  {liked ? 'Убрать лайк' : 'Лайк'} ({likesCount})
-                </button>
-              }
-            />
+            <>
+              <InfoCard
+                icon={<HeartIcon className={styles.infoIcon} />}
+                label="Лайки"
+                value={
+                  <button
+                    type="button"
+                    onClick={handleToggleLike}
+                    disabled={likeLoading || !isAuthenticated}
+                    className="ui-btn ui-btn--ghost"
+                    aria-pressed={liked}
+                    aria-label={liked ? 'Убрать лайк' : 'Поставить лайк'}
+                  >
+                    {liked ? 'Убрать лайк' : 'Лайк'} ({likesCount})
+                  </button>
+                }
+              />
+              <InfoCard
+                icon={<BookmarkIcon className={styles.infoIcon} />}
+                label="Избранное"
+                value={
+                  <button
+                    type="button"
+                    onClick={handleToggleFavorite}
+                    disabled={favoriteLoading || !isAuthenticated}
+                    className="ui-btn ui-btn--ghost"
+                    aria-pressed={favorite}
+                    aria-label={favorite ? 'Убрать из избранного' : 'В избранное'}
+                  >
+                    {favorite ? 'Убрать' : 'В избранное'}
+                  </button>
+                }
+              />
+              <InfoCard
+                icon={<StarIcon className={styles.infoIcon} />}
+                label="Рейтинг"
+                value={
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => handleSetRating(i + 1)}
+                        disabled={ratingLoading || !isAuthenticated}
+                        aria-label={`Поставить ${i + 1}`}
+                        className="ui-btn ui-btn--ghost"
+                        style={{ padding: '2px 6px' }}
+                      >
+                        {i < rating ? '★' : '☆'}
+                      </button>
+                    ))}
+                  </div>
+                }
+              />
+            </>
           )}
         </div>
 

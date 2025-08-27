@@ -940,7 +940,7 @@
         }
       }
     },
-    "/v1/user/{id}": {
+    "/v1/users/{id}": {
       "get": {
         "tags": [
           "Пользователи"
@@ -965,6 +965,130 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/UserInfoResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/{id}/ratings": {
+      "get": {
+        "tags": [
+          "Пользователи"
+        ],
+        "summary": "Получение оцененных рецептов пользователя",
+        "operationId": "getUserRatings",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecipeShortResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/{id}/likes": {
+      "get": {
+        "tags": [
+          "Пользователи"
+        ],
+        "summary": "Получение лайкнутые рецепты пользователя",
+        "operationId": "getUserLikes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecipeShortResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/users/favorites": {
+      "get": {
+        "tags": [
+          "Пользователи"
+        ],
+        "summary": "Получение избранных рецептов пользователя (по токену, личная информация)",
+        "operationId": "getUserFavorites",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecipeShortResponseDto"
+                  }
                 }
               }
             }
@@ -1274,9 +1398,7 @@
                 "CUP",
                 "PIECE",
                 "SLICE",
-                "ITEM",
-                "GR",
-                "ML"
+                "ITEM"
               ]
             }
           },
@@ -2136,9 +2258,7 @@
               "CUP",
               "PIECE",
               "SLICE",
-              "ITEM",
-              "GR",
-              "ML"
+              "ITEM"
             ],
             "examples": [
               "PORTION",
@@ -3389,6 +3509,10 @@
               "$ref": "#/components/schemas/TagResponseDto"
             }
           },
+          "cookingTime": {
+            "$ref": "#/components/schemas/CookingTimeDto",
+            "description": "Время готовки"
+          },
           "statistic": {
             "$ref": "#/components/schemas/RecipeResponseStatisticDto",
             "description": "Статистика рецепта"
@@ -3510,9 +3634,7 @@
               "CUP",
               "PIECE",
               "SLICE",
-              "ITEM",
-              "GR",
-              "ML"
+              "ITEM"
             ]
           },
           "sortField": {

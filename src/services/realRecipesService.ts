@@ -185,14 +185,17 @@ class RealRecipesService {
     try {
       const url = `${API_BASE_URL}/recipe/${recipeId}/action`;
       const headers = getAuthHeaders();
-      // Передаём значение как boolean для LIKE (или конвертируем типы в boolean)
-      const normalizedValue = ((): boolean | number => {
-        if (typeof value === 'boolean') return value;
-        if (typeof value === 'number') return value === 1;
-        if (typeof value === 'string') return value.toLowerCase() === 'true';
-        return Boolean(value);
-      })();
-      const body = { action, value: normalizedValue } as any;
+      // Для LIKE/FAVORITE — boolean, для SET_RATE — число 1..5
+      let normalized: boolean | number;
+      if (action === 'SET_RATE') {
+        const num = typeof value === 'number' ? value : Number(value);
+        normalized = Math.min(5, Math.max(1, isNaN(num) ? 0 : num));
+      } else {
+        if (typeof value === 'boolean') normalized = value;
+        else if (typeof value === 'number') normalized = value !== 0;
+        else normalized = String(value).toLowerCase() === 'true';
+      }
+      const body = { action, value: normalized } as any;
       apiLogger.logRequest(url, 'POST', headers, body);
       const res = await fetch(url, {
         method: 'POST',
