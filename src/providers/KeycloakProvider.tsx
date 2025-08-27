@@ -45,6 +45,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                                 if (keycloak.token) {
                                     localStorage.setItem('authToken', keycloak.token);
                                     apiService.setAuthToken(keycloak.token);
+                                    try { console.log('Swagger bearer token:', `Bearer ${keycloak.token}`); } catch {}
                                 }
                                 // Обновляем токен перед истечением
                                 keycloak.onTokenExpired = async () => {
@@ -53,6 +54,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                                         if (refreshed && keycloak.token) {
                                             localStorage.setItem('authToken', keycloak.token);
                                             apiService.setAuthToken(keycloak.token);
+                                            try { console.log('Swagger bearer token (refreshed):', `Bearer ${keycloak.token}`); } catch {}
                                         }
                                     } catch (e) {
                                         console.error('Не удалось обновить токен Keycloak', e);

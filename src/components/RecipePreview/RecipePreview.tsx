@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { ingredientsService } from '../../services/ingredientsService';
 import type { Recipe } from '../../types';
 import type { CreateRecipeDto, CreateRecipeIngredientDto, RecipeIngredientDto } from '../../types/recipe.types';
@@ -22,6 +22,7 @@ import styles from './RecipePreview.module.css';
 import InfoCard from '../InfoCard/InfoCard';
 import RecipeTags from '../RecipeTags/RecipeTags';
 import { RecipesService } from '../../services/recipesService';
+import { KeycloakContext } from '../../providers/KeycloakProvider';
 
 interface RecipePreviewProps {
   formData?: CreateRecipeDto;
@@ -132,9 +133,15 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const [likesCount, setLikesCount] = useState<number>(initialLikes);
   const [liked, setLiked] = useState<boolean>(false);
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
+  const keycloakCtx = useContext(KeycloakContext);
+  const isAuthenticated = !!keycloakCtx?.authenticated;
 
   const handleToggleLike = async () => {
     if (isFormData || !(data as Recipe).id) return;
+    if (!isAuthenticated) {
+      console.warn('Действие LIKE недоступно: пользователь не авторизован');
+      return;
+    }
     if (likeLoading) return;
     const next = !liked;
     setLiked(next);
@@ -203,7 +210,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                 <button
                   type="button"
                   onClick={handleToggleLike}
-                  disabled={likeLoading}
+                  disabled={likeLoading || !isAuthenticated}
                   className="ui-btn ui-btn--ghost"
                   aria-pressed={liked}
                   aria-label={liked ? 'Убрать лайк' : 'Поставить лайк'}

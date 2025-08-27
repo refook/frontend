@@ -136,11 +136,18 @@ class RealRecipesService {
   /**
    * Выполнить действие над рецептом (LIKE, FAVORITE, SET_RATE)
    */
-  async setRecipeAction(recipeId: string, action: 'LIKE' | 'FAVORITE' | 'SET_RATE', value: boolean | number): Promise<void> {
+  async setRecipeAction(recipeId: string, action: 'LIKE' | 'FAVORITE' | 'SET_RATE', value: boolean | number | string): Promise<void> {
     try {
       const url = `${API_BASE_URL}/recipe/${recipeId}/action`;
       const headers = getAuthHeaders();
-      const body = { action, value } as any;
+      // Передаём значение как boolean для LIKE (или конвертируем типы в boolean)
+      const normalizedValue = ((): boolean | number => {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'number') return value === 1;
+        if (typeof value === 'string') return value.toLowerCase() === 'true';
+        return Boolean(value);
+      })();
+      const body = { action, value: normalizedValue } as any;
       apiLogger.logRequest(url, 'POST', headers, body);
       const res = await fetch(url, {
         method: 'POST',
@@ -148,7 +155,8 @@ class RealRecipesService {
         body: JSON.stringify(body)
       });
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
       }
     } catch (error) {
       console.error('Ошибка при выполнении действия над рецептом:', error);
@@ -373,11 +381,11 @@ class RealRecipesService {
           avatar: apiRecipe.ownerUser.photo || undefined
         },
         stats: {
-          views: 0,
-          likes: 0,
-          saves: 0,
-          rating: 0,
-          reviewsCount: 0
+          views: (apiRecipe as any)?.statistic?.viewsCount ?? 0,
+          likes: (apiRecipe as any)?.statistic?.likesCount ?? 0,
+          saves: (apiRecipe as any)?.statistic?.favoritesCount ?? 0,
+          rating: (apiRecipe as any)?.statistic?.avgRating ?? 0,
+          reviewsCount: (apiRecipe as any)?.statistic?.commentsCount ?? 0
         },
         createdAt: apiRecipe.createdAt,
         updatedAt: apiRecipe.updatedAt
