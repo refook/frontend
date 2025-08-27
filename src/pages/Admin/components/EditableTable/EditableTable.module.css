@@ -1,0 +1,14 @@
+.table {}
+.row { display: grid; grid-template-columns: 0.9fr 2.1fr 1fr; gap: 8px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--token-border); }
+.header { font-weight: 600; background: var(--bg-secondary); border-top-left-radius: 8px; border-top-right-radius: 8px; }
+.colId { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; overflow: hidden; text-overflow: ellipsis; }
+.colName {}
+.colActions { text-align: right; }
+.input { width: 100%; }
+.loading { padding: 12px; color: var(--token-muted); }
+.empty { padding: 12px; color: var(--token-muted); }
+.idButton { background: transparent; border: none; padding: 0; cursor: pointer; }
+.idText { max-width: 100%; display: inline-block; overflow: hidden; text-overflow: ellipsis; border: 1px dashed var(--token-border); border-radius: 6px; padding: 2px 6px; }
+.idButton:hover .idText { border-color: var(--token-accent); background: color-mix(in oklab, var(--token-accent-weak) 24%, transparent); }
+
+

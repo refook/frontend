@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import styles from './FavoritesSection.module.css';
 import SectionHeader from '../../components/SectionHeader';
 import RecipeCard from '../../../../components/RecipeCard/RecipeCard';
-import { initialRecipes } from '../../../../data/initialRecipes';
+import { RecipesService } from '../../../../services/recipesService';
 import type { Recipe } from '../../../../types';
-import { PlusIcon, PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilSquareIcon, TrashIcon, EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 
 /**
  * Секция «Favorite Recipes» с полным функционалом закладок (группы):
@@ -28,6 +28,7 @@ const FavoritesSection: React.FC = () => {
   const [activeGroupId, setActiveGroupId] = useState<string>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedToAdd, setSelectedToAdd] = useState<Record<string, boolean>>({});
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   // Инициализация из localStorage
   useEffect(() => {
@@ -54,7 +55,41 @@ const FavoritesSection: React.FC = () => {
 
   const activeGroup = useMemo(() => groups.find(g => g.id === activeGroupId) || groups[0], [groups, activeGroupId]);
 
-  const allKnownRecipes: Recipe[] = useMemo(() => initialRecipes as unknown as Recipe[], []);
+  const [availableRecipes, setAvailableRecipes] = useState<Recipe[]>([]);
+
+  // Загружаем избранные рецепты пользователя по токену
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const favorites = await RecipesService.getFavorites();
+        if (isMounted) setAvailableRecipes(favorites || []);
+      } catch {
+        if (isMounted) setAvailableRecipes([]);
+      }
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  const allKnownRecipes: Recipe[] = useMemo(() => availableRecipes, [availableRecipes]);
+
+  // После загрузки favorites — заполняем группу "All" для отображения карточек
+  useEffect(() => {
+    if (!availableRecipes) return;
+    setGroups(prev => {
+      if (!prev || prev.length === 0) {
+        return [
+          { id: 'all', name: 'All', recipes: availableRecipes },
+          { id: 'desserts', name: 'Desserts', recipes: [] }
+        ];
+      }
+      const hasAll = prev.some(g => g.id === 'all');
+      if (!hasAll) {
+        return [{ id: 'all', name: 'All', recipes: availableRecipes }, ...prev];
+      }
+      return prev.map(g => g.id === 'all' ? { ...g, recipes: availableRecipes } : g);
+    });
+  }, [availableRecipes]);
 
   // Статистика по активной группе
   const totalLikes = useMemo(() => (activeGroup?.recipes || []).reduce((sum, r) => sum + (r.stats?.likes ?? 0), 0), [activeGroup]);
@@ -123,6 +158,19 @@ const FavoritesSection: React.FC = () => {
     setActiveGroupId('all');
   };
 
+  // Закрытие меню по клику вне
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest?.(`.${styles.groupActions}`)) {
+        setIsSettingsOpen(false);
+      }
+    };
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
+  }, [isSettingsOpen]);
+
   return (
     <div className={styles.wrapper}>
       <SectionHeader
@@ -141,18 +189,57 @@ const FavoritesSection: React.FC = () => {
             className={`${styles.groupPill} ${group.id === activeGroupId ? styles.groupPillActive : ''}`}
             onClick={() => setActiveGroupId(group.id)}
           >
-            <span className={styles.groupName}>{group.name}</span>
+            {group.id === activeGroupId && group.id !== 'all' ? (
+              <span
+                className={`${styles.groupName} ${styles.groupNameEditable}`}
+                onClick={(e) => { e.stopPropagation(); renameGroup(group.id); }}
+                title="Rename group"
+              >
+                {group.name}
+              </span>
+            ) : (
+              <span className={styles.groupName}>{group.name}</span>
+            )}
             <span className={styles.groupCount}>{group.recipes.length}</span>
-            {group.id !== 'all' && (
+            {group.id === activeGroupId && group.id !== 'all' && (
               <span className={styles.groupActions}>
-                <PencilSquareIcon className={styles.groupIcon} onClick={(e) => { e.stopPropagation(); renameGroup(group.id); }} />
-                <TrashIcon className={styles.groupIcon} onClick={(e) => { e.stopPropagation(); deleteGroup(group.id); }} />
+                <button
+                  type="button"
+                  className={styles.groupIconBtn}
+                  onClick={(e) => { e.stopPropagation(); setIsSettingsOpen(v => !v); }}
+                  aria-label={`Settings ${group.name}`}
+                >
+                  <EllipsisHorizontalIcon className={styles.groupIcon} />
+                </button>
+                {isSettingsOpen && (
+                  <div className={styles.groupMenu} role="menu">
+                    <button
+                      type="button"
+                      className={styles.groupMenuItem}
+                      onClick={(e) => { e.stopPropagation(); setIsSettingsOpen(false); renameGroup(group.id); }}
+                    >
+                      Rename
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.groupMenuItem} ${styles.groupMenuItemDanger}`}
+                      onClick={(e) => { e.stopPropagation(); setIsSettingsOpen(false); deleteGroup(group.id); }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
               </span>
             )}
           </button>
         ))}
         <button className={styles.groupPill} onClick={createGroup} aria-label="New group">
-          <PlusIcon className={styles.groupIcon} />
+
+
+            <span className={styles.groupIconBtn} aria-hidden>
+              <PlusIcon className={styles.groupIcon} />
+            </span>
+
         </button>
       </div>
 

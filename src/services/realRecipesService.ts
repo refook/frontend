@@ -179,20 +179,45 @@ class RealRecipesService {
   }
 
   /**
+   * Избранные рецепты текущего пользователя (по токену)
+   * GET /v1/users/favorites → Array<RecipeShortResponseDto>
+   */
+  async getUserFavorites(): Promise<Recipe[]> {
+    try {
+      const url = `${API_BASE_URL}/users/favorites`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'GET', headers, undefined);
+      const res = await fetch(url, { method: 'GET', headers });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
+      }
+      const data: any[] = await res.json();
+      return (Array.isArray(data) ? data : []).map((it: any) => this.transformShortApiRecipeToLocal(it));
+    } catch (error) {
+      console.error('Ошибка при загрузке избранных рецептов пользователя:', error);
+      return [];
+    }
+  }
+
+  /**
    * Выполнить действие над рецептом (LIKE, FAVORITE, SET_RATE)
    */
   async setRecipeAction(recipeId: string, action: 'LIKE' | 'FAVORITE' | 'SET_RATE', value: boolean | number | string): Promise<void> {
     try {
       const url = `${API_BASE_URL}/recipe/${recipeId}/action`;
       const headers = getAuthHeaders();
-      // Передаём значение как boolean для LIKE (или конвертируем типы в boolean)
-      const normalizedValue = ((): boolean | number => {
-        if (typeof value === 'boolean') return value;
-        if (typeof value === 'number') return value === 1;
-        if (typeof value === 'string') return value.toLowerCase() === 'true';
-        return Boolean(value);
-      })();
-      const body = { action, value: normalizedValue } as any;
+      // Для LIKE/FAVORITE — boolean, для SET_RATE — число 1..5
+      let normalized: boolean | number;
+      if (action === 'SET_RATE') {
+        const num = typeof value === 'number' ? value : Number(value);
+        normalized = Math.min(5, Math.max(1, isNaN(num) ? 0 : num));
+      } else {
+        if (typeof value === 'boolean') normalized = value;
+        else if (typeof value === 'number') normalized = value !== 0;
+        else normalized = String(value).toLowerCase() === 'true';
+      }
+      const body = { action, value: normalized } as any;
       apiLogger.logRequest(url, 'POST', headers, body);
       const res = await fetch(url, {
         method: 'POST',
@@ -387,10 +412,11 @@ class RealRecipesService {
    * Преобразовать API рецепт в локальный формат
    */
   transformApiRecipeToLocal(apiRecipe: RecipeResponseDto): Recipe {
-    // Вычисляем время подготовки как разность общего времени и времени готовки
-    // Конвертируем из секунд в минуты для отображения
-    const prepTimeMinutes = Math.max(0, Math.round((apiRecipe.allTime - apiRecipe.cookTime) / 60));
-    const cookTimeMinutes = Math.round(apiRecipe.cookTime / 60);
+    // Время из API: cookingTime { activeTime, allTime } — в секундах
+    const activeSeconds = Number(((apiRecipe as any)?.cookingTime?.activeTime) ?? 0);
+    const allSeconds = Number(((apiRecipe as any)?.cookingTime?.allTime) ?? activeSeconds);
+    const cookTimeMinutes = Math.max(0, Math.round(activeSeconds / 60));
+    const prepTimeMinutes = Math.max(0, Math.round((allSeconds - activeSeconds) / 60));
     
           const photoList: string[] = (apiRecipe as any)?.metaInfo?.photos || apiRecipe.photos || [];
           const rawTags: any[] = (apiRecipe as any)?.metaInfo?.tags || (apiRecipe as any)?.tags || [];
@@ -410,7 +436,7 @@ class RealRecipesService {
         })(),
         prepTime: prepTimeMinutes, // время подготовки в минутах
         cookTime: cookTimeMinutes, // время готовки в минутах  
-        servings: apiRecipe.portion || 4, // количество порций с дефолтным значением
+        servings: (apiRecipe as any)?.serving?.unitCount || 4,
         difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
         cuisine: apiRecipe.kitchen,
         tags: tagsList,
@@ -447,6 +473,10 @@ class RealRecipesService {
    * Трансформировать короткий рецепт (RecipeShortResponseDto) в локальный формат Recipe
    */
   private transformShortApiRecipeToLocal(short: any): Recipe {
+    const activeSeconds = Number(short?.cookingTime?.activeTime ?? 0);
+    const allSeconds = Number(short?.cookingTime?.allTime ?? activeSeconds);
+    const cookTimeMinutes = Math.max(0, Math.round(activeSeconds / 60));
+    const prepTimeMinutes = Math.max(0, Math.round((allSeconds - activeSeconds) / 60));
     const photoList: string[] = short?.photos || short?.metaInfo?.photos || [];
     const firstPhoto: string | undefined = photoList?.[0];
     const tagsList: string[] = (Array.isArray(short?.tags) ? short.tags : [])
@@ -459,8 +489,8 @@ class RealRecipesService {
       description: short.description ?? '',
       photos: photoList,
       image: firstPhoto ? (/^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`) : undefined,
-      prepTime: 0,
-      cookTime: 0,
+      prepTime: prepTimeMinutes,
+      cookTime: cookTimeMinutes,
       servings: 4,
       difficulty: String(short.level || 'EASY').toLowerCase() as any,
       cuisine: (short.kitchens && short.kitchens[0]?.name) || undefined,

@@ -117,9 +117,27 @@
 
 .tags { display: flex; flex-wrap: wrap; gap: var(--token-space-3); }
 
-.tag { background-color: var(--token-neutral-100); color: var(--token-muted); padding: 0.25rem 0.75rem; border-radius: var(--token-radius-full); font-size: var(--token-text-sm); font-weight: 500; }
+.tag {
+  background: color-mix(in oklab, var(--token-neutral-100) 22%, transparent);
+  color: var(--token-muted);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--token-radius-full);
+  font-size: var(--token-text-sm);
+  font-weight: 500;
+  border: 1px solid var(--token-border);
+}
 
-.moreTag { background-color: var(--token-neutral-200); color: var(--token-muted); padding: 0.25rem 0.75rem; border-radius: var(--token-radius-full); font-size: var(--token-text-sm); font-weight: 500; }
+.tag:hover { background: color-mix(in oklab, var(--token-neutral-100) 30%, transparent); }
+
+.moreTag {
+  background: color-mix(in oklab, var(--token-neutral-200) 18%, transparent);
+  color: var(--token-muted);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--token-radius-full);
+  font-size: var(--token-text-sm);
+  font-weight: 500;
+  border: 1px solid var(--token-border);
+}
 
 .ingredients { border-top: 1px solid var(--token-border); padding-top: var(--token-space-4); }
 

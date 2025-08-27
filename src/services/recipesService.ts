@@ -165,6 +165,21 @@ export class RecipesService {
     return realRecipesService.aiSearch(prompt);
   }
 
+  // Избранные рецепты пользователя (по токену)
+  static async getFavorites(): Promise<Recipe[]> {
+    return realRecipesService.getUserFavorites();
+  }
+
+  // Добавить/убрать из избранного
+  static async toggleFavorite(recipeId: string, favorite: boolean): Promise<void> {
+    return realRecipesService.setRecipeAction(recipeId, 'FAVORITE', favorite);
+  }
+
+  // Установить рейтинг (1..5)
+  static async setRating(recipeId: string, rating: number): Promise<void> {
+    return realRecipesService.setRecipeAction(recipeId, 'SET_RATE', rating);
+  }
+
   // Лайкнуть/снять лайк у рецепта
   static async toggleLike(recipeId: string, like: boolean): Promise<void> {
     return realRecipesService.setRecipeAction(recipeId, 'LIKE', like);
