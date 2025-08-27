@@ -126,9 +126,11 @@ const RecipeDetailPage: React.FC = () => {
           <button onClick={() => navigate(-1)} className={styles.backBtn}>
             ← Назад
           </button>
-          <button onClick={handleEdit} className={styles.editBtn}>
+          <button 
+          //onClick={handleEdit} 
+          className={styles.editBtn}>
             <PencilIcon className={styles.editIcon} />
-            Редактировать
+            Редактировать (в разработке)
           </button>
         </div>
         

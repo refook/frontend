@@ -375,6 +375,12 @@ class RealRecipesService {
           photos: step.photos || [],
           ingredients: step.ingredients || []
         })) || [],
+        macros: (apiRecipe as any)?.macros ? {
+          calories: Number((apiRecipe as any).macros?.calories ?? 0),
+          proteins: Number((apiRecipe as any).macros?.proteins ?? 0),
+          fats: Number((apiRecipe as any).macros?.fats ?? 0),
+          carbs: Number((apiRecipe as any).macros?.carbs ?? 0),
+        } : undefined,
         author: {
           id: apiRecipe.ownerUser.id.toString(),
           name: apiRecipe.ownerUser.name,
