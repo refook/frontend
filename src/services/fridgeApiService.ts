@@ -7,7 +7,6 @@ import type {
   FridgeResponseDto
 } from '../types/fridge.types';
 import { apiLogger } from '../utils/apiLogger';
-import { apiService } from './api';
 
 // Функция для получения авторизационных заголовков
 function getAuthHeaders() {
@@ -60,10 +59,25 @@ class FridgeApiService {
    */
   async getAllFridgeProducts(fridgeId: string): Promise<FridgeProduct[]> {
     try {
-      console.log(`Загрузка продуктов холодильника через apiService: /fridge/${fridgeId}/products`);
-      const list = await apiService.get<FridgeProductResponseDto[]>(`/fridge/${fridgeId}/products`);
-      console.log(`Успешно загружено ${Array.isArray(list) ? list.length : 0} продуктов из холодильника`);
-      return (list || []).map(product => this.transformApiProductToLocal(product));
+      console.log(`Загрузка продуктов холодильника из: ${API_BASE_URL}/fridge/${fridgeId}/products`);
+      const response = await fetch(`${API_BASE_URL}/fridge/${fridgeId}/products`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const raw = await response.json();
+      console.log('Сырой ответ продуктов холодильника:', raw);
+      const list: FridgeProductResponseDto[] = Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw?.items)
+            ? raw.items
+            : [];
+      console.log(`Успешно загружено ${list.length} продуктов из холодильника`);
+      return list.map(product => this.transformApiProductToLocal(product));
     } catch (error) {
       console.error('Ошибка при загрузке продуктов холодильника:', error);
       return [];
