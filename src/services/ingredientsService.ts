@@ -2,16 +2,10 @@ import type { ApiIngredient } from '../types/ingredient.types';
 import type { MeasureType } from '../types/measures.types';
 import { apiLogger } from '../utils/apiLogger';
 import {API_BASE_URL} from "./api.ts";
-import keycloak from "./keycloak.ts";
+import { getAuthHeaders, authorizedFetch } from './auth';
 
 // Функция для получения авторизационных заголовков
-function getAuthHeaders() {
-  const token = keycloak.token
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
+// централизованные заголовки и fetch
 
 // API endpoint for ingredients
 class IngredientsService {
@@ -23,7 +17,7 @@ class IngredientsService {
     try {
       console.log(`Загрузка ингредиентов из: ${API_BASE_URL}/ingredient/all`);
       
-      const response = await fetch(`${API_BASE_URL}/ingredient/all`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/ingredient/all`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -78,7 +72,7 @@ class IngredientsService {
       // Логируем запрос
       apiLogger.logRequest(url, 'POST', headers, ingredientData);
       
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(ingredientData)

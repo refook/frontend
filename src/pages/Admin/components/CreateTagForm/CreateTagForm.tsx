@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../../services/api';
 import styles from './CreateTagForm.module.css';
+import { getAuthHeaders, authorizedFetch } from '../../../../services/auth';
 
 /**
  * Интерфейс формы создания тега
@@ -93,12 +94,10 @@ const CreateTagForm: React.FC<CreateEntityFormProps> = ({
     setMessage(null);
     try {
       // Получение токена авторизации
-      const token = localStorage.getItem('authToken');
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = getAuthHeaders();
 
       // Отправка данных на сервер
-      const response = await fetch(apiUrl, {
+      const response = await authorizedFetch(apiUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(formData),

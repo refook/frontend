@@ -7,6 +7,7 @@ import { PencilIcon } from '@heroicons/react/24/outline';
 import RecipePreview from '../components/RecipePreview';
 import styles from './RecipeDetailPage.module.css';
 import { API_BASE_URL } from '../services/api';
+import { getAuthHeaders, authorizedFetch } from '../services/auth';
 import type { RecipeIngredientDto, StepResponseDto } from '../types/recipe.types';
 
 const RecipeDetailPage: React.FC = () => {
@@ -34,10 +35,8 @@ const RecipeDetailPage: React.FC = () => {
       if (!id) return;
       try {
         setCompositionError(null);
-        const token = localStorage.getItem('authToken');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-        const resp = await fetch(`${API_BASE_URL}/recipe/details/${id}` , { headers });
+        const headers = getAuthHeaders();
+        const resp = await authorizedFetch(`${API_BASE_URL}/recipe/details/${id}` , { headers });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         const ingredients = data?.composition?.ingredients;

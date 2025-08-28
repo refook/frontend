@@ -1,16 +1,10 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
 import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
 import { apiLogger } from '../utils/apiLogger';
-import keycloak from "./keycloak.ts";
+import { getAuthHeaders, authorizedFetch } from './auth';
 
 // Функция для получения авторизационных заголовков
-function getAuthHeaders() {
-  const token = keycloak.token
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
+// централизованные заголовки и fetch
 
 // API endpoint for recipes
 const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
@@ -32,7 +26,7 @@ class RealRecipesService {
     try {
       console.log(`Загрузка списка рецептов из: ${API_BASE_URL}/recipe/all`);
       
-      const response = await fetch(`${API_BASE_URL}/recipe/all`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/recipe/all`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -74,7 +68,7 @@ class RealRecipesService {
     try {
       console.log(`Загрузка рецепта по ID: ${id}`);
       
-      const response = await fetch(`${API_BASE_URL}/recipe/details/${id}`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/recipe/details/${id}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -119,7 +113,7 @@ class RealRecipesService {
     try {
       const url = `${API_BASE_URL}/recipe/${userId}/all`;
       console.log(`Загрузка рецептов пользователя: ${url}`);
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -144,7 +138,7 @@ class RealRecipesService {
       const url = `${API_BASE_URL}/recipe/ai-search?promt=${encodeURIComponent(prompt)}`;
       const headers = getAuthHeaders();
       apiLogger.logRequest(url, 'GET', headers, undefined);
-      const res = await fetch(url, {
+      const res = await authorizedFetch(url, {
         method: 'GET',
         headers
       });
@@ -220,7 +214,7 @@ class RealRecipesService {
       }
       const body = { action, value: normalized } as any;
       apiLogger.logRequest(url, 'POST', headers, body);
-      const res = await fetch(url, {
+      const res = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(body)
@@ -339,7 +333,7 @@ class RealRecipesService {
       // Логируем запрос
       apiLogger.logRequest(url, 'POST', headers, apiRecipeData);
       
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(apiRecipeData)
@@ -391,7 +385,7 @@ class RealRecipesService {
       const url = `${API_BASE_URL}/recipe/${id}`;
       apiLogger.logRequest(url, 'PUT', headers, apiRecipeData);
 
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'PUT',
         headers,
         body: JSON.stringify(apiRecipeData)

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../store';
 import { API_BASE_URL } from '../../services/api';
+import { getAuthHeaders, authorizedFetch } from '../../services/auth';
 import { BASE_UNITS_ARRAY, PRODUCT_UNITS } from '../../constants/measures';
 import type { ApiIngredient } from '../../types/ingredient.types';
 import styles from './AddProductForm.module.css';
@@ -30,13 +31,9 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
 
   // Временная загрузка продуктов через новый эндпоинт products/all
   const fetchProducts = async (): Promise<ApiIngredient[]> => {
-    const token = localStorage.getItem('authToken');
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    const headers = getAuthHeaders();
 
-    const response = await fetch(`${API_BASE_URL}/products/all`, { headers });
+    const response = await authorizedFetch(`${API_BASE_URL}/products/all`, { headers });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

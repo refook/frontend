@@ -7,6 +7,7 @@ import StepsEditor from '../StepsEditor/StepsEditor';
 import TagsInput from '../TagsInput/TagsInput';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import styles from './RecipeForm.module.css';
+import { getAuthHeaders, authorizedFetch } from '../../services/auth';
 
 interface RecipeFormProps {
   initialData: CreateRecipeDto;
@@ -124,10 +125,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
   useEffect(() => {
     const loadKitchens = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-        const resp = await fetch(`${API_BASE_URL}/kitchens/all`, { headers });
+        const headers = getAuthHeaders();
+        const resp = await authorizedFetch(`${API_BASE_URL}/kitchens/all`, { headers });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         const normalized = (Array.isArray(data) ? data : []).map((k: any) => ({
@@ -144,9 +143,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
 
   const calculateMacrosFromProducts = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = getAuthHeaders();
       let calories = 0;
       let proteins = 0;
       let fats = 0;
@@ -154,7 +151,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       for (const ing of formData.ingredients) {
         if (!ing?.id || !ing?.count) continue;
         try {
-          const resp = await fetch(`${API_BASE_URL}/products/${ing.id}`, { headers });
+          const resp = await authorizedFetch(`${API_BASE_URL}/products/${ing.id}`, { headers });
           if (!resp.ok) continue;
           const product = await resp.json();
           const m = product?.macros;
