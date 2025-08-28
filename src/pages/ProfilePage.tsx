@@ -56,7 +56,7 @@ const ProfilePage: React.FC = () => {
       website: '',
       language: 'ru',
       notifications: { email: true, push: false },
-      avatarUrl: context?.user?.avatar || undefined,
+      avatarUrl: context?.user?.photoUrl || undefined,
     };
   }, [context?.user]);
 

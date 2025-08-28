@@ -164,8 +164,8 @@ const Header: React.FC = () => {
                 aria-expanded={isProfileMenuOpen}
                 aria-haspopup="menu"
               >
-                {user?.avatar ? (
-                  <img src={user.avatar} alt="Avatar" className={styles.avatar} />
+                {user?.photoUrl ? (
+                  <img src={user.photoUrl} alt="Avatar" className={styles.avatar} />
                 ) : (
                   <UserCircleIcon className={styles.icon} />
                 )}
@@ -261,9 +261,9 @@ const Header: React.FC = () => {
           {authenticated ? (
             <div className={styles.mobileUserInfo}>
               <span className={styles.mobileUserName}>{user?.name}</span>
-              {user?.avatar && (
+              {user?.photoUrl && (
                 <img
-                  src={user.avatar}
+                  src={user.photoUrl}
                   alt="Avatar"
                   className={styles.mobileAvatar}
                 />
