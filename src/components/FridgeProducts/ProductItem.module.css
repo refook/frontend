@@ -1,9 +1,9 @@
 .productItem {
-  background: white;
-  border-radius: 12px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
   padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   position: relative;
   border: 2px solid transparent;
@@ -15,13 +15,13 @@
 }
 
 .productItem.expiring {
-  border-color: #fbbf24;
-  background: linear-gradient(135deg, #fef3c7 0%, white 100%);
+  border-color: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--bg-primary) 100%);
 }
 
 .productItem.expired {
-  border-color: #ef4444;
-  background: linear-gradient(135deg, #fecaca 0%, white 100%);
+  border-color: var(--color-danger);
+  background: linear-gradient(135deg, var(--color-danger-light) 0%, var(--bg-primary) 100%);
 }
 
 .productHeader {
@@ -32,9 +32,9 @@
 }
 
 .productName {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0;
   flex: 1;
 }
@@ -59,23 +59,23 @@
 }
 
 .editButton:hover {
-  background: #e5e7eb;
+  background: var(--color-gray-200);
 }
 
 .deleteButton:hover {
-  background: #fecaca;
+  background: var(--color-danger-light);
 }
 
 .saveButton:hover {
-  background: #dcfce7;
+  background: var(--color-success-light);
 }
 
 .cancelButton:hover {
-  background: #fecaca;
+  background: var(--color-danger-light);
 }
 
 .productDetails {
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .amount {
@@ -84,17 +84,17 @@
 }
 
 .amount strong {
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .expiry {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   margin-bottom: 8px;
 }
 
 .notes {
-  font-size: 14px;
-  color: #9ca3af;
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
 }
 
 .editForm {
@@ -109,9 +109,9 @@
 }
 
 .editRow label {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
   margin-bottom: 4px;
   display: flex;
   align-items: center;
@@ -120,34 +120,34 @@
 
 .editInput {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   transition: border-color 0.2s ease;
   flex: 1;
 }
 
 .editInput:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 .unit {
-  font-size: 14px;
-  color: #6b7280;
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
   margin-left: 8px;
 }
 
 .statusBadge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  bottom: 8px;
+  left: 8px;
   padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
+  border-radius: var(--radius-xl);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -160,6 +160,14 @@
 .expiring .statusBadge {
   background: #fbbf24;
   color: white;
+}
+
+/* Dark theme: ослабляем яркость подложки чипа */
+[data-theme="dark"] .productItem.expiring {
+  background: rgba(245, 158, 11, 0.08);
+}
+[data-theme="dark"] .productItem.expired {
+  background: rgba(239, 68, 68, 0.08);
 }
 
 /* Мобильная адаптация */

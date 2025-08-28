@@ -49,15 +49,23 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDele
                 className={styles.editButton}
                 onClick={() => setIsEditing(true)}
                 title="Редактировать"
+                aria-label="Редактировать"
               >
-                ✏️
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor"/>
+                  <path d="M20.71 7.04a1.003 1.003 0 000-1.42l-2.34-2.34a1.003 1.003 0 00-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z" fill="currentColor"/>
+                </svg>
               </button>
               <button
                 className={styles.deleteButton}
                 onClick={handleDelete}
                 title="Удалить"
+                aria-label="Удалить"
               >
-                🗑️
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M6 7h12v12a2 2 0 01-2 2H8a2 2 0 01-2-2V7z" fill="currentColor"/>
+                  <path d="M9 4h6l1 2H8l1-2z" fill="currentColor"/>
+                </svg>
               </button>
             </>
           ) : (
@@ -66,15 +74,21 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDele
                 className={styles.saveButton}
                 onClick={handleUpdate}
                 title="Сохранить"
+                aria-label="Сохранить"
               >
-                ✅
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M9 16.2l-3.5-3.5L4 14.2 9 19l12-12-1.5-1.5L9 16.2z" fill="currentColor"/>
+                </svg>
               </button>
               <button
                 className={styles.cancelButton}
                 onClick={handleCancel}
                 title="Отмена"
+                aria-label="Отмена"
               >
-                ❌
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M18.3 5.71L12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.29 19.71 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29 10.59 10.6 16.89 4.29l1.41 1.42z" fill="currentColor"/>
+                </svg>
               </button>
             </>
           )}
