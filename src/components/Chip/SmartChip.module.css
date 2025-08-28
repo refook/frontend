@@ -1,0 +1,59 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--token-border, #e5e7eb);
+  background: var(--token-neutral-50, #f9fafb);
+  color: var(--token-neutral-800, #1f2937);
+  font-size: 14px;
+}
+
+.chip:hover {
+  background: color-mix(in oklab, var(--token-accent-weak, #e0f2fe) 20%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent, #38bdf8) 30%, var(--token-border, #e5e7eb));
+}
+
+.label {
+  font-weight: 500;
+}
+
+.input {
+  width: 80px;
+  height: 28px;
+  padding: 2px 8px;
+  border: 1px solid var(--token-border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.select {
+  height: 28px;
+  padding: 2px 8px;
+  border: 1px solid var(--token-border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.sep {
+  opacity: 0.6;
+}
+
+.removeBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.removeBtn:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+.removeMode {
+  background: color-mix(in oklab, var(--color-danger-light, #fee2e2) 30%, transparent) !important;
+  border-color: color-mix(in oklab, var(--color-danger, #ef4444) 30%, var(--token-border, #e5e7eb)) !important;
+}
+

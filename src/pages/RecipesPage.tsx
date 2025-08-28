@@ -3,7 +3,7 @@ import { SparklesIcon } from '@heroicons/react/24/solid';
 import { RecipesService } from '../services/recipesService';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setPage, setFilters, setSort } from '../store/slices/recipesSlice';
-import { QUICK_FILTERS, type QuickFilterId, toggleWithGroups, computeSelection } from '../config/recipeQuickFilters';
+import type { QuickFilterId } from '../config/recipeQuickFilters';
 import { QuickFiltersBar } from '../components/QuickFiltersBar';
 import { fetchRecipes } from '../store/thunks';
 import RecipesList from '../components/RecipesList/RecipesList';
@@ -43,13 +43,8 @@ const RecipesPage: React.FC = () => {
 
   const [activeFilters, setActiveFilters] = useState<Set<QuickFilterId>>(new Set());
 
-  const applyQuickFilter = (type: QuickFilterId) => {
-    const next = toggleWithGroups(activeFilters, type);
-    setActiveFilters(next);
-    const applied = computeSelection(next, { filters, sort });
-    dispatch(setFilters(applied.filters));
-    dispatch(setSort(applied.sort));
-  };
+  // applyQuickFilter больше не используется, оставлен пустым для совместимости
+  const applyQuickFilter = (_type: QuickFilterId) => {};
 
   const resultsText = useMemo(() => {
     const count = (aiMode && aiRecipes) ? aiRecipes.length : pagination.total;
@@ -84,11 +79,65 @@ const RecipesPage: React.FC = () => {
                     try {
                       const { filter, recipes } = await RecipesService.aiSearchRecipes(searchQuery.trim());
                       setAiRecipes(recipes as any);
+                      // Преобразование backend-фильтра в фильтры стора
                       const next: any = { ...filters };
-                      if (filter?.search) next.search = filter.search;
-                      if (Array.isArray(filter?.difficulty) && filter.difficulty.length > 0) next.difficulty = filter.difficulty;
-                      if (Array.isArray(filter?.cuisine) && filter.cuisine.length > 0) next.cuisine = filter.cuisine;
+                      if (filter?.name) next.search = filter.name;
+                      if (typeof filter?.maxCalories === 'number') {
+                        next.calories = { ...(next.calories || {}), max: Math.max(0, Number(filter.maxCalories)) };
+                      }
+                      if (typeof filter?.minCalories === 'number') {
+                        next.calories = { ...(next.calories || {}), min: Math.max(0, Number(filter.minCalories)), max: next.calories?.max };
+                      }
+                      if (typeof filter?.maxTime === 'number') {
+                        next.cookTime = { ...(next.cookTime || {}), max: Math.max(0, Number(filter.maxTime) / 60) };
+                      }
+                      // kitchens/tags/products/calories пока не отображаем чипами — оставляем для будущего
                       dispatch(setFilters(next));
+                      // Преобразуем сортировку из ответа
+                      if (filter?.sortField || filter?.sortDirection) {
+                        const mapField = (f?: string): any => {
+                          switch ((f || '').toUpperCase()) {
+                            case 'CREATED_AT': return 'createdAt';
+                            case 'COOK_TIME': return 'prepTime';
+                            case 'RATING': return 'rating';
+                            default: return 'createdAt';
+                          }
+                        };
+                        const mapOrder = (d?: string): 'asc' | 'desc' => ((d || '').toUpperCase() === 'ASC' ? 'asc' : 'desc');
+                        dispatch(setSort({ field: mapField(filter?.sortField), order: mapOrder(filter?.sortDirection) } as any));
+                      }
+                      // Визуально отразим чипы sort/time независимо
+                      setActiveFilters(prev => {
+                        const nextSet = new Set(prev);
+                        // sort chip
+                        const sortChip = ((f?: string) => {
+                          switch ((f || '').toUpperCase()) {
+                            case 'CREATED_AT': return 'new';
+                            case 'RATING': return 'popular';
+                            default: return undefined;
+                          }
+                        })(filter?.sortField);
+                        for (const id of Array.from(nextSet)) {
+                          if (['popular','new'].includes(id as any)) nextSet.delete(id);
+                        }
+                        if (sortChip) nextSet.add(sortChip as QuickFilterId);
+                        // time chip
+                        for (const id of Array.from(nextSet)) {
+                          if (['time15','time30','time60'].includes(id as any)) nextSet.delete(id);
+                        }
+                        if (typeof filter?.maxTime === 'number') {
+                          const maxMin = Math.floor((Number(filter.maxTime) / 60));
+                          const timeChip = maxMin <= 15 ? 'time15' : maxMin <= 30 ? 'time30' : maxMin <= 60 ? 'time60' : undefined;
+                          if (timeChip) nextSet.add(timeChip as QuickFilterId);
+                        }
+                        // difficulty chip from filter.level
+                        // удаляем возможные старые difficulty-чипы (исторически)
+                        for (const id of Array.from(nextSet)) {
+                          if (['easy','medium','hard'].includes(id as any)) nextSet.delete(id);
+                        }
+                        // больше не добавляем difficulty-чипы, поскольку они убраны
+                        return nextSet;
+                      });
                     } catch (e) {
                       setAiRecipes([]);
                     } finally {
@@ -126,6 +175,8 @@ const RecipesPage: React.FC = () => {
           activeFilters={activeFilters}
           filters={filters}
           sort={sort}
+          ensureVisible={Array.from(activeFilters)}
+          ensureCaloriesVisible={typeof filters.calories?.max === 'number'}
           onChange={(selected, applied) => {
             setActiveFilters(selected);
             dispatch(setFilters(applied.filters));

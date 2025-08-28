@@ -1,89 +1,109 @@
 import React, { useEffect, useState } from 'react';
 import styles from './QuickFiltersBar.module.css';
-import { QUICK_FILTERS, DEFAULT_VISIBLE_QUICK_FILTERS, type QuickFilterId, computeSelection, toggleWithGroups } from '../../config/recipeQuickFilters';
 import type { RecipeFilters, RecipeSort } from '../../types';
+import SmartChip from '../Chip/SmartChip';
+import type { QuickFilterId } from '../../config/recipeQuickFilters';
 
 interface Props {
   activeFilters: Set<QuickFilterId>;
   filters: RecipeFilters;
   sort: RecipeSort;
   onChange: (selected: Set<QuickFilterId>, next: { filters: RecipeFilters; sort: RecipeSort }) => void;
+  ensureVisible?: QuickFilterId[]; // сохранено для совместимости, игнорируется
+  ensureCaloriesVisible?: boolean; // показать чип калорий при необходимости
 }
 
-const QuickFiltersBar: React.FC<Props> = ({ activeFilters, filters, sort, onChange }) => {
+const QuickFiltersBar: React.FC<Props> = ({ activeFilters, filters, sort, onChange, ensureVisible, ensureCaloriesVisible }) => {
   const [showAdd, setShowAdd] = useState(false);
-  const [visible, setVisible] = useState<Set<QuickFilterId>>(() => {
+  const [caloriesVisible, setCaloriesVisible] = useState<boolean>(() => {
     try {
-      const raw = localStorage.getItem('quickFilters.visible');
-      if (raw) {
-        const arr = JSON.parse(raw) as QuickFilterId[];
-        const validIds = new Set(QUICK_FILTERS.map(f => f.id));
-        return new Set(arr.filter((id) => validIds.has(id)));
-      }
+      const raw = localStorage.getItem('quickFilters.caloriesVisible');
+      if (raw === 'false') return false;
     } catch {}
-    return new Set(DEFAULT_VISIBLE_QUICK_FILTERS);
+    return true;
   });
+  const [caloriesActive, setCaloriesActive] = useState<boolean>(() => {
+    try {
+      const raw = localStorage.getItem('quickFilters.caloriesActive');
+      return raw === 'true';
+    } catch {}
+    return false;
+  });
+
+  // Историческая совместимость: ensureVisible больше не используется (чипы удалены)
+  useEffect(() => {
+    /* no-op */
+  }, [ensureVisible]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('quickFilters.visible', JSON.stringify(Array.from(visible)));
+      localStorage.setItem('quickFilters.caloriesVisible', String(caloriesVisible));
     } catch {}
-  }, [visible]);
+  }, [caloriesVisible]);
 
-  const handleToggle = (id: QuickFilterId) => {
-    // В обычном режиме кликом переключаем активность
-    const next = toggleWithGroups(activeFilters, id);
-    const applied = computeSelection(next, { filters, sort });
-    onChange(next, applied);
-  };
+  useEffect(() => {
+    try {
+      localStorage.setItem('quickFilters.caloriesActive', String(caloriesActive));
+    } catch {}
+  }, [caloriesActive]);
 
-  const handleMainClick = (id: QuickFilterId) => {
-    if (showAdd) {
-      // В режиме редактирования (открыто меню) — кликом по кнопке убираем её с панели
-      const nextVisible = new Set(visible);
-      nextVisible.delete(id);
-      setVisible(nextVisible);
-      return;
+  // Принудительно показать чип калорий при необходимости (например, после ai-search)
+  useEffect(() => {
+    if (ensureCaloriesVisible && !caloriesVisible) {
+      setCaloriesVisible(true);
     }
-    handleToggle(id);
-  };
+  }, [ensureCaloriesVisible]);
 
-  const handleAdd = (id: QuickFilterId) => {
-    // Добавляем кнопку в панель (без изменения активных фильтров)
-    const nextVisible = new Set(visible);
-    nextVisible.add(id);
-    setVisible(nextVisible);
-  };
+  // Убраны остальные чипы; оставлен только чип «Калории»
 
   return (
     <div>
       <div className={styles.container}>
         <span className={styles.label}>Фильтры:</span>
-        {QUICK_FILTERS.filter(qf => visible.has(qf.id)).map((qf) => (
-          <button
-            key={qf.id}
-            onClick={() => handleMainClick(qf.id)}
-            className={`ui-btn ui-btn--ghost ${styles.filterBtn} ${activeFilters.has(qf.id) ? styles.filterBtnActive : ''} ${showAdd ? styles.filterBtnRemoveMode : ''}`}
-          >
-            {qf.label}
-          </button>
-        ))}
+        {/* Чип калорий как SmartChip c диапазоном */}
+        {caloriesVisible && (
+        <button
+          type="button"
+          className={`${styles.smartChipBtn} ${showAdd ? styles.filterBtnRemoveMode : ''} ${caloriesActive ? styles.filterBtnActive : ''}`}
+          onClick={() => {
+            // Заглушка: в обычном режиме ничего не делаем
+            if (showAdd) {
+              // В режиме редактирования — скрываем чип с панели
+              setCaloriesVisible(false);
+            } else {
+              // Тогглим активность чипа (только визуально)
+              setCaloriesActive((v) => !v);
+            }
+          }}
+          title="Калории"
+        >
+          <SmartChip
+            kind="range"
+            title="Калории"
+            from={filters.calories?.min}
+            to={filters.calories?.max}
+            placeholderFrom="от"
+            placeholderTo="до"
+            removeMode={showAdd}
+            onChange={() => { /* заглушка: не фильтруем */ }}
+          />
+        </button>
+        )}
         <button onClick={() => setShowAdd((v) => !v)} className={`ui-btn ui-btn--ghost ${styles.filterBtn} ${styles.addBtn}`}>+ Добавить свой фильтр</button>
       </div>
 
       {showAdd && (
         <div className={styles.menu}>
           <div className={styles.menuList}>
-            {/* Показываем только те, которых нет на панели и не активны */}
-            {QUICK_FILTERS.filter(qf => !visible.has(qf.id) && !activeFilters.has(qf.id)).map((qf) => (
+            {!caloriesVisible && (
               <button
-                key={`add-${qf.id}`}
+                key="add-calories"
                 className={`ui-btn ${styles.menuItem} ${styles.menuItemAdd}`}
-                onClick={() => handleAdd(qf.id)}
+                onClick={() => setCaloriesVisible(true)}
               >
-                {qf.label}
+                Калории
               </button>
-            ))}
+            )}
           </div>
         </div>
       )}

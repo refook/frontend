@@ -67,6 +67,10 @@ export interface RecipeFilters {
     max?: number;
   };
   tags?: string[];
+  calories?: {
+    min?: number;
+    max?: number;
+  };
 }
 
 export interface RecipeSort {

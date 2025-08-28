@@ -41,3 +41,9 @@
 [data-theme='dark'] .addBtn { border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border)) !important; }
 [data-theme='dark'] .addBtn:hover { background: color-mix(in oklab, var(--token-accent) 15%, transparent) !important; }
 
+.caloriesChip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border: 1px solid var(--token-border); border-radius: var(--token-radius-full); background: var(--token-neutral-50); }
+.caloriesInput { width: 80px; height: 28px; padding: 2px 8px; border: 1px solid var(--token-border); border-radius: 8px; font-size: var(--token-text-sm); }
+
+/* Wrapper button for SmartChip: reset styles to avoid double borders */
+.smartChipBtn { border: none; background: transparent; padding: 0; display: inline-flex; }
+
