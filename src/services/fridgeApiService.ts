@@ -58,10 +58,20 @@ class FridgeApiService {
   /**
    * Получить все продукты из конкретного холодильника
    */
-  async getAllFridgeProducts(fridgeId: string): Promise<FridgeProduct[]> {
+
+  async getAllFridgeProducts(fridgeId?: string): Promise<FridgeProduct[]> {
     try {
-      console.log(`Загрузка продуктов холодильника из: ${API_BASE_URL}/fridge/${fridgeId}/products`);
-      const response = await fetch(`${API_BASE_URL}/fridge/${fridgeId}/products`, {
+      let targetFridgeId = fridgeId;
+      if (!targetFridgeId) {
+        const fridges = await this.getUserFridges();
+        targetFridgeId = fridges[0]?.id;
+        if (!targetFridgeId) {
+          console.warn('Нет доступных холодильников для загрузки продуктов');
+          return [];
+        }
+      }
+      console.log(`Загрузка продуктов холодильника из: ${API_BASE_URL}/fridge/${targetFridgeId}/products`);
+      const response = await fetch(`${API_BASE_URL}/fridge/${targetFridgeId}/products`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
