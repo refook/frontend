@@ -16,7 +16,7 @@ export async function authorizedFetch(input: RequestInfo | URL, init: RequestIni
   const doFetch = () => fetch(input, { ...init, headers });
 
   let response = await doFetch();
-  if (response.status === 401) {
+  if (response.status === 401 || response.status === 403) {
     try {
       const refreshed = await keycloak.updateToken(0);
       if (refreshed && keycloak.token) {

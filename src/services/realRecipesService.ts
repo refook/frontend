@@ -182,7 +182,7 @@ class RealRecipesService {
       const url = `${API_BASE_URL}/users/favorites`;
       const headers = getAuthHeaders();
       apiLogger.logRequest(url, 'GET', headers, undefined);
-      const res = await fetch(url, { method: 'GET', headers });
+      const res = await authorizedFetch(url, { method: 'GET', headers });
       if (!res.ok) {
         const text = await res.text().catch(() => '');
         throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);

@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useContext } from 'react';
 import styles from './FavoritesSection.module.css';
 import SectionHeader from '../../components/SectionHeader';
 import RecipeCard from '../../../../components/RecipeCard/RecipeCard';
 import { RecipesService } from '../../../../services/recipesService';
 import type { Recipe } from '../../../../types';
 import { PlusIcon, PencilSquareIcon, TrashIcon, EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
+import { KeycloakContext } from '../../../../providers/KeycloakProvider';
 
 /**
  * Секция «Favorite Recipes» с полным функционалом закладок (группы):
@@ -57,19 +58,28 @@ const FavoritesSection: React.FC = () => {
 
   const [availableRecipes, setAvailableRecipes] = useState<Recipe[]>([]);
 
-  // Загружаем избранные рецепты пользователя по токену
+  // Загружаем избранные рецепты пользователя по токену после инициализации/аутентификации
+  const keycloakCtx = useContext(KeycloakContext);
   useEffect(() => {
     let isMounted = true;
+    if (!keycloakCtx?.isInitialized) return; // ждём инициализации
+    if (!keycloakCtx?.authenticated) {
+      setAvailableRecipes([]);
+      return;
+    }
     (async () => {
       try {
+        console.log('[Favorites] loading favorites...');
         const favorites = await RecipesService.getFavorites();
+        console.log('[Favorites] loaded:', favorites?.length);
         if (isMounted) setAvailableRecipes(favorites || []);
       } catch {
+        console.warn('[Favorites] failed to load');
         if (isMounted) setAvailableRecipes([]);
       }
     })();
     return () => { isMounted = false; };
-  }, []);
+  }, [keycloakCtx?.isInitialized, keycloakCtx?.authenticated]);
 
   const allKnownRecipes: Recipe[] = useMemo(() => availableRecipes, [availableRecipes]);
 
