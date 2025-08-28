@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../store';
 import { API_BASE_URL } from '../../services/api';
-import { MEASURES_ARRAY } from '../../constants/measures';
+import { BASE_UNITS_ARRAY, PRODUCT_UNITS } from '../../constants/measures';
 import type { ApiIngredient } from '../../types/ingredient.types';
 import styles from './AddProductForm.module.css';
 
@@ -10,6 +10,7 @@ interface AddProductFormProps {
     ingredient: ApiIngredient;
     amount: number;
     unit: string;
+    baseUnit?: 'GR' | 'ML';
     expiryDate?: string;
     notes?: string;
   }) => void;
@@ -22,6 +23,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
   const [selectedIngredient, setSelectedIngredient] = useState<ApiIngredient | null>(null);
   const [amount, setAmount] = useState<string>('1');
   const [unit, setUnit] = useState<string>('');
+  const [baseUnit, setBaseUnit] = useState<'GR' | 'ML' | ''>('');
   const [expiryDate, setExpiryDate] = useState<string>('');
   const [notes, setNotes] = useState<string>('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -89,6 +91,10 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
       newErrors.unit = 'Выберите единицу измерения';
     }
 
+    if (!baseUnit) {
+      newErrors.baseUnit = 'Выберите базовую единицу';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -102,6 +108,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
       ingredient: selectedIngredient,
       amount: parseFloat(amount),
       unit,
+      baseUnit: baseUnit || undefined,
       expiryDate: expiryDate || undefined,
       notes: notes || undefined
     });
@@ -216,19 +223,46 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
             <select
               value={unit}
               onChange={(e) => {
-                setUnit(e.target.value);
+                const nextUnit = e.target.value;
+                setUnit(nextUnit);
+                // Автоподстановка baseUnit из выбранной единицы
+                const u = (nextUnit || '').toUpperCase();
+                const inferredBase = (u === 'ML' || u === 'L' || u === 'MILLILITER' || u === 'LITER') ? 'ML' : (u ? 'GR' : '');
+                if (inferredBase) setBaseUnit(inferredBase as 'GR' | 'ML');
                 setErrors(prev => ({ ...prev, unit: '' }));
               }}
               className={`${styles.select} ${errors.unit ? styles.inputError : ''}`}
             >
               <option value="">Выберите единицу</option>
-              {MEASURES_ARRAY.map(measure => (
-                <option key={measure.value} value={measure.value}>
-                  {measure.label}
+              {[PRODUCT_UNITS.GRAM, PRODUCT_UNITS.KILOGRAM, PRODUCT_UNITS.MILLIGRAM].map(u => (
+                <option key={u.value} value={u.value}>
+                  {u.label}
                 </option>
               ))}
             </select>
           </div>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label className={styles.label}>
+            Базовая единица продукта *
+            {errors.baseUnit && <span className={styles.error}>{errors.baseUnit}</span>}
+          </label>
+          <select
+            value={baseUnit}
+            onChange={(e) => {
+              setBaseUnit(e.target.value as 'GR' | 'ML');
+              setErrors(prev => ({ ...prev, baseUnit: '' }));
+            }}
+            className={`${styles.select} ${errors.baseUnit ? styles.inputError : ''}`}
+          >
+            <option value="">Выберите базовую единицу</option>
+            {BASE_UNITS_ARRAY.map(bu => (
+              <option key={bu.value} value={bu.value}>
+                {bu.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className={styles.formGroup}>

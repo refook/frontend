@@ -1,4 +1,5 @@
 import type {BaseEntity, Ingredient, MeasureType} from "./index.ts";
+import type { BaseUnitType, ProductUnitType } from './measures.types';
 
 // Fridge types
 export interface FridgeItem extends BaseEntity {
@@ -24,10 +25,11 @@ export interface AddFridgeItemForm {
 
 // DTO для создания продукта в холодильнике
 export interface CreateFridgeProductDto {
-  ingredientId: string;
-  count: number;
-  measure: MeasureType;
-  expiryDate?: string; // ISO date string
+  productId: string;
+  baseUnit: BaseUnitType;
+  avgWeight: number;
+  productUnit: ProductUnitType;
+  expiryDate?: string | null; // ISO date string or null
   comment?: string;
 }
 
@@ -43,15 +45,33 @@ export interface UpdateFridgeProductDto {
 // DTO ответа API для продукта в холодильнике
 export interface FridgeProductResponseDto {
   id: string;
-  ingredientId: string;
+  productId: string;
   name: string;
+  baseUnit: 'ML' | 'GR';
   count: number;
-  measure: MeasureType;
-  expiryDate?: string; // ISO date string
+  productUnit:
+    | 'GRAM'
+    | 'KILOGRAM'
+    | 'MILLIGRAM'
+    | 'MILLILITER'
+    | 'LITER'
+    | 'TEASPOON'
+    | 'TABLESPOON'
+    | 'CUP'
+    | 'PIECE'
+    | 'PACKAGE'
+    | 'BUNCH'
+    | 'SLICE'
+    | 'LEAF'
+    | 'PIECE_PART'
+    | 'PORTION'
+    | 'PINCH'
+    | 'HANDFUL'
+    | 'PLATE'
+    | 'TO_TASTE'
+    | 'APPROX';
+  expiryDate?: string | null;
   comment?: string;
-  ownerId: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // Локальный тип для продукта в холодильнике (для UI)
@@ -68,4 +88,24 @@ export interface FridgeProduct {
   notes?: string;
   addedAt: Date;
   updatedAt: Date;
+}
+
+// ---------------- Fridges (контейнеры) ----------------
+
+// DTO для создания холодильника
+export interface CreateFridgeDto {
+  name: string;
+  description?: string;
+  address?: string;
+}
+
+// DTO ответа API для холодильника
+export interface FridgeResponseDto {
+  id: string;
+  name: string;
+  description?: string;
+  address?: string;
+  ownerId?: string | number;
+  createdAt?: string;
+  updatedAt?: string;
 }

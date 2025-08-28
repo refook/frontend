@@ -2,9 +2,12 @@ import type {
   CreateFridgeProductDto, 
   UpdateFridgeProductDto, 
   FridgeProductResponseDto,
-  FridgeProduct 
+  FridgeProduct,
+  CreateFridgeDto,
+  FridgeResponseDto
 } from '../types/fridge.types';
 import { apiLogger } from '../utils/apiLogger';
+import { apiService } from './api';
 
 // Функция для получения авторизационных заголовков
 function getAuthHeaders() {
@@ -19,28 +22,48 @@ function getAuthHeaders() {
 const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
 
 class FridgeApiService {
+  // ---------------- Fridges (контейнеры) ----------------
+
+  /**
+   * Получить список холодильников текущего пользователя
+   */
+  async getUserFridges(): Promise<FridgeResponseDto[]> {
+    const url = `${API_BASE_URL}/fridges`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'GET', headers);
+    const response = await fetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      throw new Error(`Не удалось загрузить холодильники: ${response.status}`);
+    }
+    return response.json();
+  }
+
+  /**
+   * Создать холодильник пользователя
+   */
+  async createFridge(payload: CreateFridgeDto): Promise<FridgeResponseDto> {
+    const url = `${API_BASE_URL}/fridges`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'POST', headers, payload);
+    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload) });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Не удалось создать холодильник: ${response.status} ${errorText}`);
+    }
+    return response.json();
+  }
+
+  // ---------------- Fridge products ----------------
   
   /**
-   * Получить все продукты из холодильника
+   * Получить все продукты из конкретного холодильника
    */
-  async getAllFridgeProducts(): Promise<FridgeProduct[]> {
+  async getAllFridgeProducts(fridgeId: string): Promise<FridgeProduct[]> {
     try {
-      console.log(`Загрузка продуктов холодильника из: ${API_BASE_URL}/fridge`);
-      
-      const response = await fetch(`${API_BASE_URL}/fridge`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const products: FridgeProductResponseDto[] = await response.json();
-      console.log(`Успешно загружено ${products.length} продуктов из холодильника`);
-
-      // Трансформируем данные из API в локальный формат
-      return products.map(product => this.transformApiProductToLocal(product));
+      console.log(`Загрузка продуктов холодильника через apiService: /fridge/${fridgeId}/products`);
+      const list = await apiService.get<FridgeProductResponseDto[]>(`/fridge/${fridgeId}/products`);
+      console.log(`Успешно загружено ${Array.isArray(list) ? list.length : 0} продуктов из холодильника`);
+      return (list || []).map(product => this.transformApiProductToLocal(product));
     } catch (error) {
       console.error('Ошибка при загрузке продуктов холодильника:', error);
       return [];
@@ -48,15 +71,15 @@ class FridgeApiService {
   }
 
   /**
-   * Добавить продукт в холодильник
+   * Добавить продукт в конкретный холодильник
    */
-  async createFridgeProduct(productData: CreateFridgeProductDto): Promise<FridgeProduct> {
+  async createFridgeProduct(fridgeId: string, productData: CreateFridgeProductDto): Promise<FridgeProduct> {
     try {
       console.log('Добавление продукта в холодильник:', productData);
       console.log('JSON данные для отправки:', JSON.stringify(productData, null, 2));
       
       const headers = getAuthHeaders();
-      const url = `${API_BASE_URL}/fridge`;
+      const url = `${API_BASE_URL}/fridge/${fridgeId}/products`;
       
       // Логируем запрос
       apiLogger.logRequest(url, 'POST', headers, productData);
@@ -153,16 +176,16 @@ class FridgeApiService {
     return {
       id: apiProduct.id,
       ingredient: {
-        id: apiProduct.ingredientId,
+        id: apiProduct.productId,
         name: apiProduct.name,
-        description: undefined // API не возвращает описание в продуктах холодильника
+        description: undefined
       },
       amount: apiProduct.count,
-      unit: apiProduct.measure,
+      unit: apiProduct.productUnit,
       expiryDate: apiProduct.expiryDate ? new Date(apiProduct.expiryDate) : undefined,
       notes: apiProduct.comment,
-      addedAt: new Date(apiProduct.createdAt),
-      updatedAt: new Date(apiProduct.updatedAt)
+      addedAt: new Date(),
+      updatedAt: new Date()
     };
   }
 
@@ -173,22 +196,40 @@ class FridgeApiService {
     ingredient: { id: string };
     amount: number;
     unit: string;
+    baseUnit?: 'GR' | 'ML';
     expiryDate?: string;
     notes?: string;
   }): CreateFridgeProductDto {
-    const toIsoStartOfDayUtc = (dateStr?: string): string | undefined => {
-      if (!dateStr) return undefined;
+    const toIsoStartOfDayUtc = (dateStr?: string): string | null => {
+      if (!dateStr) return null;
       // Ожидаем формат YYYY-MM-DD из инпута и конвертируем в ISO в UTC полночь
       const [year, month, day] = dateStr.split('-').map(n => parseInt(n, 10));
-      if (!year || !month || !day) return undefined;
+      if (!year || !month || !day) return null;
       const iso = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0)).toISOString();
       return iso;
     };
 
+    // Определяем baseUnit по выбранной единице
+    const unit = (localProduct.unit || '').toUpperCase();
+    const baseUnit = (localProduct.baseUnit as any) || (unit === 'ML' || unit === 'L' || unit === 'MILLILITER' || unit === 'LITER' ? 'ML' : 'GR');
+
+    // productUnit ограничиваем до: GRAM, KILOGRAM, MILLIGRAM
+    const productUnit = (() => {
+      const u = unit;
+      if (u === 'KG' || u === 'KILOGRAM') return 'KILOGRAM';
+      if (u === 'MG' || u === 'MILLIGRAM') return 'MILLIGRAM';
+      // По умолчанию отправляем в граммах
+      return 'GRAM';
+    })();
+
+    // avgWeight пока задаём эвристически: количество, если есть; иначе 1
+    const avgWeight = Number.isFinite(localProduct.amount) ? Number(localProduct.amount) : 1;
+
     return {
-      ingredientId: localProduct.ingredient.id,
-      count: Math.round(localProduct.amount),
-      measure: localProduct.unit as any, // Приводим к типу MeasureType
+      productId: localProduct.ingredient.id,
+      baseUnit: baseUnit as any,
+      avgWeight,
+      productUnit: productUnit as any,
       expiryDate: toIsoStartOfDayUtc(localProduct.expiryDate),
       comment: localProduct.notes || undefined
     };
