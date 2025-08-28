@@ -12,11 +12,27 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDele
   const [isEditing, setIsEditing] = useState(false);
   const [editAmount, setEditAmount] = useState(item.amount.toString());
   const [editNotes, setEditNotes] = useState(item.notes || '');
+  // Новые поля редактирования единиц измерения
+  const initialProductUnit = ((): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' => {
+    const u = (item.unit || '').toUpperCase();
+    if (u === 'KG' || u === 'KILOGRAM') return 'KILOGRAM';
+    if (u === 'MG' || u === 'MILLIGRAM') return 'MILLIGRAM';
+    return 'GRAM';
+  })();
+  const initialBaseUnit = ((): 'GR' | 'ML' => {
+    if (item.baseUnit) return item.baseUnit;
+    const u = (item.unit || '').toUpperCase();
+    return (u === 'ML' || u === 'L' || u === 'MILLILITER' || u === 'LITER') ? 'ML' : 'GR';
+  })();
+  const [editProductUnit, setEditProductUnit] = useState<'GRAM' | 'KILOGRAM' | 'MILLIGRAM'>(initialProductUnit);
+  const [editBaseUnit, setEditBaseUnit] = useState<'GR' | 'ML'>(initialBaseUnit);
 
   const handleUpdate = () => {
     const updates = {
       count: parseFloat(editAmount) || 0,
-      comment: editNotes.trim() || undefined
+      comment: editNotes.trim() || undefined,
+      productUnit: editProductUnit,
+      baseUnit: editBaseUnit
     };
     
     onUpdate?.(item.id, updates);
@@ -125,7 +141,34 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDele
                   step="0.1"
                   className={styles.editInput}
                 />
-                <span className={styles.unit}>{item.unit}</span>
+                <span className={styles.unit}>{editProductUnit}</span>
+              </label>
+            </div>
+            <div className={styles.editRow}>
+              <label>
+                Ед. продукта (productUnit):
+                <select
+                  className={styles.editInput}
+                  value={editProductUnit}
+                  onChange={(e) => setEditProductUnit(e.target.value as 'GRAM' | 'KILOGRAM' | 'MILLIGRAM')}
+                >
+                  <option value="GRAM">GRAM</option>
+                  <option value="KILOGRAM">KILOGRAM</option>
+                  <option value="MILLIGRAM">MILLIGRAM</option>
+                </select>
+              </label>
+            </div>
+            <div className={styles.editRow}>
+              <label>
+                Базовая ед. (baseUnit):
+                <select
+                  className={styles.editInput}
+                  value={editBaseUnit}
+                  onChange={(e) => setEditBaseUnit(e.target.value as 'GR' | 'ML')}
+                >
+                  <option value="GR">GR</option>
+                  <option value="ML">ML</option>
+                </select>
               </label>
             </div>
             <div className={styles.editRow}>
@@ -144,12 +187,12 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDele
         )}
       </div>
 
-      {isExpired && (
+      {!isEditing && isExpired && (
         <div className={styles.statusBadge}>
           Просрочено
         </div>
       )}
-      {isExpiringSoon && !isExpired && (
+      {!isEditing && isExpiringSoon && !isExpired && (
         <div className={styles.statusBadge}>
           Скоро истечет
         </div>

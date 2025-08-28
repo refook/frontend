@@ -146,11 +146,20 @@ class FridgeApiService {
       return d.toISOString();
     };
 
+    const resolvedProductUnit = ((): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' => {
+      if (updates.productUnit) return updates.productUnit as any;
+      return normalizeProductUnit(current.unit) as any;
+    })();
+    const resolvedBaseUnit = ((): 'GR' | 'ML' => {
+      if (updates.baseUnit) return updates.baseUnit as any;
+      return inferBaseUnit(current.unit) as any;
+    })();
+
     return {
       productId: current.ingredient.id,
-      baseUnit: inferBaseUnit(current.unit) as any,
+      baseUnit: resolvedBaseUnit as any,
       count: typeof updates.count === 'number' ? updates.count : current.amount,
-      productUnit: normalizeProductUnit(current.unit) as any,
+      productUnit: resolvedProductUnit as any,
       expiryDate: toIsoOrNull(current.expiryDate),
       comment: typeof updates.comment === 'string' ? updates.comment : current.notes
     };
@@ -229,6 +238,7 @@ class FridgeApiService {
       },
       amount: apiProduct.count,
       unit: apiProduct.productUnit,
+      baseUnit: apiProduct.baseUnit,
       expiryDate: apiProduct.expiryDate ? new Date(apiProduct.expiryDate) : undefined,
       notes: apiProduct.comment,
       addedAt: new Date(),

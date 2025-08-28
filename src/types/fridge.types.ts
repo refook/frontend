@@ -84,7 +84,8 @@ export interface FridgeProduct {
     description?: string;
   };
   amount: number;
-  unit: string;
+  unit: string; // productUnit (например, GRAM/KILOGRAM)
+  baseUnit?: 'GR' | 'ML';
   expiryDate?: Date;
   notes?: string;
   addedAt: Date;
