@@ -1,10 +1,11 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
 import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
 import { apiLogger } from '../utils/apiLogger';
+import keycloak from "./keycloak.ts";
 
 // Функция для получения авторизационных заголовков
 function getAuthHeaders() {
-  const token = localStorage.getItem('authToken');
+  const token = keycloak.token
   return {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` })
