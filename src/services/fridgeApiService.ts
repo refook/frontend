@@ -7,10 +7,11 @@ import type {
   FridgeResponseDto
 } from '../types/fridge.types';
 import { apiLogger } from '../utils/apiLogger';
+import keycloak from "./keycloak.ts";
 
 // Функция для получения авторизационных заголовков
 function getAuthHeaders() {
-  const token = localStorage.getItem('authToken');
+  const token = keycloak.token
   return {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` })
@@ -57,6 +58,7 @@ class FridgeApiService {
   /**
    * Получить все продукты из конкретного холодильника
    */
+
   async getAllFridgeProducts(fridgeId?: string): Promise<FridgeProduct[]> {
     try {
       let targetFridgeId = fridgeId;
