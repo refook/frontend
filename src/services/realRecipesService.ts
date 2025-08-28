@@ -315,7 +315,7 @@ class RealRecipesService {
           baseUnit: (formData.baseUnit as any) || 'GR',
           totalWeight: Number(formData.avgWeight ?? 0),
           recipeUnit: (formData.recipeUnit as any) || 'PORTION',
-          unitCount: 1
+          unitCount: Number((formData as any).unitCount ?? 1)
         },
         macros: {
           calories: Number(formData.macros?.calories ?? 0),

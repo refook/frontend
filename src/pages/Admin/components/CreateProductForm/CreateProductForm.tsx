@@ -25,7 +25,7 @@ interface CreateProductDtoForm {
   description: string;
   /** Базовая единица измерения */
   baseUnit: BaseUnitType;
-  /** Средний вес в граммах */
+  /** Вес всего блюда в граммах */
   avgWeight: number;
   /** Конкретная единица измерения */
   unit: ProductUnitType;

@@ -40,7 +40,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     avgWeight: initialData.avgWeight || 100,
     unit: initialData.unit || 'GRAM',
     macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 },
-    recipeUnit: initialData.recipeUnit || 'PORTION'
+    recipeUnit: initialData.recipeUnit || 'PORTION',
+    unitCount: (initialData as any).unitCount ?? 1
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -62,7 +63,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       avgWeight: initialData.avgWeight || 100,
       unit: initialData.unit || 'GRAM',
       macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 },
-      recipeUnit: initialData.recipeUnit || 'PORTION'
+      recipeUnit: initialData.recipeUnit || 'PORTION',
+      unitCount: (initialData as any).unitCount ?? 1
     });
   }, [initialData]);
 
@@ -272,7 +274,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
               </select>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Средний вес (г)</label>
+              <label className={styles.label}>Вес всего блюда (г)</label>
               <input
                 type="number"
                 className={styles.input}
@@ -280,6 +282,17 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                 step={1}
                 value={formData.avgWeight ?? 0}
                 onChange={(e) => updateField('avgWeight', Number(e.target.value) || 0)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Количество единиц</label>
+              <input
+                type="number"
+                className={styles.input}
+                min={1}
+                step={1}
+                value={formData.unitCount ?? 1}
+                onChange={(e) => updateField('unitCount', Math.max(1, Number(e.target.value) || 1) as any)}
               />
             </div>
             {/* Убрано: конкретная мера. Используем recipeUnit вместо unit */}
