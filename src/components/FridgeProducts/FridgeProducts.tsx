@@ -106,7 +106,8 @@ export const FridgeProducts: React.FC = () => {
 
   const handleDeleteProduct = async (id: string) => {
     try {
-      await fridgeApiService.deleteFridgeProduct(id);
+      if (!activeFridgeId) throw new Error('Холодильник не выбран');
+      await fridgeApiService.deleteFridgeProduct(activeFridgeId, id);
       // Обновляем список продуктов
       await loadFridgeProducts();
     } catch (error) {
@@ -117,7 +118,10 @@ export const FridgeProducts: React.FC = () => {
 
   const handleUpdateProduct = async (id: string, updates: any) => {
     try {
-      await fridgeApiService.updateFridgeProduct(id, updates);
+      if (!activeFridgeId) throw new Error('Холодильник не выбран');
+      const current = items.find(i => i.id === id);
+      if (!current) throw new Error('Продукт не найден в списке');
+      await fridgeApiService.updateFridgeProduct(activeFridgeId, id, updates, current);
       // Обновляем список продуктов
       await loadFridgeProducts();
     } catch (error) {
@@ -164,14 +168,14 @@ export const FridgeProducts: React.FC = () => {
             </select>
           )}
           <button 
-            className={styles.addButton}
+            className={`${styles.addButton} ui-btn ui-btn--primary`}
             onClick={handleCreateFridge}
           >
             <span className={styles.addIcon}>+</span>
             Создать холодильник
           </button>
           <button 
-            className={styles.addButton}
+            className={`${styles.addButton} ui-btn ui-btn--primary`}
             onClick={handleAddProductGuard}
             disabled={fridges.length === 0}
             title={fridges.length === 0 ? 'Сначала создайте холодильник' : undefined}
@@ -188,7 +192,7 @@ export const FridgeProducts: React.FC = () => {
           <h3>У вас пока нет холодильников</h3>
           <p>Создайте холодильник, чтобы начинать добавлять продукты</p>
           <button 
-            className={styles.emptyButton}
+            className={`${styles.emptyButton} ui-btn ui-btn--primary`}
             onClick={handleCreateFridge}
           >
             Создать холодильник
@@ -213,7 +217,7 @@ export const FridgeProducts: React.FC = () => {
           <h3>Холодильник пуст</h3>
           <p>Добавьте продукты, чтобы получать персональные рекомендации рецептов</p>
           <button 
-            className={styles.emptyButton}
+            className={`${styles.emptyButton} ui-btn ui-btn--primary`}
             onClick={() => setShowAddForm(true)}
           >
             Добавить первый продукт

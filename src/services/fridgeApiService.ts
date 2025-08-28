@@ -124,20 +124,48 @@ class FridgeApiService {
   /**
    * Обновить продукт в холодильнике
    */
-  async updateFridgeProduct(productId: string, updateData: UpdateFridgeProductDto): Promise<FridgeProduct> {
+  private buildUpdateDto(current: FridgeProduct, updates: Partial<UpdateFridgeProductDto> & { count?: number; comment?: string }): UpdateFridgeProductDto {
+    const normalizeProductUnit = (u: string): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' | any => {
+      const U = (u || '').toUpperCase();
+      if (U === 'KG' || U === 'KILOGRAM') return 'KILOGRAM';
+      if (U === 'MG' || U === 'MILLIGRAM') return 'MILLIGRAM';
+      return 'GRAM';
+    };
+    const inferBaseUnit = (u: string): 'GR' | 'ML' => {
+      const U = (u || '').toUpperCase();
+      return (U === 'ML' || U === 'L' || U === 'MILLILITER' || U === 'LITER') ? 'ML' : 'GR';
+    };
+    const toIsoOrNull = (d?: Date): string | null => {
+      if (!d) return null;
+      // Оставляем как есть в ISO
+      return d.toISOString();
+    };
+
+    return {
+      productId: current.ingredient.id,
+      baseUnit: inferBaseUnit(current.unit) as any,
+      count: typeof updates.count === 'number' ? updates.count : current.amount,
+      productUnit: normalizeProductUnit(current.unit) as any,
+      expiryDate: toIsoOrNull(current.expiryDate),
+      comment: typeof updates.comment === 'string' ? updates.comment : current.notes
+    };
+  }
+
+  async updateFridgeProduct(fridgeId: string, fridgeProductId: string, updateData: Partial<UpdateFridgeProductDto> & { count?: number; comment?: string }, current: FridgeProduct): Promise<FridgeProduct> {
     try {
-      console.log('Обновление продукта в холодильнике:', { productId, updateData });
+      console.log('Обновление продукта в холодильнике:', { fridgeId, fridgeProductId, updateData });
       
       const headers = getAuthHeaders();
-      const url = `${API_BASE_URL}/fridge/${productId}`;
+      const url = `${API_BASE_URL}/fridge/${fridgeId}/products/${fridgeProductId}`;
+      const body = this.buildUpdateDto(current, updateData);
       
       // Логируем запрос
-      apiLogger.logRequest(url, 'PUT', headers, updateData);
+      apiLogger.logRequest(url, 'PUT', headers, body);
       
       const response = await fetch(url, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(updateData)
+        body: JSON.stringify(body)
       });
       
       if (!response.ok) {
@@ -157,12 +185,12 @@ class FridgeApiService {
   /**
    * Удалить продукт из холодильника
    */
-  async deleteFridgeProduct(productId: string): Promise<void> {
+  async deleteFridgeProduct(fridgeId: string, fridgeProductId: string): Promise<void> {
     try {
-      console.log('Удаление продукта из холодильника:', productId);
+      console.log('Удаление продукта из холодильника:', { fridgeId, fridgeProductId });
       
       const headers = getAuthHeaders();
-      const url = `${API_BASE_URL}/fridge/${productId}`;
+      const url = `${API_BASE_URL}/fridge/${fridgeId}/products/${fridgeProductId}`;
       
       // Логируем запрос
       apiLogger.logRequest(url, 'DELETE', headers);

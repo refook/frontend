@@ -291,13 +291,13 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
           <button
             type="button"
             onClick={onCancel}
-            className={styles.cancelButton}
+            className={`${styles.cancelButton} ui-btn ui-btn--ghost`}
           >
             Отмена
           </button>
           <button
             type="submit"
-            className={styles.submitButton}
+            className={`${styles.submitButton} ui-btn ui-btn--primary`}
             disabled={ingredientsLoading}
           >
             {ingredientsLoading ? 'Загрузка...' : 'Добавить продукт'}

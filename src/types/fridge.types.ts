@@ -28,17 +28,18 @@ export interface CreateFridgeProductDto {
   productId: string;
   baseUnit: BaseUnitType;
   avgWeight: number;
-  productUnit: ProductUnitType;
+  productUnit: 'GRAM' | 'KILOGRAM' | 'MILLIGRAM';
   expiryDate?: string | null; // ISO date string or null
   comment?: string;
 }
 
 // DTO для обновления продукта в холодильнике
 export interface UpdateFridgeProductDto {
-  ingredientId?: string;
-  count?: number;
-  measure?: MeasureType;
-  expiryDate?: string; // ISO date string
+  productId: string;
+  baseUnit: 'ML' | 'GR';
+  count: number;
+  productUnit: 'GRAM' | 'KILOGRAM' | 'MILLIGRAM';
+  expiryDate?: string | null; // ISO date string or null
   comment?: string;
 }
 
