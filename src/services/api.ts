@@ -95,16 +95,19 @@ class ApiService {
     private async handle401(error: AxiosError) {
         try {
             // пробуем обновить токен
-            await keycloak.updateToken(keycloak.tokenParsed!.auth_time! - keycloak.tokenParsed!.exp!);
-            if (keycloak.token) {
+            const refresh = await keycloak.updateToken(0);
+            if (refresh && keycloak.token) {
+                console.warn("ТОКЕН ОБНОВЛЕН")
                 this.updateLocalstorageTokens()
-            }
-            // повторяем оригинальный запрос
-            if (error.config) {
-                if (keycloak.token) {
-                    error.config.headers.Authorization = `Bearer ${keycloak.token}`;
+                // повторяем оригинальный запрос
+                if (error.config) {
+                    if (keycloak.token) {
+                        error.config.headers.Authorization = `Bearer ${keycloak.token}`;
+                    }
+                    return this.api.request(error.config);
                 }
-                return this.api.request(error.config);
+            } else {
+                console.warn("refresh не сработал, выходим")
             }
         } catch (e) {
             console.error("refresh не сработал, выходим", e)
@@ -179,12 +182,14 @@ class ApiService {
     public removeAuthTokens() {
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('idToken');
         delete this.api.defaults.headers.Authorization;
     }
 
     public updateLocalstorageTokens = () => {
         localStorage.setItem('authToken', keycloak.token!);
         localStorage.setItem('refreshToken', keycloak.refreshToken!);
+        localStorage.setItem('idToken', keycloak.idToken!);
     };
 
 }

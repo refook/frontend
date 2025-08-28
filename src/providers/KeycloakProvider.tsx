@@ -7,12 +7,19 @@ import {apiService} from "../services/api";
 interface KeycloakContextType {
     keycloak: Keycloak | null;
     authenticated: boolean;
-    user: any | null; // Можно уточнить тип, например, KeycloakUser
+    user: KeycloakUserInfo | null; // Можно уточнить тип, например, KeycloakUser
     login: () => void;
     logout: () => void;
     register: () => void;
     manageAccount: () => void;
     isInitialized: boolean;
+}
+
+interface KeycloakUserInfo {
+    name: string,
+    email: string,
+    photoUrl?: string,
+    username: string
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -21,7 +28,7 @@ export const KeycloakContext = createContext<KeycloakContextType | undefined>(un
 
 export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) => {
         const [authenticated, setAuthenticated] = useState<boolean>(false);
-        const [user, setUser] = useState<any | null>(null);
+        const [user, setUser] = useState<KeycloakUserInfo | null>(null);
         const [keycloakInstance, setKeycloakInstance] = useState<Keycloak | null>(null);
         const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
@@ -43,14 +50,18 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                             onLoad: 'check-sso',
                             pkceMethod: 'S256',
                             checkLoginIframe: false,
+                            idToken: localStorage.getItem("idToken") ?? undefined,
+                            token: localStorage.getItem("authToken") ?? undefined,
+                            refreshToken: localStorage.getItem("refreshToken") ?? undefined,
                             silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
                             //@ts-ignore
                             tokenStorage: "localStorage"
                         }) // Включаем логи для отладки
                         .then((auth: boolean) => {
+                            console.log('Keycloak initialized, authenticated:', auth);
                             if (auth) {
                                 setAuthenticated(true);
-                                setUser(keycloak.tokenParsed);
+                                saveUser();
                                 // Сохраняем токен для API
                                 if (keycloak.token && keycloak.refreshToken) {
                                     updateLocalstorageTokens()
@@ -73,22 +84,8 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                                     });
                                 };
                             } else {
-                                keycloak.updateToken(0).then(
-                                    (refreshed) => {
-                                        if (refreshed && keycloak.token && keycloak.refreshToken) {
-                                            updateLocalstorageTokens()
-                                            setAuthenticated(true);
-                                            setUser(keycloak.tokenParsed);
-                                            console.log("Токен обновлен")
-                                        }
-                                    }
-                                ).catch((e) => {
-                                    console.error('Не удалось обновить токен Keycloak', e);
-                                    setAuthenticated(false);
-                                    // Очищаем токен если не авторизованы
-                                    apiService.removeAuthTokens();
-                                    console.log('Keycloak initialized, authenticated:', auth);
-                                });
+                                console.error('Не удалось обновить токен Keycloak');
+                                setAuthenticated(false);
                             }
                             setKeycloakInstance(keycloak);
                             setIsInitialized(true)
@@ -99,8 +96,19 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                 }
                 initKeycloak()
             }, []
-        )
-        ; // Пустой массив зависимостей гарантирует вызов только при монтировании
+        ); // Пустой массив зависимостей гарантирует вызов только при монтировании
+
+        const saveUser= () => {
+            if (keycloak.tokenParsed) {
+                const user: KeycloakUserInfo = {
+                    name: keycloak.tokenParsed.name,
+                    email: keycloak.tokenParsed.email,
+                    photoUrl: keycloak.tokenParsed.photo,
+                    username: keycloak.tokenParsed.preferred_username
+                }
+                setUser(user)
+            }
+        }
 
         const login = () => {
             keycloakInstance?.login({
@@ -122,6 +130,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
 
         const updateLocalstorageTokens = () => {
             localStorage.setItem('authToken', keycloak.token!);
+            localStorage.setItem('idToken', keycloak.idToken!);
             localStorage.setItem('refreshToken', keycloak.refreshToken!);
         };
 
