@@ -2,6 +2,7 @@ import React, { useState, useRef, type KeyboardEvent, useEffect } from 'react';
 import { API_BASE_URL } from '../../services/api';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import styles from './TagsInput.module.css';
+import { getAuthHeaders } from '../../services/auth';
 
 interface TagsInputProps {
   tags: { id: string; name: string }[];
@@ -24,9 +25,7 @@ const TagsInput: React.FC<TagsInputProps> = ({
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const headers = getAuthHeaders();
         const resp = await fetch(`${API_BASE_URL}/tags/all`, { headers });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();

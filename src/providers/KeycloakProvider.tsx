@@ -35,28 +35,14 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
         useEffect(() => {
                 const initKeycloak = async () => {
                     console.log('Initializing Keycloak...');
-                    const token = localStorage.getItem("authToken");
-                    const refreshToken = localStorage.getItem("refreshToken");
-
                     console.warn(keycloak)
-
-                    if (token && refreshToken) {
-                        keycloak.token = token;
-                        keycloak.refreshToken = refreshToken;
-                    }
-                    console.log(token, refreshToken);
                     await keycloak
                         .init({
                             onLoad: 'check-sso',
                             pkceMethod: 'S256',
                             checkLoginIframe: false,
-                            idToken: localStorage.getItem("idToken") ?? undefined,
-                            token: localStorage.getItem("authToken") ?? undefined,
-                            refreshToken: localStorage.getItem("refreshToken") ?? undefined,
-                            silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-                            //@ts-ignore
-                            tokenStorage: "localStorage"
-                        }) // Включаем логи для отладки
+                            silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html'
+                        })
                         .then((auth: boolean) => {
                             console.log('Keycloak initialized, authenticated:', auth);
                             if (auth) {
@@ -64,7 +50,6 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                                 saveUser();
                                 // Сохраняем токен для API
                                 if (keycloak.token && keycloak.refreshToken) {
-                                    updateLocalstorageTokens()
                                     apiService.setAuthToken(keycloak.token);
                                     try { console.log('Swagger bearer token:', `Bearer ${keycloak.token}`); } catch {}
                                 }
@@ -73,7 +58,6 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                                     keycloak.updateToken(keycloak.tokenParsed!.auth_time! - keycloak.tokenParsed!.exp!).then(
                                         (refreshed) => {
                                             if (refreshed && keycloak.token && keycloak.refreshToken) {
-                                                updateLocalstorageTokens()
                                                 console.log("Токен обновлен")
                                                 try { console.log('Swagger bearer token (refreshed):', `Bearer ${keycloak.token}`); } catch {}
                                             }
@@ -119,7 +103,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
         };
 
         const logout = () => {
-            // Чистим localStorage и axios заголовки заранее
+            // Чистим axios заголовки заранее
             apiService.removeAuthTokens();
             keycloakInstance?.logout();
         };
@@ -128,11 +112,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
             keycloakInstance?.register()
         }
 
-        const updateLocalstorageTokens = () => {
-            localStorage.setItem('authToken', keycloak.token!);
-            localStorage.setItem('idToken', keycloak.idToken!);
-            localStorage.setItem('refreshToken', keycloak.refreshToken!);
-        };
+        // Убрано: сохранение токенов в localStorage. Всегда используем keycloak.token напрямую.
 
         const manageAccount = () => {
             // Открыть страницу управления аккаунтом Keycloak (редактирование профиля)

@@ -63,9 +63,7 @@ export const RECIPE_UNITS = {
   CUP: { value: 'CUP', label: 'Стакан' },
   PIECE: { value: 'PIECE', label: 'Штука' },
   SLICE: { value: 'SLICE', label: 'Ломтик' },
-  ITEM: { value: 'ITEM', label: 'Предмет' },
-  GR: { value: 'GR', label: 'Грамм' },
-  ML: { value: 'ML', label: 'Миллилитр' }
+  ITEM: { value: 'ITEM', label: 'Предмет' }
 } as const;
 
 export const RECIPE_UNITS_ARRAY = Object.values(RECIPE_UNITS);

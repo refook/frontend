@@ -50,6 +50,8 @@ export interface CreateRecipeDto {
   unit?: ProductUnitType;
   // Единица результата рецепта (для сервинга)
   recipeUnit?: ApiRecipeServingDto['recipeUnit'];
+  // Количество единиц результата (serving.unitCount)
+  unitCount?: number;
   macros?: {
     calories: number;
     proteins: number;

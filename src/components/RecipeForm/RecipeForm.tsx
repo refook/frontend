@@ -7,6 +7,7 @@ import StepsEditor from '../StepsEditor/StepsEditor';
 import TagsInput from '../TagsInput/TagsInput';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import styles from './RecipeForm.module.css';
+import { getAuthHeaders, authorizedFetch } from '../../services/auth';
 
 interface RecipeFormProps {
   initialData: CreateRecipeDto;
@@ -39,7 +40,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     avgWeight: initialData.avgWeight || 100,
     unit: initialData.unit || 'GRAM',
     macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 },
-    recipeUnit: initialData.recipeUnit || 'PORTION'
+    recipeUnit: initialData.recipeUnit || 'PORTION',
+    unitCount: (initialData as any).unitCount ?? 1
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -61,7 +63,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       avgWeight: initialData.avgWeight || 100,
       unit: initialData.unit || 'GRAM',
       macros: initialData.macros || { calories: 0, proteins: 0, fats: 0, carbs: 0 },
-      recipeUnit: initialData.recipeUnit || 'PORTION'
+      recipeUnit: initialData.recipeUnit || 'PORTION',
+      unitCount: (initialData as any).unitCount ?? 1
     });
   }, [initialData]);
 
@@ -124,10 +127,8 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
   useEffect(() => {
     const loadKitchens = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-        const resp = await fetch(`${API_BASE_URL}/kitchens/all`, { headers });
+        const headers = getAuthHeaders();
+        const resp = await authorizedFetch(`${API_BASE_URL}/kitchens/all`, { headers });
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
         const normalized = (Array.isArray(data) ? data : []).map((k: any) => ({
@@ -144,9 +145,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
 
   const calculateMacrosFromProducts = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = getAuthHeaders();
       let calories = 0;
       let proteins = 0;
       let fats = 0;
@@ -154,7 +153,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       for (const ing of formData.ingredients) {
         if (!ing?.id || !ing?.count) continue;
         try {
-          const resp = await fetch(`${API_BASE_URL}/products/${ing.id}`, { headers });
+          const resp = await authorizedFetch(`${API_BASE_URL}/products/${ing.id}`, { headers });
           if (!resp.ok) continue;
           const product = await resp.json();
           const m = product?.macros;
@@ -275,7 +274,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
               </select>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Средний вес (г)</label>
+              <label className={styles.label}>Вес всего блюда (г)</label>
               <input
                 type="number"
                 className={styles.input}
@@ -283,6 +282,17 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
                 step={1}
                 value={formData.avgWeight ?? 0}
                 onChange={(e) => updateField('avgWeight', Number(e.target.value) || 0)}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Количество единиц</label>
+              <input
+                type="number"
+                className={styles.input}
+                min={1}
+                step={1}
+                value={formData.unitCount ?? 1}
+                onChange={(e) => updateField('unitCount', Math.max(1, Number(e.target.value) || 1) as any)}
               />
             </div>
             {/* Убрано: конкретная мера. Используем recipeUnit вместо unit */}

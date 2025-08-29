@@ -1,5 +1,6 @@
 .container { max-width: 64rem; margin: 0 auto var(--token-space-8) auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
 .label { color: var(--token-muted); font-size: var(--token-text-sm); }
+.editModeNote { color: var(--color-danger, #ef4444); font-size: var(--token-text-sm); margin-left: 12px; }
 .filterBtn { padding: 6px 12px; border-radius: var(--token-radius-full); background: var(--token-neutral-100); color: var(--token-neutral-800); border: 1px solid var(--token-border); font-size: var(--token-text-sm); cursor: pointer; }
 .filterBtn:hover { background-color: #e5e7eb; }
 .filterBtnActive { background: color-mix(in oklab, var(--token-accent-weak) 60%, transparent) !important; color: var(--token-accent-strong) !important; border-color: var(--token-accent) !important; }
@@ -40,4 +41,10 @@
 
 [data-theme='dark'] .addBtn { border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border)) !important; }
 [data-theme='dark'] .addBtn:hover { background: color-mix(in oklab, var(--token-accent) 15%, transparent) !important; }
+
+.caloriesChip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border: 1px solid var(--token-border); border-radius: var(--token-radius-full); background: var(--token-neutral-50); }
+.caloriesInput { width: 80px; height: 28px; padding: 2px 8px; border: 1px solid var(--token-border); border-radius: 8px; font-size: var(--token-text-sm); }
+
+/* Wrapper button for SmartChip: reset styles to avoid double borders */
+.smartChipBtn { border: none; background: transparent; padding: 0; display: inline-flex; cursor: pointer; }
 

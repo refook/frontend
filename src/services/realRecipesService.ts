@@ -1,16 +1,10 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
 import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
 import { apiLogger } from '../utils/apiLogger';
-import keycloak from "./keycloak.ts";
+import { getAuthHeaders, authorizedFetch } from './auth';
 
 // Функция для получения авторизационных заголовков
-function getAuthHeaders() {
-  const token = keycloak.token
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
+// централизованные заголовки и fetch
 
 // API endpoint for recipes
 const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
@@ -30,9 +24,9 @@ class RealRecipesService {
    */
   async getAllRecipes(): Promise<Recipe[]> {
     try {
-      console.log(`Загрузка списка рецептов из: ${API_BASE_URL}/recipe/all`);
+      //console.log(`Загрузка списка рецептов из: ${API_BASE_URL}/recipe/all`);
       
-      const response = await fetch(`${API_BASE_URL}/recipe/all`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/recipe/all`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -74,7 +68,7 @@ class RealRecipesService {
     try {
       console.log(`Загрузка рецепта по ID: ${id}`);
       
-      const response = await fetch(`${API_BASE_URL}/recipe/details/${id}`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/recipe/details/${id}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -119,7 +113,7 @@ class RealRecipesService {
     try {
       const url = `${API_BASE_URL}/recipe/${userId}/all`;
       console.log(`Загрузка рецептов пользователя: ${url}`);
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -144,7 +138,7 @@ class RealRecipesService {
       const url = `${API_BASE_URL}/recipe/ai-search?promt=${encodeURIComponent(prompt)}`;
       const headers = getAuthHeaders();
       apiLogger.logRequest(url, 'GET', headers, undefined);
-      const res = await fetch(url, {
+      const res = await authorizedFetch(url, {
         method: 'GET',
         headers
       });
@@ -157,22 +151,27 @@ class RealRecipesService {
       // Возможные варианты ответа:
       // 1) Array<RecipeShortResponseDto>
       // 2) Array<AiRecipeSearchResponseDto> где элемент = { filter, recipes: RecipeShortResponseDto[] }
-      let mapped: Recipe[] = [];
+      // 3) { filter: RecipeFilterResponseDto, recipes: RecipeShortResponseDto[] }
+      let apiFilter: any = null;
+      let recipesRaw: any[] = [];
+
       if (Array.isArray(data)) {
-        if (data.length > 0 && Array.isArray((data[0] as any)?.recipes)) {
-          // Вариант 2
-          mapped = (data as any[])
-            .flatMap((entry: any) => Array.isArray(entry.recipes) ? entry.recipes : [])
-            .map((it: any) => this.transformShortApiRecipeToLocal(it));
+        const hasEntriesWithRecipes = data.some((entry: any) => Array.isArray(entry?.recipes));
+        if (hasEntriesWithRecipes) {
+          for (const entry of data as any[]) {
+            if (!apiFilter && entry?.filter) apiFilter = entry.filter;
+            if (Array.isArray(entry?.recipes)) recipesRaw.push(...entry.recipes);
+          }
         } else {
-          // Вариант 1
-          mapped = (data as any[]).map((it: any) => this.transformShortApiRecipeToLocal(it));
+          recipesRaw = data as any[];
         }
-      } else if (data && Array.isArray((data as any).recipes)) {
-        // Вариант 3: объект с полем recipes
-        mapped = ((data as any).recipes as any[]).map((it: any) => this.transformShortApiRecipeToLocal(it));
+      } else if (data && typeof data === 'object') {
+        if (Array.isArray((data as any).recipes)) recipesRaw = (data as any).recipes as any[];
+        if ((data as any).filter) apiFilter = (data as any).filter;
       }
-      return { filter: null, recipes: mapped };
+
+      const mapped: Recipe[] = (recipesRaw || []).map((it: any) => this.transformShortApiRecipeToLocal(it));
+      return { filter: apiFilter, recipes: mapped };
     } catch (error) {
       console.error('Ошибка при ИИ-поиске рецептов:', error);
       return { filter: null, recipes: [] };
@@ -188,7 +187,7 @@ class RealRecipesService {
       const url = `${API_BASE_URL}/users/favorites`;
       const headers = getAuthHeaders();
       apiLogger.logRequest(url, 'GET', headers, undefined);
-      const res = await fetch(url, { method: 'GET', headers });
+      const res = await authorizedFetch(url, { method: 'GET', headers });
       if (!res.ok) {
         const text = await res.text().catch(() => '');
         throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
@@ -220,7 +219,7 @@ class RealRecipesService {
       }
       const body = { action, value: normalized } as any;
       apiLogger.logRequest(url, 'POST', headers, body);
-      const res = await fetch(url, {
+      const res = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(body)
@@ -321,7 +320,7 @@ class RealRecipesService {
           baseUnit: (formData.baseUnit as any) || 'GR',
           totalWeight: Number(formData.avgWeight ?? 0),
           recipeUnit: (formData.recipeUnit as any) || 'PORTION',
-          unitCount: 1
+          unitCount: Number((formData as any).unitCount ?? 1)
         },
         macros: {
           calories: Number(formData.macros?.calories ?? 0),
@@ -339,7 +338,7 @@ class RealRecipesService {
       // Логируем запрос
       apiLogger.logRequest(url, 'POST', headers, apiRecipeData);
       
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(apiRecipeData)
@@ -391,7 +390,7 @@ class RealRecipesService {
       const url = `${API_BASE_URL}/recipe/${id}`;
       apiLogger.logRequest(url, 'PUT', headers, apiRecipeData);
 
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'PUT',
         headers,
         body: JSON.stringify(apiRecipeData)

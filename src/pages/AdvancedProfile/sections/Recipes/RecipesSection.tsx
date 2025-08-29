@@ -24,7 +24,8 @@ import { KeycloakContext } from '../../../../providers/KeycloakProvider';
 const RecipesSection: React.FC = () => {
   const keycloakCtx = useContext(KeycloakContext);
   const isAuthenticated = !!keycloakCtx?.authenticated;
-  const userId = (keycloakCtx?.user as any)?.sub as string | undefined;
+  // Получаем userId из токена (sub), так как в user нет sub
+  const userId = (keycloakCtx?.keycloak?.tokenParsed as any)?.sub as string | undefined;
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

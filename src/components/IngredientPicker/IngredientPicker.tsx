@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { ProductUnitType } from '../../types/measures.types';
 import { API_BASE_URL } from '../../services/api';
+import keycloak from '../../services/keycloak.ts';
 import { PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
 import type {ApiIngredient, CreateRecipeIngredientDto} from "../../types";
+import { getAuthHeaders, authorizedFetch } from '../../services/auth';
 
 interface IngredientPickerProps {
   ingredients: CreateRecipeIngredientDto[];
@@ -35,10 +37,8 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       try {
         setIngredientsLoading(true);
         console.log('IngredientPicker: Загрузка продуктов из API /products/all ...');
-        const token = localStorage.getItem('authToken');
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-        const resp = await fetch(`${API_BASE_URL}/products/all`, { headers });
+        const headers: Record<string, string> = getAuthHeaders();
+        const resp = await authorizedFetch(`${API_BASE_URL}/products/all`, { headers });
         if (!resp.ok) {
           throw new Error(`HTTP ${resp.status}`);
         }

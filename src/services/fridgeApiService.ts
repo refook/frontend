@@ -7,16 +7,10 @@ import type {
   FridgeResponseDto
 } from '../types/fridge.types';
 import { apiLogger } from '../utils/apiLogger';
-import keycloak from "./keycloak.ts";
+import { getAuthHeaders, authorizedFetch } from './auth';
 
 // Функция для получения авторизационных заголовков
-function getAuthHeaders() {
-  const token = keycloak.token
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-}
+// централизованные заголовки и fetch
 
 // API endpoint
 const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
@@ -31,7 +25,7 @@ class FridgeApiService {
     const url = `${API_BASE_URL}/fridges`;
     const headers = getAuthHeaders();
     apiLogger.logRequest(url, 'GET', headers);
-    const response = await fetch(url, { method: 'GET', headers });
+    const response = await authorizedFetch(url, { method: 'GET', headers });
     if (!response.ok) {
       throw new Error(`Не удалось загрузить холодильники: ${response.status}`);
     }
@@ -71,7 +65,7 @@ class FridgeApiService {
         }
       }
       console.log(`Загрузка продуктов холодильника из: ${API_BASE_URL}/fridge/${targetFridgeId}/products`);
-      const response = await fetch(`${API_BASE_URL}/fridge/${targetFridgeId}/products`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/fridge/${targetFridgeId}/products`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -109,7 +103,7 @@ class FridgeApiService {
       // Логируем запрос
       apiLogger.logRequest(url, 'POST', headers, productData);
       
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(productData)
@@ -152,11 +146,20 @@ class FridgeApiService {
       return d.toISOString();
     };
 
+    const resolvedProductUnit = ((): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' => {
+      if (updates.productUnit) return updates.productUnit as any;
+      return normalizeProductUnit(current.unit) as any;
+    })();
+    const resolvedBaseUnit = ((): 'GR' | 'ML' => {
+      if (updates.baseUnit) return updates.baseUnit as any;
+      return inferBaseUnit(current.unit) as any;
+    })();
+
     return {
       productId: current.ingredient.id,
-      baseUnit: inferBaseUnit(current.unit) as any,
+      baseUnit: resolvedBaseUnit as any,
       count: typeof updates.count === 'number' ? updates.count : current.amount,
-      productUnit: normalizeProductUnit(current.unit) as any,
+      productUnit: resolvedProductUnit as any,
       expiryDate: toIsoOrNull(current.expiryDate),
       comment: typeof updates.comment === 'string' ? updates.comment : current.notes
     };
@@ -173,7 +176,7 @@ class FridgeApiService {
       // Логируем запрос
       apiLogger.logRequest(url, 'PUT', headers, body);
       
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'PUT',
         headers,
         body: JSON.stringify(body)
@@ -206,7 +209,7 @@ class FridgeApiService {
       // Логируем запрос
       apiLogger.logRequest(url, 'DELETE', headers);
       
-      const response = await fetch(url, {
+      const response = await authorizedFetch(url, {
         method: 'DELETE',
         headers
       });
@@ -235,6 +238,7 @@ class FridgeApiService {
       },
       amount: apiProduct.count,
       unit: apiProduct.productUnit,
+      baseUnit: apiProduct.baseUnit,
       expiryDate: apiProduct.expiryDate ? new Date(apiProduct.expiryDate) : undefined,
       notes: apiProduct.comment,
       addedAt: new Date(),

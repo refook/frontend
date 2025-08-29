@@ -59,15 +59,15 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   };
 
   // Логируем входящие данные для отладки
-  console.log('Recipe data:', recipe);
-  console.log('Is form data:', isFormData);
+  //console.log('Recipe data:', recipe);
+  //console.log('Is form data:', isFormData);
 
   // Получаем значения в зависимости от типа данных
   const prepTime = isFormData ? (recipe as CreateRecipeDto).allTime : ((recipe as Recipe).prepTime || 0);
   const cookTime = isFormData ? (recipe as CreateRecipeDto).cookTime : ((recipe as Recipe).cookTime || 0);
   const servingsCount = isFormData ? 1 : ((recipe as Recipe).servings || 4);
 
-  console.log('Calculated values:', { prepTime, cookTime, servingsCount });
+  //console.log('Calculated values:', { prepTime, cookTime, servingsCount });
   
   const totalTime = formatTime(prepTime + cookTime);
 

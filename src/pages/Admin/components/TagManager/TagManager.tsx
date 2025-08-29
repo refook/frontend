@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { API_BASE_URL } from '../../../../services/api';
 import styles from './TagManager.module.css';
 import EditableTable, { type EditableRow } from '../EditableTable/EditableTable';
+import { getAuthHeaders, authorizedFetch } from '../../../../services/auth';
 
 interface TagResponseDto {
   id: string;
@@ -19,12 +20,7 @@ const TagManager: React.FC = () => {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const headers = useMemo(() => {
-    const token = localStorage.getItem('authToken');
-    const h: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) h['Authorization'] = `Bearer ${token}`;
-    return h;
-  }, []);
+  const headers = useMemo(() => getAuthHeaders(), []);
 
   const handleCopyId = async (id: string) => {
     try {
@@ -40,7 +36,7 @@ const TagManager: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/tags/all`, { headers });
+      const res = await authorizedFetch(`${API_BASE_URL}/tags/all`, { headers });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: TagResponseDto[] = await res.json();
       setTags(Array.isArray(data) ? data : []);
@@ -59,7 +55,7 @@ const TagManager: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/tags/search?name=${encodeURIComponent(name)}`, { headers });
+      const res = await authorizedFetch(`${API_BASE_URL}/tags/search?name=${encodeURIComponent(name)}`, { headers });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: TagResponseDto[] = await res.json();
       setTags(Array.isArray(data) ? data : []);
@@ -76,7 +72,7 @@ const TagManager: React.FC = () => {
     setUpdatingId(id);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE_URL}/tags/${id}`, {
+      const res = await authorizedFetch(`${API_BASE_URL}/tags/${id}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify({ name: newName } as UpdateTagDto),

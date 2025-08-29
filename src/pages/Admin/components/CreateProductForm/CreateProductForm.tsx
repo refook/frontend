@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { API_BASE_URL } from '../../../../services/api';
 import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../../../../constants/measures';
 import styles from './CreateProductForm.module.css';
+import { getAuthHeaders, authorizedFetch } from '../../../../services/auth';
 
 /**
  * Тип базовых единиц измерения из констант
@@ -24,7 +25,7 @@ interface CreateProductDtoForm {
   description: string;
   /** Базовая единица измерения */
   baseUnit: BaseUnitType;
-  /** Средний вес в граммах */
+  /** Вес всего блюда в граммах */
   avgWeight: number;
   /** Конкретная единица измерения */
   unit: ProductUnitType;
@@ -115,12 +116,10 @@ const CreateProductForm: React.FC = () => {
     setMessage(null);
     try {
       // Получение токена авторизации
-      const token = localStorage.getItem('authToken');
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const headers = getAuthHeaders();
 
       // Отправка данных на сервер
-      const response = await fetch(`${API_BASE_URL}/products`, {
+      const response = await authorizedFetch(`${API_BASE_URL}/products`, {
         method: 'POST',
         headers,
         body: JSON.stringify(formData),
