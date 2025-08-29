@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { SparklesIcon } from '@heroicons/react/24/solid';
 import { RecipesService } from '../services/recipesService';
+import { mergeAiFilterIntoFilters } from '../utils/aiFilterMapper';
 import { useAppDispatch, useAppSelector } from '../store';
 import { setPage, setFilters, setSort } from '../store/slices/recipesSlice';
 import type { QuickFilterId } from '../config/recipeQuickFilters';
@@ -78,19 +79,13 @@ const RecipesPage: React.FC = () => {
                     setAiLoading(true);
                     try {
                       const { filter, recipes } = await RecipesService.aiSearchRecipes(searchQuery.trim());
+                      // Логируем фильтры из ответа ИИ
+                      try {
+                        console.log('[AI-SEARCH] Received filter:', filter);
+                      } catch {}
                       setAiRecipes(recipes as any);
-                      // Преобразование backend-фильтра в фильтры стора
-                      const next: any = { ...filters };
-                      if (filter?.name) next.search = filter.name;
-                      if (typeof filter?.maxCalories === 'number') {
-                        next.calories = { ...(next.calories || {}), max: Math.max(0, Number(filter.maxCalories)) };
-                      }
-                      if (typeof filter?.minCalories === 'number') {
-                        next.calories = { ...(next.calories || {}), min: Math.max(0, Number(filter.minCalories)), max: next.calories?.max };
-                      }
-                      if (typeof filter?.maxTime === 'number') {
-                        next.cookTime = { ...(next.cookTime || {}), max: Math.max(0, Number(filter.maxTime) / 60) };
-                      }
+                      // Преобразование backend-фильтра в фильтры стора (рефакторинг)
+                      const next: any = mergeAiFilterIntoFilters(filter, filters);
                       // kitchens/tags/products/calories пока не отображаем чипами — оставляем для будущего
                       dispatch(setFilters(next));
                       // Преобразуем сортировку из ответа
