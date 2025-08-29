@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import {VitePWA} from "vite-plugin-pwa";
 
 export default defineConfig(({ mode }) => {
   return {
-    plugins: [react()],
+    plugins: [react(),
+      VitePWA({
+        registerType: 'autoUpdate',
+      })],
     base: '',
     build: {
       outDir: mode == 'production' ? 'prod/dist' : 'dist',
