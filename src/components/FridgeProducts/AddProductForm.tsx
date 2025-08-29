@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppSelector } from '../../store';
 import { API_BASE_URL } from '../../services/api';
 import { getAuthHeaders, authorizedFetch } from '../../services/auth';
-import { BASE_UNITS_ARRAY, PRODUCT_UNITS } from '../../constants/measures';
+import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 import type { ApiIngredient } from '../../types/ingredient.types';
 import styles from './AddProductForm.module.css';
 
@@ -231,7 +231,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ onSubmit, onCanc
               className={`${styles.select} ${errors.unit ? styles.inputError : ''}`}
             >
               <option value="">Выберите единицу</option>
-              {[PRODUCT_UNITS.GRAM, PRODUCT_UNITS.KILOGRAM, PRODUCT_UNITS.MILLIGRAM].map(u => (
+              {PRODUCT_UNITS_ARRAY.map(u => (
                 <option key={u.value} value={u.value}>
                   {u.label}
                 </option>
