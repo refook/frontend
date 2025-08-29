@@ -92,7 +92,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                 const user: KeycloakUserInfo = {
                     name: keycloak.tokenParsed.name,
                     email: keycloak.tokenParsed.email,
-                    photoUrl: keycloak.tokenParsed.photo,
+                    photoUrl: keycloak.tokenParsed.photoUrl,
                     username: keycloak.tokenParsed.preferred_username
                 }
                 setUser(user)
