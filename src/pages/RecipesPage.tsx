@@ -84,8 +84,8 @@ const RecipesPage: React.FC = () => {
                         console.log('[AI-SEARCH] Received filter:', filter);
                       } catch {}
                       setAiRecipes(recipes as any);
-                      // Преобразование backend-фильтра в фильтры стора (рефакторинг)
-                      const next: any = mergeAiFilterIntoFilters(filter, filters);
+                      // Преобразование backend-фильтра в фильтры стора (каждый ИИ-запрос формирует фильтры заново)
+                      const next: any = mergeAiFilterIntoFilters(filter, {} as any);
                       // kitchens/tags/products/calories пока не отображаем чипами — оставляем для будущего
                       dispatch(setFilters(next));
                       // Преобразуем сортировку из ответа

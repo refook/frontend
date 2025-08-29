@@ -30,7 +30,7 @@ interface Props {
  * Идентификаторы UI‑чипов панели.
  * Добавляйте новый id при расширении конфигурации чипов.
  */
-type UIChipId = 'calories' | 'difficulty' | 'dessert' | 'servings';
+type UIChipId = 'calories' | 'difficulty' | 'servings' | 'tags' | 'time';
 
 /**
  * Описание одного UI‑чипа панели. Позволяет декларативно задать лейбл
@@ -45,7 +45,7 @@ interface UIChipDef {
 /**
  * Порядок отображения чипов на панели (слева направо, сверху вниз).
  */
-const UI_CHIPS_ORDER: UIChipId[] = ['calories', 'difficulty', 'servings', 'dessert'];
+const UI_CHIPS_ORDER: UIChipId[] = ['calories', 'difficulty', 'tags', 'time', 'servings'];
 
 /**
  * Реестр доступных чипов. Добавьте новый элемент для подключения чипа.
@@ -112,18 +112,48 @@ const UI_CHIPS: Record<UIChipId, UIChipDef> = {
       />
     )
   },
-  dessert: {
-    id: 'dessert',
-    label: 'Десерт',
-    render: ({ removeMode, active }) => (
+  time: {
+    id: 'time',
+    label: 'Время',
+    render: ({ filters, removeMode, active }) => (
       <SmartChip
-        kind="label"
-        text="Десерт"
-        title="Имя"
+        kind="range"
+        title="Время (мин)"
+        to={filters.cookTime?.max}
+        placeholderTo="до"
+        toOnly
         removeMode={removeMode}
         active={active}
+        onChange={() => { /* заглушка: не фильтруем */ }}
       />
     )
+  },
+  tags: {
+    id: 'tags',
+    label: 'Теги',
+    render: ({ filters, removeMode, active }) => {
+      const list = Array.isArray((filters as any)?.tags) ? (filters as any).tags : [];
+      if (!list.length) return null;
+      return (
+        <span>
+          {list.map((t: any, idx: number) => {
+            const text = (t && typeof t === 'object') ? (t.name ?? t.id ?? '') : String(t ?? '');
+            const label = String(text);
+            if (!label) return null;
+            return (
+              <SmartChip
+                key={`${label}-${idx}`}
+                kind="label"
+                text={label}
+                title="Тег"
+                removeMode={removeMode}
+                active={active}
+              />
+            );
+          })}
+        </span>
+      );
+    }
   }
 };
 
@@ -208,13 +238,17 @@ const QuickFiltersBar: React.FC<Props> = ({ activeFilters, filters, sort, onChan
     const hasDifficulty = Array.isArray((filters as any)?.difficulty) && (filters as any)?.difficulty?.length > 0;
     const hasCalories = typeof (filters as any)?.calories?.min === 'number' || typeof (filters as any)?.calories?.max === 'number';
     const hasServings = typeof (filters as any)?.servings?.min === 'number' || typeof (filters as any)?.servings?.max === 'number';
+    const hasTags = Array.isArray((filters as any)?.tags) && (filters as any)?.tags?.length > 0;
+    const hasTime = typeof (filters as any)?.cookTime?.max === 'number';
 
     setVisibleChips(prev => {
       let mutated = false;
       const next = new Set(prev);
       if (hasDifficulty && !next.has('difficulty')) { next.add('difficulty'); mutated = true; }
       if (hasCalories && !next.has('calories')) { next.add('calories'); mutated = true; }
+      if (hasTime && !next.has('time')) { next.add('time'); mutated = true; }
       if (hasServings && !next.has('servings')) { next.add('servings'); mutated = true; }
+      if (hasTags && !next.has('tags')) { next.add('tags'); mutated = true; }
       return mutated ? next : prev;
     });
   }, [filters]);

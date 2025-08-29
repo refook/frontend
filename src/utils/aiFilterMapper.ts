@@ -86,6 +86,24 @@ export function mergeAiFilterIntoFilters(ai: AiFilterResponseLike | null | undef
     if (typeof maxUnits === 'number') next.servings.max = maxUnits;
   }
 
+  // tags → массив строковых названий тегов (или id, если имени нет)
+  const rawTags = (ai as any)?.tags;
+  if (Array.isArray(rawTags)) {
+    const mappedTags = rawTags
+      .map((t: any) => {
+        if (t && typeof t === 'object') {
+          if (typeof t.name === 'string' && t.name.trim().length > 0) return t.name.trim();
+          if (typeof t.id === 'string' && t.id.trim().length > 0) return t.id.trim();
+        }
+        if (typeof t === 'string' && t.trim().length > 0) return t.trim();
+        return undefined;
+      })
+      .filter((s: any): s is string => typeof s === 'string');
+    if (mappedTags.length > 0) {
+      next.tags = mappedTags;
+    }
+  }
+
   return next;
 }
 
