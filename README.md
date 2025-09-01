@@ -83,3 +83,5 @@ src/
 Приложение интегрировано с реальным API ингредиентов:
 - **Endpoint**: `https://api.refook.ru/v1/ingredient/all`
 - **Fallback**: Mock данные при недоступности API
+
+test
