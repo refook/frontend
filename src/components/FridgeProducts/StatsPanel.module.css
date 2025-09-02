@@ -1,0 +1,47 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--token-surface);
+  /* убрана обводка */
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+.iconTotal { background: rgba(59, 130, 246, 0.15); color: #2563eb; }
+.iconAttn { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.iconFresh { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.iconSoon { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+
+.body { display: flex; flex-direction: column; gap: 2px; }
+.title { color: var(--text-secondary); font-weight: 600; }
+.value { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+
+@media (max-width: 768px) {
+  .value { font-size: 24px; }
+}
+
+/* Мобильный режим: 2 карточки в ряд */
+@media (max-width: 600px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+

@@ -1,0 +1,44 @@
+.wrapper { position: relative; display: inline-flex; }
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--token-radius-full);
+  border: 1px dashed transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--token-duration-fast), border-color var(--token-duration-fast), color var(--token-duration-fast);
+}
+.trigger:hover {
+  background: color-mix(in oklab, var(--token-accent-weak) 50%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
+}
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 160px;
+  background: var(--token-surface);
+  border: 1px solid var(--token-border);
+  border-radius: 10px;
+  box-shadow: var(--token-shadow-md);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+}
+.item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--token-text);
+  cursor: pointer;
+}
+.item:hover { background: color-mix(in oklab, var(--token-accent-weak) 40%, transparent); }
+.danger { color: #ef4444; }
+

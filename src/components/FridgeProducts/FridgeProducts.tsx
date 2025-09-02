@@ -6,6 +6,7 @@ import type { MeasureType } from '../../types/measures.types';
 import type { FridgeProduct, FridgeResponseDto, CreateFridgeDto } from '../../types/fridge.types';
 import { fridgeApiService } from '../../services/fridgeApiService';
 import styles from './FridgeProducts.module.css';
+import { StatsPanel } from './StatsPanel';
 
 export const FridgeProducts: React.FC = () => {
   const [items, setItems] = useState<FridgeProduct[]>([]);
@@ -14,6 +15,7 @@ export const FridgeProducts: React.FC = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [fridges, setFridges] = useState<FridgeResponseDto[]>([]);
   const [selectedFridgeId, setSelectedFridgeId] = useState<string | undefined>(undefined);
+  const [compactView, setCompactView] = useState(false);
   const activeFridgeId = selectedFridgeId || fridges[0]?.id;
 
   // Загрузка продуктов из API
@@ -53,16 +55,21 @@ export const FridgeProducts: React.FC = () => {
     }
   };
 
-  const handleCreateFridge = async () => {
+  const handleCreateFridge = async (): Promise<FridgeResponseDto | null> => {
     try {
       const name = window.prompt('Введите название холодильника');
-      if (!name || !name.trim()) return;
+      if (!name || !name.trim()) return null;
       const payload: CreateFridgeDto = { name: name.trim() };
-      await fridgeApiService.createFridge(payload);
+      const created = await fridgeApiService.createFridge(payload);
       await loadUserFridges();
+      if (created?.id) {
+        setSelectedFridgeId(created.id);
+      }
+      return created;
     } catch (err) {
       console.error('Ошибка создания холодильника:', err);
       setError(err instanceof Error ? err.message : 'Не удалось создать холодильник');
+      return null;
     }
   };
 
@@ -155,24 +162,51 @@ export const FridgeProducts: React.FC = () => {
       <div className={styles.header}>
         <h2>Мои продукты</h2>
         <div className={styles.headerButtons}>
-          {fridges.length > 0 && (
+          {(
             <select
               className={styles.select}
               value={activeFridgeId || ''}
-              onChange={(e) => setSelectedFridgeId(e.target.value || undefined)}
+              onChange={async (e) => {
+                const val = e.target.value;
+                if (val === '__create__') {
+                  await handleCreateFridge();
+                } else {
+                  setSelectedFridgeId(val || undefined);
+                }
+              }}
               title="Выберите холодильник"
             >
               {fridges.map(f => (
                 <option key={f.id} value={f.id}>{f.name}</option>
               ))}
+              <option value="__create__">+ Создать холодильник…</option>
             </select>
           )}
-          <button 
-            className={`${styles.addButton} ui-btn ui-btn--primary`}
-            onClick={handleCreateFridge}
+          <button
+            className={`${styles.addButton} ui-btn`}
+            onClick={() => setCompactView(v => !v)}
+            aria-label={compactView ? 'Обычный вид' : 'Компактный вид'}
+            title={compactView ? 'Обычный вид' : 'Компактный вид'}
           >
-            <span className={styles.addIcon}>+</span>
-            Создать холодильник
+            {compactView ? (
+              // Icon: Regular view (card)
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="3" y="3" width="8" height="8" rx="2"/>
+                <rect x="13" y="3" width="8" height="5" rx="2"/>
+                <rect x="13" y="10" width="8" height="11" rx="2"/>
+                <rect x="3" y="13" width="8" height="8" rx="2"/>
+              </svg>
+            ) : (
+              // Icon: Compact view (avatar + lines)
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <circle cx="6.5" cy="7" r="3.5"/>
+                <rect x="12" y="5" width="9" height="2" rx="1"/>
+                <rect x="12" y="9" width="7" height="2" rx="1"/>
+                <circle cx="6.5" cy="17" r="3.5"/>
+                <rect x="12" y="15" width="9" height="2" rx="1"/>
+                <rect x="12" y="19" width="7" height="2" rx="1"/>
+              </svg>
+            )}
           </button>
           <button 
             className={`${styles.addButton} ui-btn ui-btn--primary`}
@@ -185,6 +219,11 @@ export const FridgeProducts: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Панель статистики */}
+      {items.length > 0 && (
+        <StatsPanel items={items} />
+      )}
 
       {fridges.length === 0 && (
         <div className={styles.empty}>
@@ -224,11 +263,12 @@ export const FridgeProducts: React.FC = () => {
           </button>
         </div>
       ) : (
-        <div className={styles.productsList}>
+        <div className={`${styles.productsList} ${compactView ? styles.productsListCompact : ''}`}>
           {items.map(item => (
             <ProductItem
               key={item.id}
               item={item}
+              compact={compactView}
               onUpdate={handleUpdateProduct}
               onDelete={handleDeleteProduct}
             />
