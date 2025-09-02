@@ -1,0 +1,48 @@
+@keyframes sk-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  background: var(--bg-primary);
+}
+
+.container {
+  width: min(720px, 92vw);
+}
+
+.shimmer {
+  background: var(--bg-tertiary);
+  background-image: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 0%,
+    var(--bg-secondary) 50%,
+    var(--bg-tertiary) 100%
+  );
+  background-size: 800px 100%;
+  animation: sk-shimmer 1.1s infinite;
+  border-radius: var(--radius-lg);
+}
+
+.line {
+  height: 14px;
+  margin-bottom: var(--spacing-md);
+}
+
+.sm { width: 40%; }
+.md { width: 70%; }
+.lg { width: 90%; }
+
+.block {
+  height: 140px;
+  margin-top: var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+

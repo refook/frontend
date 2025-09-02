@@ -17,6 +17,14 @@ if (import.meta.env.DEV) {
     console.log('  - StorageUtils.getApiStats() - статистика API');
 }
 
+// Устанавливаем тему синхронно ДО первого рендера, чтобы скелетоны подхватили корректные переменные
+(() => {
+    try {
+        const saved = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+    } catch {}
+})();
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
         <KeycloakProvider>
             <Provider store={store}>
