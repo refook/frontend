@@ -4,6 +4,7 @@ import Keycloak from "keycloak-js";
 import type {ComponentWithChildren} from "../types";
 import {apiService} from "../services/api";
 import {removeLocalStorageTokens, updateLocalStorageTokens} from "../utils/localStorageUtils.ts";
+import styles from './AuthenticationSkeleton.module.css';
 
 interface KeycloakContextType {
     keycloak: Keycloak | null;
@@ -87,6 +88,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
             }, []
         ); // Пустой массив зависимостей гарантирует вызов только при монтировании
 
+
         const saveUser= () => {
             if (keycloak.tokenParsed) {
                 const user: KeycloakUserInfo = {
@@ -123,8 +125,19 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
             keycloakInstance?.accountManagement();
         }
 
+        const AuthenticationSkeleton: React.FC = () => (
+            <div className={styles.wrap} aria-busy="true" aria-live="polite">
+                <div className={styles.container}>
+                    <div className={`${styles.shimmer} ${styles.line} ${styles.sm}`}/>
+                    <div className={`${styles.shimmer} ${styles.line} ${styles.md}`}/>
+                    <div className={`${styles.shimmer} ${styles.line} ${styles.lg}`}/>
+                    <div className={`${styles.shimmer} ${styles.block}`}/>
+                </div>
+            </div>
+        );
+
         if (!isInitialized) {
-            return <div>Loading authentication...</div>; // или спиннер
+            return <AuthenticationSkeleton/>;
         }
         return (
             <KeycloakContext.Provider value={{keycloak: keycloakInstance, authenticated, user, login, logout, register, manageAccount, isInitialized}}>
