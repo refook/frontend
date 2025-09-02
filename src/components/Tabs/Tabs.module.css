@@ -38,6 +38,34 @@
 .tabActive .icon { color: var(--token-accent); }
 .label { font-weight: 600; }
 
+.subbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--spacing-2xl);
+  align-items: center;
+  background: var(--token-surface);
+  border: none;
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--token-shadow-md);
+  padding: var(--spacing-sm) var(--spacing-2xl);
+  width: 100%;
+  margin-top: var(--spacing-lg);
+}
+
+.panel {
+  margin-top: var(--spacing-xl);
+  background: var(--token-surface);
+  border: none;
+  border-radius: var(--token-radius-lg);
+  box-shadow: var(--token-shadow-md);
+  padding: var(--spacing-xl);
+}
+
+.panelTitle {
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+}
+
 @media (max-width: 768px) {
   .bar {
     display: flex;

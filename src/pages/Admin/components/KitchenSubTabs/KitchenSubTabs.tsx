@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import Tabs from '../../../../components/Tabs/Tabs';
 import styles from './KitchenSubTabs.module.css';
 import EditableTable, { type EditableRow } from '../EditableTable/EditableTable';
 import KitchensService, { type KitchenResponseDto } from '../../../../services/kitchensService';
 import AdminCard from '../AdminCard/AdminCard';
 import CreateTagForm from '../CreateTagForm/CreateTagForm';
 
-const KitchenSubTabs: React.FC = () => {
-  const [active, setActive] = useState<string>('create');
+interface KitchenSubTabsProps { mode: 'create' | 'manage' }
+
+const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<KitchenResponseDto[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState<string>('');
-
-  const tabs = [
-    { id: 'create', label: 'Создать кухню' },
-    { id: 'manage', label: 'Управление кухнями' },
-  ];
 
   const load = async () => {
     const list = await KitchensService.getAll();
@@ -52,7 +47,6 @@ const KitchenSubTabs: React.FC = () => {
       await KitchensService.create(name.trim());
       setName('');
       await load();
-      setActive('manage');
     } catch (e: any) {
       setError(e?.message || 'Не удалось создать кухню');
     } finally {
@@ -79,9 +73,7 @@ const KitchenSubTabs: React.FC = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Tabs initial={active} onChange={setActive} tabs={tabs} ariaLabel="Подразделы кухонь" />
-
-      {active === 'create' && (
+      {mode === 'create' && (
         <div className={styles.section}>
           <AdminCard
             title="Создать кухню"
@@ -101,7 +93,7 @@ const KitchenSubTabs: React.FC = () => {
         </div>
       )}
 
-      {active === 'manage' && (
+      {mode === 'manage' && (
         <div className={styles.section}>
           <AdminCard title="Управление кухнями">
             <div className={styles.createForm} style={{ marginBottom: 12 }}>

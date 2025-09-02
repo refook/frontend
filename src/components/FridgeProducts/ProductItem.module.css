@@ -1,5 +1,5 @@
 .productItem {
-  background: var(--bg-primary);
+  background: var(--token-surface);
   border-radius: var(--radius-xl);
   padding: 16px;
   box-shadow: var(--shadow-md);
