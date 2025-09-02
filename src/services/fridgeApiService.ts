@@ -70,7 +70,9 @@ class FridgeApiService {
         headers: getAuthHeaders()
       });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error Response (getAllFridgeProducts):', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
       const raw = await response.json();
       console.log('Сырой ответ продуктов холодильника:', raw);
@@ -146,6 +148,19 @@ class FridgeApiService {
       return d.toISOString();
     };
 
+    // Преобразуем строку от date input (YYYY-MM-DD) в ISO (UTC полночь)
+    const toIsoFromDateInput = (dateStr?: string | null): string | null => {
+      if (!dateStr) return null;
+      const [year, month, day] = dateStr.split('-').map(n => parseInt(n, 10));
+      if (!year || !month || !day) return null;
+      // Формат без таймзоны: YYYY-MM-DDTHH:mm:ss
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const now = new Date();
+      const isToday = now.getFullYear() === year && (now.getMonth() + 1) === month && now.getDate() === day;
+      const time = isToday ? '23:59:59' : '00:00:00';
+      return `${year}-${pad(month)}-${pad(day)}T${time}`;
+    };
+
     const resolvedProductUnit = ((): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' => {
       if (updates.productUnit) return updates.productUnit as any;
       return normalizeProductUnit(current.unit) as any;
@@ -155,12 +170,20 @@ class FridgeApiService {
       return inferBaseUnit(current.unit) as any;
     })();
 
+    // expiryDate: приоритет обновления из формы, иначе текущее значение
+    const resolvedExpiryDateIso: string | null = (() => {
+      if (Object.prototype.hasOwnProperty.call(updates, 'expiryDate')) {
+        return toIsoFromDateInput(updates.expiryDate as any);
+      }
+      return toIsoOrNull(current.expiryDate);
+    })();
+
     return {
       productId: current.ingredient.id,
       baseUnit: resolvedBaseUnit as any,
       count: typeof updates.count === 'number' ? updates.count : current.amount,
       productUnit: resolvedProductUnit as any,
-      expiryDate: toIsoOrNull(current.expiryDate),
+      expiryDate: resolvedExpiryDateIso,
       comment: typeof updates.comment === 'string' ? updates.comment : current.notes
     };
   }
@@ -229,6 +252,11 @@ class FridgeApiService {
    * Преобразовать API продукт в локальный формат
    */
   private transformApiProductToLocal(apiProduct: FridgeProductResponseDto): FridgeProduct {
+    const createdAtStr = (apiProduct as any).createdAt as string | undefined;
+    const updatedAtStr = (apiProduct as any).updatedAt as string | undefined;
+    const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
+    const updatedAt = updatedAtStr ? new Date(updatedAtStr) : new Date();
+
     return {
       id: apiProduct.id,
       ingredient: {
@@ -241,8 +269,8 @@ class FridgeApiService {
       baseUnit: apiProduct.baseUnit,
       expiryDate: apiProduct.expiryDate ? new Date(apiProduct.expiryDate) : undefined,
       notes: apiProduct.comment,
-      addedAt: new Date(),
-      updatedAt: new Date()
+      addedAt: createdAt,
+      updatedAt: updatedAt
     };
   }
 
@@ -257,13 +285,17 @@ class FridgeApiService {
     expiryDate?: string;
     notes?: string;
   }): CreateFridgeProductDto {
-    const toIsoStartOfDayUtc = (dateStr?: string): string | null => {
+    const toApiDate = (dateStr?: string): string | null => {
       if (!dateStr) return null;
       // Ожидаем формат YYYY-MM-DD из инпута и конвертируем в ISO в UTC полночь
       const [year, month, day] = dateStr.split('-').map(n => parseInt(n, 10));
       if (!year || !month || !day) return null;
-      const iso = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0)).toISOString();
-      return iso;
+      const pad = (n: number) => String(n).padStart(2, '0');
+      // Формат без таймзоны: YYYY-MM-DDTHH:mm:ss
+      const now = new Date();
+      const isToday = now.getFullYear() === year && (now.getMonth() + 1) === month && now.getDate() === day;
+      const time = isToday ? '23:59:59' : '00:00:00';
+      return `${year}-${pad(month)}-${pad(day)}T${time}`;
     };
 
     // Определяем baseUnit по выбранной единице
@@ -287,7 +319,7 @@ class FridgeApiService {
       baseUnit: baseUnit as any,
       avgWeight,
       productUnit: productUnit as any,
-      expiryDate: toIsoStartOfDayUtc(localProduct.expiryDate),
+      expiryDate: toApiDate(localProduct.expiryDate),
       comment: localProduct.notes || undefined
     };
   }

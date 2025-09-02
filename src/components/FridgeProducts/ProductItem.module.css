@@ -1,11 +1,48 @@
 .productItem {
   background: var(--token-surface);
   border-radius: var(--radius-xl);
-  padding: 16px;
+  padding: 0;
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   position: relative;
   border: 2px solid transparent;
+}
+
+/* Компактный режим */
+.compact .imageContainer { height: 140px; width: 140px; margin: 8px auto; position: relative; }
+.compact .productHeader { padding: 8px 12px 0 12px; }
+.compact .productDetails { padding: 8px 12px 12px 12px; }
+.compact .imagePlaceholder { border-radius: 9999px; margin: 0; display: block; position: absolute; width: 106px; height: 106px; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%); }
+.compact .imageContainer { border-radius: 9999px; width: 140px; height: 140px; margin: 8px auto; overflow: visible; }
+.circleWrap { position: relative; }
+.circleSvg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; }
+.circleInner { position: absolute; width: 106px; height: 106px; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 9999px; }
+.circleProgress { transition: stroke-dasharray 0.3s ease; }
+.compact .imageOverlay, .compact .imageCaption, .compact .imageNote { display: none; }
+.compact .productItem { display: flex; }
+.compact { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px; }
+.compact .actions { top: 6px; right: 6px; z-index: 5; }
+.compact .productHeader { width: 100%; padding: 4px 8px 0 8px; text-align: center; }
+.compact .productName { justify-self: center; text-align: center; width: 100%; }
+.compact .productDetails { width: 100%; padding: 4px 8px 8px 8px; text-align: center; }
+.compact .amount { margin: 0 auto; }
+.compact .expiryBar { margin: 6px 0 0 0; height: 6px; }
+.compactNote { 
+  width: 100%;
+  max-width: 90%;
+  margin: 6px auto 0 auto;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(0,0,0,0.06);
+  padding: 6px 10px;
+  border-radius: 9999px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .compactNote { background: rgba(255,255,255,0.08); }
 }
 
 .productItem:hover {
@@ -23,11 +60,62 @@
   background: linear-gradient(135deg, var(--color-danger-light) 0%, var(--bg-primary) 100%);
 }
 
+.imageContainer {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
+}
+
+.imageOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.25) 50%, transparent 100%);
+}
+
+.imageCaption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  color: #fff;
+  font-size: 12px;
+  opacity: 0.95;
+}
+
+.imageNote {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.45);
+  border-radius: 10px;
+  padding: 6px 10px;
+  max-width: calc(100% - 24px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .productHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  padding: 12px 16px 0 16px;
 }
 
 .productName {
@@ -39,9 +127,11 @@
 }
 
 .actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: flex;
   gap: 8px;
-  margin-left: 12px;
 }
 
 .actions button {
@@ -73,9 +163,75 @@
   background: var(--color-danger-light);
 }
 
+.menuWrapper { position: relative; }
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--token-radius-full);
+  border: 1px dashed transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--token-duration-fast), border-color var(--token-duration-fast), color var(--token-duration-fast);
+}
+.menuButton:hover { 
+  background: color-mix(in oklab, var(--token-accent-weak) 50%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
+}
+.menu { 
+  position: absolute; 
+  right: 0; 
+  top: calc(100% + 6px); 
+  min-width: 160px;
+  background: var(--token-surface); 
+  border: 1px solid var(--token-border); 
+  border-radius: 10px; 
+  box-shadow: var(--token-shadow-md); 
+  padding: 6px; 
+  display: flex; 
+  flex-direction: column; 
+  z-index: 10; 
+}
+.menuItem { 
+  width: 100%;
+  text-align: left; 
+  padding: 8px 10px; 
+  border-radius: 8px; 
+  border: none; 
+  background: transparent; 
+  color: var(--token-text); 
+  cursor: pointer; 
+}
+.menuItem:hover { 
+  background: color-mix(in oklab, var(--token-accent-weak) 40%, transparent); 
+}
+.menuDanger { color: #ef4444; }
+
 .productDetails {
   color: var(--text-secondary);
+  padding: 12px 16px 16px 16px;
 }
+
+.expiryBar {
+  width: 100%;
+  height: 8px;
+  background: var(--color-gray-200);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 8px 0 4px 0;
+}
+
+.expiryFill {
+  height: 100%;
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.ok { background: linear-gradient(90deg, #34d399, #10b981); }
+.warn { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.danger { background: linear-gradient(90deg, #ef4444, #dc2626); }
 
 .amount {
   font-size: 16px;
@@ -139,27 +295,7 @@
   margin-left: 8px;
 }
 
-.statusBadge {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  padding: 4px 8px;
-  border-radius: var(--radius-xl);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.expired .statusBadge {
-  background: #ef4444;
-  color: white;
-}
-
-.expiring .statusBadge {
-  background: #fbbf24;
-  color: white;
-}
+/* Бейджи статуса удалены – используем только прогресс-полосу */
 
 /* Dark theme: ослабляем яркость подложки чипа */
 [data-theme="dark"] .productItem.expiring {
@@ -172,7 +308,7 @@
 /* Мобильная адаптация */
 @media (max-width: 768px) {
   .productItem {
-    padding: 12px;
+    padding: 0;
     margin-bottom: 8px;
   }
 
@@ -187,7 +323,6 @@
 
   .actions {
     margin-left: 0;
-    align-self: flex-end;
   }
 
   .actions button {
@@ -213,4 +348,6 @@
     align-self: flex-start;
     margin-top: 8px;
   }
+
+  .imageContainer { height: 140px; }
 } 
