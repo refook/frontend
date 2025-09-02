@@ -3,6 +3,7 @@ import styles from './AdminPage.module.css';
 import Tabs from '../../components/Tabs/Tabs';
 import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon } from '@heroicons/react/24/outline';
 import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
+import CreateProductForm from './components/CreateProductForm/CreateProductForm';
 import TagSubTabs from './components/TagSubTabs/TagSubTabs';
 import KitchenSubTabs from './components/KitchenSubTabs/KitchenSubTabs';
 
@@ -61,57 +62,44 @@ const AdminPage: React.FC = () => {
         initial={activeTab}
         onChange={(t) => setActiveTab(t as TabKey)}
         tabs={[
-          { id: 'products', label: 'Продукты', Icon: Squares2X2Icon },
-          { id: 'recipes', label: 'Рецепты', Icon: BookOpenIcon },
-          { id: 'tags', label: 'Теги', Icon: TagIcon },
-          { id: 'kitchens', label: 'Кухни', Icon: Squares2X2Icon },
-          { id: 'users', label: 'Пользователи', Icon: UserGroupIcon },
-          { id: 'settings', label: 'Настройки', Icon: Cog6ToothIcon },
+          {
+            id: 'products',
+            label: 'Продукты',
+            Icon: Squares2X2Icon,
+            subtabs: [
+              { id: 'products:create', label: 'Создание', title: 'Создать продукт', content: <CreateProductForm /> },
+              { id: 'products:suggest', label: 'Предложения', title: 'Предложения пользователей', content: (
+                <div className={styles.placeholder}>Здесь будут предложения пользователей по новым продуктам.</div>
+              ) },
+            ],
+          },
+          { id: 'recipes', label: 'Рецепты', Icon: BookOpenIcon, title: 'Рецепты (скоро)', content: <p>Здесь появится управление рецептами.</p> },
+          {
+            id: 'tags',
+            label: 'Теги',
+            Icon: TagIcon,
+            subtabs: [
+              { id: 'tags:create', label: 'Создать', title: 'Создать тег', content: <TagSubTabs mode="create" /> },
+              { id: 'tags:manage', label: 'Управление', title: 'Управление тегами', content: <TagSubTabs mode="manage" /> },
+            ],
+          },
+          {
+            id: 'kitchens',
+            label: 'Кухни',
+            Icon: Squares2X2Icon,
+            subtabs: [
+              { id: 'kitchens:create', label: 'Создать', title: 'Создать кухню', content: <KitchenSubTabs mode="create" /> },
+              { id: 'kitchens:manage', label: 'Управление', title: 'Управление кухнями', content: <KitchenSubTabs mode="manage" /> },
+            ],
+          },
+          { id: 'users', label: 'Пользователи', Icon: UserGroupIcon, title: 'Пользователи (скоро)', content: <p>Здесь появится управление пользователями.</p> },
+          { id: 'settings', label: 'Настройки', Icon: Cog6ToothIcon, title: 'Настройки (скоро)', content: <p>Общие настройки системы.</p> },
         ]}
         ariaLabel="Admin sections"
       />
 
       {/* Контентная область с содержимым выбранной вкладки */}
-      <div className={styles.content}>
-        {/* Раздел "Продукты" - полнофункциональный с подвкладками */}
-        {activeTab === 'products' && (
-          <ProductSubTabs />
-        )}
-
-        {/* Раздел "Рецепты" - заглушка для будущей функциональности */}
-        {activeTab === 'recipes' && (
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Рецепты (скоро)</div>
-            <p>Здесь появится управление рецептами.</p>
-          </div>
-        )}
-        
-        {/* Раздел "Теги" - полнофункциональный с подвкладками */}
-        {activeTab === 'tags' && (
-          <TagSubTabs />
-        )}
-
-        {/* Раздел "Кухни" - создание и управление */}
-        {activeTab === 'kitchens' && (
-          <KitchenSubTabs />
-        )}
-        
-        {/* Раздел "Пользователи" - заглушка для управления пользователями */}
-        {activeTab === 'users' && (
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Пользователи (скоро)</div>
-            <p>Здесь появится управление пользователями.</p>
-          </div>
-        )}
-        
-        {/* Раздел "Настройки" - заглушка для системных настроек */}
-        {activeTab === 'settings' && (
-          <div className={styles.card}>
-            <div className={styles.cardTitle}>Настройки (скоро)</div>
-            <p>Общие настройки системы.</p>
-          </div>
-        )}
-      </div>
+      <div className={styles.content} />
     </div>
   );
 };
