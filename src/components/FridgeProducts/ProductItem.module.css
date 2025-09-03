@@ -50,14 +50,15 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
+
 .productItem.expiring {
-  border-color: var(--color-accent);
-  background: linear-gradient(135deg, var(--color-accent-light) 0%, var(--bg-primary) 100%);
+  border-color: rgba(245, 158, 11, 0.35); /* amber-500 */
+  background: rgba(245, 158, 11, 0.08);
 }
 
 .productItem.expired {
-  border-color: var(--color-danger);
-  background: linear-gradient(135deg, var(--color-danger-light) 0%, var(--bg-primary) 100%);
+  border-color: rgba(239, 68, 68, 0.35); /* red-500 */
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .imageContainer {
@@ -229,9 +230,9 @@
   transition: width 0.3s ease;
 }
 
-.ok { background: linear-gradient(90deg, #34d399, #10b981); }
-.warn { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
-.danger { background: linear-gradient(90deg, #ef4444, #dc2626); }
+.ok { background: linear-gradient(90deg, #6ee7b7, #10b981); }
+.warn { background: linear-gradient(90deg, #fde68a, #fbbf24); }
+.danger { background: linear-gradient(90deg, #fecaca, #f87171); }
 
 .amount {
   font-size: 16px;
