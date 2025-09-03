@@ -149,11 +149,21 @@ const Header: React.FC = () => {
 
         {/* Right section */}
         <div className={styles.rightSection}>
+          {/* Кнопка переключения темы (на месте старого "Избранное") */}
+          <button
+            type="button"
+            className={styles.iconButton}
+            aria-label={theme === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему'}
+            onClick={handleToggleTheme}
+          >
+            {theme === 'light' ? (
+              <MoonIcon className={styles.icon} />
+            ) : (
+              <SunIcon className={styles.icon} />
+            )}
+          </button>
+
           {/* Profile / Auth */}
-          {/* Favorites icon */}
-          <Link to="/profile/advanced?tab=favorites" className={styles.iconButton} aria-label="Избранное">
-            <BookmarkIcon className={styles.icon} />
-          </Link>
 
           {authenticated ? (
             <div className={styles.profile} ref={profileMenuRef}>

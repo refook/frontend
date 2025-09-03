@@ -11,6 +11,7 @@
   border: 1px solid var(--token-border);
   background: var(--token-surface);
   color: var(--token-text);
+  text-decoration: none;
   box-shadow: var(--token-shadow-sm);
   cursor: pointer;
   transition: filter var(--token-duration-fast), background var(--token-duration-fast), border-color var(--token-duration-fast);
