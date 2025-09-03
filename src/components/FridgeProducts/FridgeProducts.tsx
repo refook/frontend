@@ -10,6 +10,7 @@ import { StatsPanel } from './StatsPanel';
 
 export const FridgeProducts: React.FC = () => {
   const [items, setItems] = useState<FridgeProduct[]>([]);
+  const [baseItems, setBaseItems] = useState<FridgeProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -29,6 +30,7 @@ export const FridgeProducts: React.FC = () => {
         return;
       }
       const products = await fridgeApiService.getAllFridgeProducts(activeFridgeId);
+      setBaseItems(products);
       setItems(products);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка загрузки продуктов');
@@ -89,6 +91,24 @@ export const FridgeProducts: React.FC = () => {
       setItems([]);
     }
   }, [activeFridgeId]);
+
+  // Сортировка по клику на карточки статистики (ловим кастомное событие из StatsPanel)
+  useEffect(() => {
+    const onSort = (e: Event) => {
+      const custom = e as CustomEvent<{ mode: string; compare: (a: FridgeProduct, b: FridgeProduct) => number }>;
+      const mode = (custom.detail as any)?.mode as string | undefined;
+      const compare = custom.detail?.compare;
+      if (mode === 'total') {
+        setItems(baseItems);
+        return;
+      }
+      if (typeof compare === 'function') {
+        setItems([...baseItems].sort(compare));
+      }
+    };
+    window.addEventListener('fridge:sort', onSort as EventListener);
+    return () => window.removeEventListener('fridge:sort', onSort as EventListener);
+  }, [baseItems]);
 
   const handleAddProduct = async (productData: {
     ingredient: any;
@@ -215,7 +235,7 @@ export const FridgeProducts: React.FC = () => {
             title={fridges.length === 0 ? 'Сначала создайте холодильник' : undefined}
           >
             <span className={styles.addIcon}>+</span>
-            Добавить продукт
+            Добавить
           </button>
         </div>
       </div>

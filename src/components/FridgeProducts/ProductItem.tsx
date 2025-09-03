@@ -161,7 +161,8 @@ export const ProductItem: React.FC<ProductItemProps> = ({ item, onUpdate, onDele
     const exp = item.expiryDate;
     const isExpiredNow = !!exp && exp.getTime() < now.getTime();
     const isSoon = !!exp && !isExpiredNow && exp.getTime() <= now.getTime() + 3 * 24 * 60 * 60 * 1000;
-    const tone = isExpiredNow ? '#ef4444' : (isToday(exp) || isSoon) ? '#f59e0b' : '#10b981';
+    // Более мягкие оттенки
+    const tone = isExpiredNow ? '#f87171' : (isToday(exp) || isSoon) ? '#fbbf24' : '#10b981';
     return { size, stroke, r, c, dash, gap, tone };
   }, [expiryProgress, item.expiryDate]);
 

@@ -3,6 +3,20 @@ import type { FridgeProduct } from '../../types/fridge.types';
 import styles from './StatsPanel.module.css';
 import { StatsCard } from './StatsCard';
 
+/**
+ * StatsPanel
+ *
+ * Отображает сводную статистику по продуктам холодильника в виде 4 карточек:
+ * - Total: общее количество элементов
+ * - Need Attention: просроченные + истекающие сегодня
+ * - Fresh: продукты с датой дальше чем 3 суток от текущего момента
+ * - Expiring Soon: истекающие сегодня и в ближайшие 3 дня (без просроченных)
+ *
+ * При клике на карточку выполняется сортировка списка продуктов в родителе.
+ * Для этого панель диспатчит CustomEvent 'fridge:sort' в window с detail:
+ * { mode: 'total' | 'attention' | 'fresh' | 'soon', compare: (a,b)=>number }
+ * Родитель (FridgeProducts) подписывается на событие и применяет compare к списку.
+ */
 interface Props {
   items: FridgeProduct[];
 }
@@ -19,6 +33,41 @@ export const StatsPanel: React.FC<Props> = ({ items }) => {
   const expiringSoon = items.filter(it => isSoon(it.expiryDate) || isToday(it.expiryDate)).length;
   const needAttention = items.filter(it => isExpired(it.expiryDate) || isToday(it.expiryDate)).length;
 
+  const [active, setActive] = React.useState<'total' | 'attention' | 'fresh' | 'soon'>('total');
+
+  const sortBy = (mode: 'total' | 'attention' | 'fresh' | 'soon') => {
+    const compare = (a: FridgeProduct, b: FridgeProduct) => {
+      if (mode === 'attention') {
+        const score = (x: FridgeProduct) => (isExpired(x.expiryDate) ? 2 : (isToday(x.expiryDate) || isSoon(x.expiryDate)) ? 1 : 0);
+        return score(b) - score(a);
+      }
+      if (mode === 'fresh') {
+        const t = (x?: Date) => (x ? x.getTime() : 0);
+        return t(b.expiryDate) - t(a.expiryDate);
+      }
+      if (mode === 'soon') {
+        // Сначала «сегодня», затем «скоро» (<3 дней), потом остальные, и только в конце просроченные
+        const score = (x: FridgeProduct) => {
+          if (isExpired(x.expiryDate)) return 0;
+          if (isToday(x.expiryDate)) return 3;
+          if (isSoon(x.expiryDate)) return 2;
+          return 1;
+        };
+        const sa = score(a);
+        const sb = score(b);
+        if (sb !== sa) return sb - sa;
+        // Для группы «сегодня/скоро» сортируем по ближайшей дате
+        const ta = a.expiryDate ? a.expiryDate.getTime() : Number.MAX_SAFE_INTEGER;
+        const tb = b.expiryDate ? b.expiryDate.getTime() : Number.MAX_SAFE_INTEGER;
+        return ta - tb;
+      }
+      return 0;
+    };
+    const evt = new CustomEvent('fridge:sort', { detail: { mode, compare } });
+    window.dispatchEvent(evt);
+    setActive(mode);
+  };
+
   return (
     <div className={styles.stats}>
       <StatsCard
@@ -30,6 +79,8 @@ export const StatsPanel: React.FC<Props> = ({ items }) => {
         iconClassName={styles.iconTotal}
         title="Total"
         value={total}
+        onClick={() => sortBy('total')}
+        active={active === 'total'}
       />
       <StatsCard
         icon={
@@ -40,6 +91,8 @@ export const StatsPanel: React.FC<Props> = ({ items }) => {
         iconClassName={styles.iconAttn}
         title="Need Attention"
         value={needAttention}
+        onClick={() => sortBy('attention')}
+        active={active === 'attention'}
       />
       <StatsCard
         icon={
@@ -50,6 +103,8 @@ export const StatsPanel: React.FC<Props> = ({ items }) => {
         iconClassName={styles.iconFresh}
         title="Fresh"
         value={fresh}
+        onClick={() => sortBy('fresh')}
+        active={active === 'fresh'}
       />
       <StatsCard
         icon={
@@ -60,6 +115,8 @@ export const StatsPanel: React.FC<Props> = ({ items }) => {
         iconClassName={styles.iconSoon}
         title="Expiring Soon"
         value={expiringSoon}
+        onClick={() => sortBy('soon')}
+        active={active === 'soon'}
       />
     </div>
   );

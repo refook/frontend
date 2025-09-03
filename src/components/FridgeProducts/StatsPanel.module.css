@@ -3,10 +3,12 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
   margin-bottom: 16px;
+  align-items: stretch;
 }
 
 .card {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
   background: var(--token-surface);
@@ -14,6 +16,7 @@
   border-radius: 16px;
   padding: 16px;
   box-shadow: var(--shadow-sm);
+  height: 100%;
 }
 
 .icon {
@@ -37,10 +40,17 @@
   .value { font-size: 24px; }
 }
 
-/* Мобильный режим: 2 карточки в ряд */
+/* Мобильный режим: 4 карточки в один ряд (прокрутка по горизонтали предотвращается с minmax) */
 @media (max-width: 600px) {
   .stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Крупные экраны: фиксируем 4 карточки в ряд для стабильного вида */
+@media (min-width: 1024px) {
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
