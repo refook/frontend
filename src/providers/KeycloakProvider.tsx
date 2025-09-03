@@ -1,4 +1,4 @@
-import React, {createContext, useEffect, useState} from 'react';
+import React, {createContext, useEffect, useRef, useState} from 'react';
 import keycloak from "../services/keycloak.ts";
 import Keycloak from "keycloak-js";
 import type {ComponentWithChildren} from "../types";
@@ -34,8 +34,28 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
         const [keycloakInstance, setKeycloakInstance] = useState<Keycloak | null>(null);
         const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
+        // Флаг защиты от двойной инициализации (React 18 StrictMode в DEV вызывает эффекты дважды)
+        const didInitRef = useRef<boolean>(false);
+
         useEffect(() => {
                 const initKeycloak = async () => {
+                    if (didInitRef.current) {
+                        // Уже инициализировано — просто синхронизируем локальное состояние из существующего инстанса
+                        if (keycloak) {
+                            setKeycloakInstance(keycloak);
+                            setAuthenticated(!!keycloak.authenticated);
+                            if (keycloak.authenticated) {
+                                saveUser();
+                                if (keycloak.token) {
+                                    apiService.setAuthToken(keycloak.token);
+                                }
+                            }
+                            setIsInitialized(true);
+                        }
+                        return;
+                    }
+                    // Ставим флаг ДО вызова init, чтобы второй проход эффекта не вызывал init повторно
+                    didInitRef.current = true;
                     console.log('Initializing Keycloak...');
                     await keycloak
                         .init({
@@ -82,6 +102,8 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
                         })
                         .catch((error: any) => {
                             console.error('Keycloak init failed:', error);
+                            // Сбрасываем флаг, чтобы можно было повторить попытку на следующем рендере
+                            didInitRef.current = false;
                         });
                 }
                 initKeycloak()
