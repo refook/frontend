@@ -8,6 +8,7 @@ import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
 import { useInitializeTheme } from './hooks/useInitializeTheme';
+import CookieConsent from './components/CookieConsent';
 
 function App() {
     useInitializeTheme();
@@ -29,6 +30,7 @@ function App() {
                 </Routes>
             </Layout>
             <DevTools/>
+            <CookieConsent/>
         </>
     );
 }
