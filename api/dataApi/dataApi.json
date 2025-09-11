@@ -21,8 +21,20 @@
       "description": "Информация по кухням"
     },
     {
-      "name": "Продкуты",
+      "name": "Продукты (Варианты)",
+      "description": "Запросы с вариантами продуктов"
+    },
+    {
+      "name": "Профиль",
+      "description": "Профиль пользователя"
+    },
+    {
+      "name": "Продукты",
       "description": "Запросы с продуктами"
+    },
+    {
+      "name": "Меры продуктов",
+      "description": "Запросы с мерами продукта"
     },
     {
       "name": "Пользователи",
@@ -226,7 +238,7 @@
     "/v1/products/{id}": {
       "get": {
         "tags": [
-          "Продкуты"
+          "Продукты"
         ],
         "summary": "Получение продукта по id",
         "operationId": "getProduct",
@@ -266,7 +278,7 @@
       },
       "put": {
         "tags": [
-          "Продкуты"
+          "Продукты"
         ],
         "summary": "Обновление продукта",
         "operationId": "updateProduct",
@@ -308,6 +320,335 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/variants/{id}": {
+      "get": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Получение варианта продукта по id",
+        "operationId": "getProductVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Обновление варианта продукта",
+        "operationId": "updateProductVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeProductVariantDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Удаление варианта продукта",
+        "operationId": "deleteProductVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ"
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/measures/variant/{productVariantId}": {
+      "put": {
+        "tags": [
+          "Меры продуктов"
+        ],
+        "summary": "Обновление частной меры",
+        "operationId": "updateVariataMeasure",
+        "parameters": [
+          {
+            "name": "productVariantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductVariantMeasureDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductMeasureResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Меры продуктов"
+        ],
+        "summary": "Добавление меры к частному продукту",
+        "operationId": "addVariateMeasure",
+        "parameters": [
+          {
+            "name": "productVariantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddProductVariantMeasureDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductMeasureResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/measures/base/{productId}": {
+      "put": {
+        "tags": [
+          "Меры продуктов"
+        ],
+        "summary": "Обновление БАЗОВОЙ меры",
+        "operationId": "updateBaseMeasure",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBaseProductMeasureDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductMeasureResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Меры продуктов"
+        ],
+        "summary": "Добавление меры к БАЗОМУ продукту",
+        "operationId": "addBaseMeasure",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddBaseProductMeasureDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductMeasureResponseDto"
                 }
               }
             }
@@ -693,7 +1034,7 @@
     "/v1/products": {
       "post": {
         "tags": [
-          "Продкуты"
+          "Продукты"
         ],
         "summary": "Сохранение продукта",
         "operationId": "createProduct",
@@ -702,6 +1043,58 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateProductDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/variants/{productId}": {
+      "post": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Сохранение варианта продукта",
+        "operationId": "createProductVariant",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeProductVariantDto"
               }
             }
           },
@@ -1583,10 +1976,51 @@
         }
       }
     },
+    "/v1/profile/{username}": {
+      "get": {
+        "tags": [
+          "Профиль"
+        ],
+        "summary": "Получение информации по пользователю по его имени",
+        "operationId": "getUserByUsername",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfoResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/products/search": {
       "get": {
         "tags": [
-          "Продкуты"
+          "Продукты"
         ],
         "summary": "Получение продуктов по совпадению",
         "operationId": "getAllProductsByName",
@@ -1629,10 +2063,110 @@
         }
       }
     },
+    "/v1/products/measures/variant/{productVariantId}/all": {
+      "get": {
+        "tags": [
+          "Меры продуктов"
+        ],
+        "summary": "Получение всех мер по id частного продукта",
+        "operationId": "getVariablesMeasures",
+        "parameters": [
+          {
+            "name": "productVariantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "onlyUnique",
+            "in": "query",
+            "description": "Параметр вывода мер только частных продуктов, иначе все с базовым продуктом",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Параметр вывода мер только частных продуктов, иначе все с базовым продуктом"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductMeasureResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/measures/base/{productId}/all": {
+      "get": {
+        "tags": [
+          "Меры продуктов"
+        ],
+        "summary": "Получение всех базовых мер по id продукта",
+        "operationId": "getBaseMeasures",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductMeasureResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/products/all": {
       "get": {
         "tags": [
-          "Продкуты"
+          "Продукты"
         ],
         "summary": "Получение всего списка продуктов",
         "operationId": "getAllProducts",
@@ -1959,12 +2493,16 @@
             "example": 46.1,
             "maximum": 100.00,
             "minimum": 0
+          },
+          "isEmpty": {
+            "type": "boolean"
           }
         },
         "required": [
           "calories",
           "carbs",
           "fats",
+          "isEmpty",
           "proteins"
         ]
       },
@@ -2011,40 +2549,22 @@
             "type": "string",
             "description": "Описание ингредиента"
           },
+          "photo": {
+            "type": "string",
+            "description": "Фото ингредиента"
+          },
+          "isVariate": {
+            "type": "boolean",
+            "description": "Является ли вариантом продукта"
+          },
           "count": {
             "type": "number",
             "description": "Количество ингредиента"
           },
-          "productUnit": {
+          "productMeasureId": {
             "type": "string",
-            "description": "Мера ингредиента",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id меры продукта"
           },
           "macros": {
             "$ref": "#/components/schemas/MacrosDto",
@@ -2054,9 +2574,10 @@
         "required": [
           "count",
           "id",
+          "isVariate",
           "macros",
           "name",
-          "productUnit"
+          "productMeasureId"
         ]
       },
       "RecipeMetaInfoResponseDto": {
@@ -2146,6 +2667,10 @@
             "$ref": "#/components/schemas/RecipeResponseStatisticDto",
             "description": "Статистика рецепта"
           },
+          "state": {
+            "$ref": "#/components/schemas/StateDto",
+            "description": "Информация о действиях пользователя с рецептов"
+          },
           "ownerUser": {
             "$ref": "#/components/schemas/UserInfoResponseDto",
             "description": "Владелец рецепта"
@@ -2176,6 +2701,7 @@
           "name",
           "ownerUser",
           "serving",
+          "state",
           "updatedAt"
         ]
       },
@@ -2282,6 +2808,24 @@
           "unitCount"
         ]
       },
+      "StateDto": {
+        "type": "object",
+        "description": "Состояния пользователя",
+        "properties": {
+          "liked": {
+            "type": "boolean",
+            "description": "Лайк"
+          },
+          "favorite": {
+            "type": "boolean",
+            "description": "В избранное"
+          }
+        },
+        "required": [
+          "favorite",
+          "liked"
+        ]
+      },
       "StepIngredientDto": {
         "type": "object",
         "description": "Ингредиент шага рецепта",
@@ -2302,47 +2846,30 @@
             "type": "string",
             "description": "Описание ингредиента"
           },
+          "photo": {
+            "type": "string",
+            "description": "Фото ингредиента"
+          },
+          "isVariate": {
+            "type": "boolean",
+            "description": "Является ли вариантом продукта"
+          },
           "count": {
             "type": "number",
             "description": "Количество ингредиента"
           },
-          "productUnit": {
+          "productMeasureId": {
             "type": "string",
-            "description": "Мера ингредиента",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id меры продукта"
           }
         },
         "required": [
           "count",
           "id",
+          "isVariate",
           "name",
-          "productUnit"
+          "productMeasureId"
         ]
       },
       "StepResponseDto": {
@@ -2566,42 +3093,21 @@
             "description": "Количество ингредиента",
             "example": 1.0
           },
-          "productUnit": {
+          "isVariate": {
+            "type": "boolean",
+            "description": "Является ли вариантом продукта"
+          },
+          "productMeasureId": {
             "type": "string",
-            "description": "Мера ингредиента",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id меры продукта"
           }
         },
         "required": [
           "count",
           "id",
-          "productUnit"
+          "isVariate",
+          "productMeasureId"
         ]
       },
       "UpdateStepDto": {
@@ -2663,6 +3169,43 @@
           "index"
         ]
       },
+      "ProductMeasureResponseDto": {
+        "type": "object",
+        "description": "Ответ по мере продукта",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id меры"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Штука"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Вес (в граммах)",
+            "example": 80.0
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Является основной мерой",
+            "example": false
+          },
+          "density": {
+            "type": "number",
+            "description": "Плотность",
+            "example": 1.0
+          }
+        },
+        "required": [
+          "id",
+          "isDefault",
+          "name",
+          "weight"
+        ]
+      },
       "ProductResponseDto": {
         "type": "object",
         "description": "Ответ по 1 продукта",
@@ -2680,54 +3223,6 @@
             "type": "string",
             "description": "Описание"
           },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
-          },
-          "avgWeight": {
-            "type": "number",
-            "description": "Средний вес",
-            "example": 80.0
-          },
-          "unit": {
-            "type": "string",
-            "description": "Базовая мера продукта",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
-          },
           "photo": {
             "type": "string",
             "description": "url фото"
@@ -2735,6 +3230,13 @@
           "macros": {
             "$ref": "#/components/schemas/MacrosDto",
             "description": "КБЖУ"
+          },
+          "measures": {
+            "type": "array",
+            "description": "Список мер продукта (базовые и/или вариативные)",
+            "items": {
+              "$ref": "#/components/schemas/ProductMeasureResponseDto"
+            }
           },
           "createdAt": {
             "type": "string",
@@ -2748,13 +3250,11 @@
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
           "createdAt",
           "id",
           "macros",
+          "measures",
           "name",
-          "unit",
           "updatedAt"
         ]
       },
@@ -2774,53 +3274,10 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "baseUnit": {
+          "categoryId": {
             "type": "string",
-            "description": "Базовая мера",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
-          },
-          "avgWeight": {
-            "type": "number",
-            "description": "Средний вес",
-            "example": 80.0
-          },
-          "unit": {
-            "type": "string",
-            "description": "Конкретная мера",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id Категории"
           },
           "photo": {
             "type": "string",
@@ -2834,11 +3291,110 @@
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
           "macros",
+          "name"
+        ]
+      },
+      "ChangeProductVariantDto": {
+        "type": "object",
+        "description": "Создание/обновление варианта продукта",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название продукта",
+            "maxLength": 64,
+            "minLength": 1
+          },
+          "brandId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id бренда"
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание продукта",
+            "maxLength": 1000,
+            "minLength": 0
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id Категории"
+          },
+          "photo": {
+            "type": "string",
+            "description": "url фото",
+            "maxLength": 2000,
+            "minLength": 0
+          },
+          "macros": {
+            "$ref": "#/components/schemas/MacrosDto",
+            "description": "КБЖУ"
+          }
+        },
+        "required": [
+          "macros",
+          "name"
+        ]
+      },
+      "UpdateProductVariantMeasureDto": {
+        "type": "object",
+        "properties": {
+          "baseMeasureId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id меры"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Вес (в граммах)",
+            "example": 80.0
+          },
+          "density": {
+            "type": "number",
+            "description": "Плотность",
+            "example": 1.0
+          }
+        },
+        "required": [
+          "baseMeasureId",
+          "weight"
+        ]
+      },
+      "UpdateBaseProductMeasureDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id меры"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Штука"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Вес (в граммах)",
+            "example": 80.0
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Является основной мерой",
+            "example": false
+          },
+          "density": {
+            "type": "number",
+            "description": "Плотность",
+            "example": 1.0
+          }
+        },
+        "required": [
+          "id",
+          "isDefault",
           "name",
-          "unit"
+          "weight"
         ]
       },
       "UpdateKitchenDto": {
@@ -3254,9 +3810,40 @@
           "value"
         ]
       },
+      "AddBaseProductMeasureDto": {
+        "type": "object",
+        "description": "Добавление меры продукта",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Штука"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Вес (в граммах)",
+            "example": 80.0
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Является основной мерой",
+            "example": false
+          },
+          "density": {
+            "type": "number",
+            "description": "Плотность",
+            "example": 1.0
+          }
+        },
+        "required": [
+          "isDefault",
+          "name",
+          "weight"
+        ]
+      },
       "CreateProductDto": {
         "type": "object",
-        "description": "Запрос создания продукта",
+        "description": "Запрос создания базового продукта",
         "properties": {
           "name": {
             "type": "string",
@@ -3270,53 +3857,10 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "baseUnit": {
+          "categoryId": {
             "type": "string",
-            "description": "Базовая мера продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
-          },
-          "avgWeight": {
-            "type": "number",
-            "description": "Средний вес",
-            "example": 80.0
-          },
-          "unit": {
-            "type": "string",
-            "description": "Конкретная мера продукта",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id Категории"
           },
           "photo": {
             "type": "string",
@@ -3327,14 +3871,46 @@
           "macros": {
             "$ref": "#/components/schemas/MacrosDto",
             "description": "КБЖУ"
+          },
+          "measures": {
+            "type": "array",
+            "description": "Меры базового продукта",
+            "items": {
+              "$ref": "#/components/schemas/AddBaseProductMeasureDto"
+            },
+            "maxItems": 2147483647,
+            "minItems": 1
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
           "macros",
-          "name",
-          "unit"
+          "measures",
+          "name"
+        ]
+      },
+      "AddProductVariantMeasureDto": {
+        "type": "object",
+        "description": "Добавление меры продукта",
+        "properties": {
+          "baseMeasureId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id основной меры"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Вес (в граммах)",
+            "example": 80.0
+          },
+          "density": {
+            "type": "number",
+            "description": "Плотность",
+            "example": 1.0
+          }
+        },
+        "required": [
+          "baseMeasureId",
+          "weight"
         ]
       },
       "CreateKitchenDto": {
@@ -3525,6 +4101,10 @@
             "type": "string",
             "format": "date-time",
             "description": "Дата последнего обновления"
+          },
+          "state": {
+            "$ref": "#/components/schemas/StateDto",
+            "description": "Информация о действиях пользователя с рецептов"
           }
         },
         "required": [
@@ -3532,6 +4112,7 @@
           "level",
           "name",
           "ownerUser",
+          "state",
           "updatedAt"
         ]
       },
