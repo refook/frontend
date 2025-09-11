@@ -13,6 +13,7 @@ interface EditableTableProps {
   emptyText?: string;
   enableCopyId?: boolean;
   onCopyId?: (id: string) => void;
+  onEditClick?: (id: string) => void;
 }
 
 const EditableTable: React.FC<EditableTableProps> = ({
@@ -25,6 +26,7 @@ const EditableTable: React.FC<EditableTableProps> = ({
   emptyText = 'Записей не найдено',
   enableCopyId = false,
   onCopyId,
+  onEditClick,
 }) => {
   return (
     <div className={styles.table}>
@@ -71,6 +73,15 @@ const EditableTable: React.FC<EditableTableProps> = ({
               >
                 {updatingId === r.id ? 'Сохранение...' : 'Сохранить'}
               </button>
+              {onEditClick && (
+                <button
+                  className="ui-btn ui-btn--ghost"
+                  onClick={() => onEditClick(r.id)}
+                  style={{ marginLeft: 8 }}
+                >
+                  Редактировать
+                </button>
+              )}
             </div>
           </div>
         ))

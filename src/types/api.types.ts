@@ -46,3 +46,26 @@ export interface CreateProductDto {
     macros: ApiMacrosDto;
     measures: AddBaseProductMeasureDto[]; // minItems: 1
 }
+
+/**
+ * ДТО обновления продукта (см. UpdateProductDto в API)
+ */
+export interface UpdateProductDto {
+    name: string;
+    description?: string;
+    categoryId?: string | null; // uuid
+    photo?: string | null;
+    macros: ApiMacrosDto;
+}
+
+/**
+ * Ответ продукта из API для заполнения формы редактирования
+ */
+export interface ProductResponseDto {
+    id: string;
+    name: string;
+    description?: string;
+    categoryId?: string | null;
+    photo?: string | null;
+    macros: ApiMacrosDto;
+}

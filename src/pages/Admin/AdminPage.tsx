@@ -4,6 +4,7 @@ import Tabs from '../../components/Tabs/Tabs';
 import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon } from '@heroicons/react/24/outline';
 import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
 import CreateProductForm from './components/CreateProductForm/CreateProductForm';
+import ProductListSubTab from './components/ProductListSubTab/ProductListSubTab';
 import TagSubTabs from './components/TagSubTabs/TagSubTabs';
 import KitchenSubTabs from './components/KitchenSubTabs/KitchenSubTabs';
 
@@ -68,6 +69,7 @@ const AdminPage: React.FC = () => {
             Icon: Squares2X2Icon,
             subtabs: [
               { id: 'products:create', label: 'Создание', title: 'Создать продукт', content: <CreateProductForm /> },
+              { id: 'products:list', label: 'Список', title: 'Список продуктов', content: <ProductListSubTab /> },
               { id: 'products:suggest', label: 'Предложения', title: 'Предложения пользователей', content: (
                 <div className={styles.placeholder}>Здесь будут предложения пользователей по новым продуктам.</div>
               ) },

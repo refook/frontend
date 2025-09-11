@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Tabs from '../../../../components/Tabs/Tabs';
 import CreateProductForm from '../CreateProductForm/CreateProductForm';
+import ProductListSubTab from '../ProductListSubTab/ProductListSubTab';
 import styles from './ProductSubTabs.module.css';
 
 /**
@@ -34,6 +35,7 @@ const ProductSubTabs: React.FC = () => {
    */
   const tabs = [
     { id: 'create', label: 'Создать продукт' },
+    { id: 'list', label: 'Список' },
     { id: 'suggestions', label: 'Предложения пользователей' },
   ];
 
@@ -48,6 +50,14 @@ const ProductSubTabs: React.FC = () => {
           <div className={styles.card}>
             <div className={styles.cardTitle}>Создать продукт</div>
             <CreateProductForm />
+          </div>
+        )}
+        
+        {/* Контент вкладки "Список продуктов" */}
+        {active === 'list' && (
+          <div className={styles.card}>
+            <div className={styles.cardTitle}>Список продуктов</div>
+            <ProductListSubTab />
           </div>
         )}
         

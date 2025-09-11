@@ -1,9 +1,22 @@
 import { API_BASE_URL } from './api';
 import { authorizedFetch, getAuthHeaders } from './auth';
 import { apiLogger } from '../utils/apiLogger';
-import type { CreateProductDto } from '../types/api.types';
+import type { CreateProductDto, UpdateProductDto, ProductResponseDto } from '../types/api.types';
 
 class ProductsService {
+  async getAllProducts(): Promise<Array<{ id: string; name: string; description?: string }>> {
+    const url = `${API_BASE_URL}/products/all`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'GET', headers);
+
+    const response = await authorizedFetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    return response.json();
+  }
+
   async createProduct(dto: CreateProductDto): Promise<{ id: string }> {
     const url = `${API_BASE_URL}/products`;
     const headers = getAuthHeaders();
@@ -20,6 +33,51 @@ class ProductsService {
       throw new Error(`HTTP ${response.status}: ${text}`);
     }
 
+    return response.json();
+  }
+
+  async updateProduct(id: string, dto: UpdateProductDto): Promise<{ id: string }> {
+    const url = `${API_BASE_URL}/products/${id}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'PUT', headers, dto);
+
+    const response = await authorizedFetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(dto),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+
+    return response.json();
+  }
+
+  async getProductById(id: string): Promise<ProductResponseDto> {
+    const url = `${API_BASE_URL}/products/${id}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'GET', headers);
+
+    const response = await authorizedFetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    return response.json();
+  }
+
+  async searchProductsByName(name: string): Promise<ProductResponseDto[]> {
+    const url = `${API_BASE_URL}/products/search?name=${encodeURIComponent(name)}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'GET', headers);
+
+    const response = await authorizedFetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
     return response.json();
   }
 }
