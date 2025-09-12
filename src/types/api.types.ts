@@ -69,3 +69,30 @@ export interface ProductResponseDto {
     photo?: string | null;
     macros: ApiMacrosDto;
 }
+
+// --- Measures ---
+export interface ProductMeasureResponseDto {
+    id: string;
+    name: string;
+    weight: number;
+    isDefault: boolean;
+    density?: number;
+}
+
+export interface UpdateBaseProductMeasureDto {
+    id: string;
+    name: string;
+    weight: number;
+    isDefault: boolean;
+    density?: number;
+}
+
+// --- Product Variant ---
+export interface ChangeProductVariantDto {
+    name: string;
+    brandId?: string | null;
+    description?: string;
+    categoryId?: string | null;
+    photo?: string | null;
+    macros: ApiMacrosDto;
+}

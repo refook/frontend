@@ -4,6 +4,7 @@ import { PRODUCT_UNITS_ARRAY } from '../../../../constants/measures';
 import styles from './CreateProductForm.module.css';
 // import { authorizedFetch } from '../../../../services/auth';
 import type { CreateProductDto, AddBaseProductMeasureDto } from '../../../../types/api.types';
+import ProductForm from '../ProductForm/ProductForm';
 
 // Локальное состояние формы будет совместимо с CreateProductDto
 type CreateProductDtoForm = CreateProductDto;
@@ -277,63 +278,26 @@ const CreateProductForm: React.FC = () => {
         />
       </label>
       
-      {/* Пищевая ценность (КБЖУ) */}
       <fieldset className={styles.fieldset}>
-        <legend className={styles.legend}>КБЖУ*</legend>
-        <div className={styles.row4}>
-          <label className={styles.label}>
-            Ккал
-            <input
-              className={styles.input}
-              type="number"
-              min={0}
-              step={1}
-              value={formData.macros.calories}
-              onChange={(e) => setFormData({ ...formData, macros: { ...formData.macros, calories: Number(e.target.value) } })}
-              required
-              max={100000}
-            />
-          </label>
-          <label className={styles.label}>
-            Белки
-            <input
-              className={styles.input}
-              type="number"
-              min={0}
-              step={0.01}
-              value={formData.macros.proteins}
-              onChange={(e) => setFormData({ ...formData, macros: { ...formData.macros, proteins: Number(e.target.value) } })}
-              required
-              max={100}
-            />
-          </label>
-          <label className={styles.label}>
-            Жиры
-            <input
-              className={styles.input}
-              type="number"
-              min={0}
-              step={0.01}
-              value={formData.macros.fats}
-              onChange={(e) => setFormData({ ...formData, macros: { ...formData.macros, fats: Number(e.target.value) } })}
-              required
-              max={100}
-            />
-          </label>
-          <label className={styles.label}>
-            Углеводы
-            <input
-              className={styles.input}
-              type="number"
-              min={0}
-              step={0.01}
-              value={formData.macros.carbs}
-              onChange={(e) => setFormData({ ...formData, macros: { ...formData.macros, carbs: Number(e.target.value) } })}
-              required
-              max={100}
-            />
-          </label>
-        </div>
+        <legend className={styles.legend}>Основные поля</legend>
+        <ProductForm
+          mode="base"
+          value={{
+            name: formData.name,
+            description: formData.description,
+            categoryId: formData.categoryId ?? null,
+            photo: formData.photo ?? null,
+            macros: formData.macros,
+          }}
+          onChange={(next) => setFormData({
+            ...formData,
+            name: next.name,
+            description: next.description ?? '',
+            categoryId: next.categoryId ?? null,
+            photo: next.photo ?? null,
+            macros: next.macros,
+          })}
+        />
         <label className={styles.label}>
           Пустые значения?
           <input

@@ -1,7 +1,7 @@
 import { API_BASE_URL } from './api';
 import { authorizedFetch, getAuthHeaders } from './auth';
 import { apiLogger } from '../utils/apiLogger';
-import type { CreateProductDto, UpdateProductDto, ProductResponseDto } from '../types/api.types';
+import type { CreateProductDto, UpdateProductDto, ProductResponseDto, ProductMeasureResponseDto, UpdateBaseProductMeasureDto, AddBaseProductMeasureDto, ChangeProductVariantDto } from '../types/api.types';
 
 class ProductsService {
   async getAllProducts(): Promise<Array<{ id: string; name: string; description?: string }>> {
@@ -74,6 +74,70 @@ class ProductsService {
     apiLogger.logRequest(url, 'GET', headers);
 
     const response = await authorizedFetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    return response.json();
+  }
+
+  async getBaseMeasures(productId: string): Promise<ProductMeasureResponseDto[]> {
+    const url = `${API_BASE_URL}/products/measures/base/${productId}/all`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'GET', headers);
+
+    const response = await authorizedFetch(url, { method: 'GET', headers });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    return response.json();
+  }
+
+  async updateBaseMeasure(productId: string, dto: UpdateBaseProductMeasureDto): Promise<{ id: string }> {
+    const url = `${API_BASE_URL}/products/measures/base/${productId}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'PUT', headers, dto);
+
+    const response = await authorizedFetch(url, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(dto),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    return response.json();
+  }
+
+  async addBaseMeasure(productId: string, dto: AddBaseProductMeasureDto): Promise<{ id: string }> {
+    const url = `${API_BASE_URL}/products/measures/base/${productId}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'POST', headers, dto);
+
+    const response = await authorizedFetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(dto),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    return response.json();
+  }
+
+  async saveProductVariant(productId: string, dto: ChangeProductVariantDto): Promise<{ id: string }> {
+    const url = `${API_BASE_URL}/products/variants/${productId}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'POST', headers, dto);
+
+    const response = await authorizedFetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(dto),
+    });
     if (!response.ok) {
       const text = await response.text();
       throw new Error(`HTTP ${response.status}: ${text}`);
