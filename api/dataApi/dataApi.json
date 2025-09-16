@@ -2017,6 +2017,131 @@
         }
       }
     },
+    "/v1/products/variants/{productId}/all": {
+      "get": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Получение всего списка продуктов",
+        "operationId": "getAllVariantByProduct",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/variants/search": {
+      "get": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Получение вариантов продуктов по совпадению по имени",
+        "operationId": "getAllProductVariantsByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2147483647,
+              "minLength": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/products/variants/all": {
+      "get": {
+        "tags": [
+          "Продукты (Варианты)"
+        ],
+        "summary": "Получение всего списка вариантов продуктов",
+        "operationId": "getAllProductVariants",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProductResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/products/search": {
       "get": {
         "tags": [

@@ -14,6 +14,7 @@ interface EditableTableProps {
   enableCopyId?: boolean;
   onCopyId?: (id: string) => void;
   onEditClick?: (id: string) => void;
+  enableSave?: boolean;
 }
 
 const EditableTable: React.FC<EditableTableProps> = ({
@@ -27,6 +28,7 @@ const EditableTable: React.FC<EditableTableProps> = ({
   enableCopyId = false,
   onCopyId,
   onEditClick,
+  enableSave = true,
 }) => {
   return (
     <div className={styles.table}>
@@ -66,13 +68,15 @@ const EditableTable: React.FC<EditableTableProps> = ({
               />
             </div>
             <div className={styles.colActions}>
-              <button
-                className="ui-btn ui-btn--primary"
-                onClick={() => onSave(r.id)}
-                disabled={updatingId === r.id}
-              >
-                {updatingId === r.id ? 'Сохранение...' : 'Сохранить'}
-              </button>
+              {enableSave && (
+                <button
+                  className="ui-btn ui-btn--primary"
+                  onClick={() => onSave(r.id)}
+                  disabled={updatingId === r.id}
+                >
+                  {updatingId === r.id ? 'Сохранение...' : 'Сохранить'}
+                </button>
+              )}
               {onEditClick && (
                 <button
                   className="ui-btn ui-btn--ghost"

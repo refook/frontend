@@ -1,17 +1,27 @@
 import React from 'react';
 import type { ApiMacrosDto, ChangeProductVariantDto, CreateProductDto } from '../../../../types/api.types';
 
+/** Общие поля формы продукта, которые используются и для базы, и для варианта. */
 type CommonFields = Pick<ChangeProductVariantDto, 'name' | 'description' | 'categoryId' | 'photo' | 'macros'>;
 
 export type ProductFormMode = 'base' | 'variant';
 
+/** Пропсы компонента формы продукта. */
 interface ProductFormProps {
+  /** Режим формы: базовый продукт или вариант */
   mode: ProductFormMode;
+  /** Контролируемое значение формы */
   value: CommonFields;
+  /** Колбэк изменения значения формы */
   onChange: (next: CommonFields) => void;
+  /** Блокировка полей формы */
   disabled?: boolean;
 }
 
+/**
+ * Унифицированная форма редактирования/создания продукта.
+ * Используется как для базового продукта, так и для варианта.
+ */
 const ProductForm: React.FC<ProductFormProps> = ({ mode, value, onChange, disabled = false }) => {
   const macros = value.macros as ApiMacrosDto;
   return (

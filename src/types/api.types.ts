@@ -96,3 +96,9 @@ export interface ChangeProductVariantDto {
     photo?: string | null;
     macros: ApiMacrosDto;
 }
+
+export interface AddProductVariantMeasureDto {
+    baseMeasureId: string;
+    weight: number;
+    density?: number;
+}
