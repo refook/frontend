@@ -234,6 +234,33 @@
   margin-bottom: var(--spacing-3xl);
 }
 
+.reviewSection {
+  background: var(--token-surface);
+  border-radius: var(--token-radius-lg);
+  padding: var(--token-space-6);
+  box-shadow: var(--token-shadow-sm);
+  margin: 0 0 var(--token-space-6) 0;
+}
+.reviewTitle { margin: 0 0 var(--token-space-4) 0; color: var(--token-text); font-size: var(--token-text-xl); font-weight: 700; }
+.reviewControlsRow { display: flex; align-items: center; gap: var(--token-space-4); margin-bottom: var(--token-space-4); }
+.reviewLabel { color: var(--token-muted); }
+.reviewCount { color: var(--token-muted); font-weight: 600; }
+.reviewField { margin-bottom: var(--token-space-4); }
+.reviewTextarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  border: none;
+  outline: none;
+  border-radius: var(--token-radius-md);
+  background: var(--token-surface);
+  color: var(--token-text);
+  box-shadow: inset 0 0 0 1px var(--token-border);
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+.reviewActions { display: flex; justify-content: flex-end; }
+
 .timing {
   background-color: var(--bg-secondary);
   padding: var(--spacing-xl);

@@ -8,15 +8,14 @@ import {
   UserGroupIcon, 
   StarIcon,
   PencilIcon,
-  CheckIcon,
-  HeartIcon,
-  BookmarkIcon
+  CheckIcon
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid';
 import NutritionInfo from '../NutritionInfo/NutritionInfo';
 import { API_BASE_URL } from '../../services/api';
 import IngredientsSection from '../IngredientsSection/IngredientsSection';
 import HeroCard from '../HeroCard/HeroCard';
+import ActionToggle from '../ActionToggle/ActionToggle';
+import RatingControl from '../RatingControl/RatingControl';
 import Chip from '../Chip/Chip';
 import StepsSection from '../StepsSection/StepsSection';
 import styles from './RecipePreview.module.css';
@@ -46,10 +45,13 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   // Используем данные из recipe или formData
   const [availableIngredients, setAvailableIngredients] = useState<ApiIngredient[]>([]);
 
+  // В режиме просмотра готового рецепта (есть prop recipe) имена ингредиентов уже приходят с API,
+  // поэтому лишний запрос за списком ингредиентов не делаем, чтобы избежать ошибок/500.
+  const isFormDataMode = !recipe;
   useEffect(() => {
+    if (!isFormDataMode) return;
     const loadIngredients = async () => {
       try {
-        // Более устойчивый метод: возвращает [] при ошибках (например, 500)
         const ingredients = await ingredientsService.getIngredientsForFridge();
         setAvailableIngredients(ingredients);
       } catch (error) {
@@ -57,13 +59,13 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
         setAvailableIngredients([]);
       }
     };
-    loadIngredients();
-  }, []);
+    void loadIngredients();
+  }, [isFormDataMode]);
 
   const data = recipe || formData;
   if (!data) return null;
 
-  const isFormData = !recipe;
+  const isFormData = isFormDataMode;
   
   const title = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
   const description = isFormData ? (data as CreateRecipeDto).description : (data as Recipe).description;
@@ -205,9 +207,36 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
         <HeroCard
           title={title || 'Название рецепта'}
           description={description || 'Описание рецепта'}
-          rating={!isFormData && (data as Recipe).stats?.rating ? (data as Recipe).stats!.rating : 4.8}
+          rating={
+            !isFormData
+              ? ((data as any).stats?.avgRating ?? (data as Recipe).stats?.rating ?? 4.8)
+              : 4.8
+          }
           author={(isFormData ? 'Автор рецепта' : (data as Recipe).author?.name) || 'Автор'}
           imageUrl={heroImageUrl}
+          viewsCount={!isFormData ? (((data as any).stats?.viewsCount ?? (data as any).stats?.views) ?? undefined) : undefined}
+          actionsSlot={
+            !isFormData && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <ActionToggle
+                  type="like"
+                  active={liked}
+                  loading={likeLoading}
+                  disabled={!isAuthenticated}
+                  count={likesCount}
+                  onToggle={handleToggleLike}
+                />
+                <ActionToggle
+                  type="favorite"
+                  active={favorite}
+                  loading={favoriteLoading}
+                  disabled={!isAuthenticated}
+                  count={((data as any).stats?.favoritesCount ?? (data as any).stats?.saves) as number | undefined}
+                  onToggle={handleToggleFavorite}
+                />
+              </div>
+            )
+          }
         />
 
         {/* Основная информация */}
@@ -242,63 +271,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             label="Порции"
             value={<span>{servings}</span>}
           />
-          {!isFormData && (
-            <>
-              <InfoCard
-                icon={<HeartIcon className={styles.infoIcon} />}
-                label="Лайки"
-                value={
-                  <button
-                    type="button"
-                    onClick={handleToggleLike}
-                    disabled={likeLoading || !isAuthenticated}
-                    className="ui-btn ui-btn--ghost"
-                    aria-pressed={liked}
-                    aria-label={liked ? 'Убрать лайк' : 'Поставить лайк'}
-                  >
-                    {liked ? 'Убрать лайк' : 'Лайк'} ({likesCount})
-                  </button>
-                }
-              />
-              <InfoCard
-                icon={<BookmarkIcon className={styles.infoIcon} />}
-                label="Избранное"
-                value={
-                  <button
-                    type="button"
-                    onClick={handleToggleFavorite}
-                    disabled={favoriteLoading || !isAuthenticated}
-                    className="ui-btn ui-btn--ghost"
-                    aria-pressed={favorite}
-                    aria-label={favorite ? 'Убрать из избранного' : 'В избранное'}
-                  >
-                    {favorite ? 'Убрать' : 'В избранное'}
-                  </button>
-                }
-              />
-              <InfoCard
-                icon={<StarIcon className={styles.infoIcon} />}
-                label="Рейтинг"
-                value={
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => handleSetRating(i + 1)}
-                        disabled={ratingLoading || !isAuthenticated}
-                        aria-label={`Поставить ${i + 1}`}
-                        className="ui-btn ui-btn--ghost"
-                        style={{ padding: '2px 6px' }}
-                      >
-                        {i < rating ? '★' : '☆'}
-                      </button>
-                    ))}
-                  </div>
-                }
-              />
-            </>
-          )}
+          {/* блок лайков/избранного/рейтинга перенесён в заголовок HeroCard */}
         </div>
 
         {/* Теги */}
@@ -341,6 +314,36 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Блок рейтинга и отзыва (заглушка) */}
+        {!isFormData && (
+          <div className={styles.reviewSection}>
+            <h3 className={styles.reviewTitle}>Ваш отзыв</h3>
+            <div className={styles.reviewControlsRow}>
+              <span className={styles.reviewLabel}>Оцените рецепт:</span>
+              <RatingControl
+                value={rating}
+                loading={ratingLoading}
+                disabled={!isAuthenticated}
+                onChange={handleSetRating}
+                countLabel={`${Number((data as any).stats?.ratingsCount ?? 0)} оценок`}
+              />
+            </div>
+            <div className={styles.reviewField}>
+              <textarea
+                className={styles.reviewTextarea}
+                placeholder={isAuthenticated ? 'Поделитесь впечатлениями о рецепте… (скоро)' : 'Войдите, чтобы оставить отзыв'}
+                disabled={!isAuthenticated}
+                rows={4}
+              />
+            </div>
+            <div className={styles.reviewActions}>
+              <button type="button" className="ui-btn ui-btn--flat" disabled>
+                Отправить отзыв (скоро)
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Комментарии (заглушка) */}
         {!isFormData && (

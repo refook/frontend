@@ -5,7 +5,7 @@ import type {
   RecipeSort, 
   PaginatedResponse
 } from '../types';
-import type { CreateRecipeDto, UpdateRecipeDto, DifficultyLevel, KitchenType } from '../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto, DifficultyLevel, KitchenType, ApiCreateRecipeDto } from '../types/recipe.types';
 
 export class RecipesService {
   // Получение списка рецептов с пагинацией и фильтрами
@@ -40,7 +40,7 @@ export class RecipesService {
   }
 
   // Создание нового рецепта
-  static async createRecipe(formData: CreateRecipeDto): Promise<Recipe> {
+  static async createRecipe(formData: ApiCreateRecipeDto): Promise<Recipe> {
     try {
       return await realRecipesService.createRecipe(formData);
     } catch (error: any) {
@@ -186,38 +186,34 @@ export class RecipesService {
   }
 
   // Проверка валидности формы рецепта
-  static validateRecipeForm(formData: CreateRecipeDto): { isValid: boolean; errors: string[] } {
+  static validateRecipeForm(formData: ApiCreateRecipeDto): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (!formData.name?.trim()) {
+    if (!formData?.name?.trim()) {
       errors.push('Название рецепта обязательно');
     }
 
-    if (!formData.description?.trim()) {
+    if (!formData?.description?.trim()) {
       errors.push('Описание рецепта обязательно');
     }
 
-    if (!formData.level) {
+    if (!formData?.level) {
       errors.push('Выберите сложность рецепта');
     }
 
-    if (formData.allTime < 0) {
+    if (typeof formData?.allTime === 'number' && formData.allTime < 0) {
       errors.push('Общее время приготовления не может быть отрицательным');
     }
 
-    if (formData.cookTime < 0) {
+    if (typeof formData?.cookTime === 'number' && formData.cookTime < 0) {
       errors.push('Время готовки не может быть отрицательным');
     }
 
-    // portion больше не используется в форме; unitCount устанавливается на бэке
-
-    if (!formData.ingredients?.length) {
+    // Новый формат: composition обязателен, ingredients обязательны
+    if (!formData.composition?.ingredients || formData.composition.ingredients.length === 0) {
       errors.push('Добавьте хотя бы один ингредиент');
     }
-
-    if (!formData.steps?.length) {
-      errors.push('Добавьте хотя бы один шаг приготовления');
-    }
+    // steps опциональны по схеме, не валидируем
 
     return {
       isValid: errors.length === 0,

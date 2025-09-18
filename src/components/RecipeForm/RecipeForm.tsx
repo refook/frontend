@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../../services/api';
-import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY, RECIPE_UNITS_ARRAY } from '../../constants/measures';
-import type { CreateRecipeDto, KitchenType, DifficultyLevel } from '../../types/recipe.types';
+import { BASE_UNITS_ARRAY, PRODUCT_UNITS, PRODUCT_UNITS_ARRAY, RECIPE_UNITS_ARRAY } from '../../constants/measures';
+import type { CreateRecipeDto, KitchenType, DifficultyLevel, ApiCreateRecipeDto, ApiUpdateStepDto } from '../../types/recipe.types';
+import type { ProductMeasureResponseDto } from '../../types/api.types';
+import { productsService } from '../../services';
 import IngredientPicker from '../IngredientPicker/IngredientPicker';
 import StepsEditor from '../StepsEditor/StepsEditor';
 import TagsInput from '../TagsInput/TagsInput';
@@ -111,9 +113,100 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) onSubmit(formData);
+    if (!validateForm()) return;
+
+    // Кеш базовых мер по продукту
+    const measuresCache = new Map<string, ProductMeasureResponseDto[]>();
+    const getMeasures = async (productId: string) => {
+      if (measuresCache.has(productId)) return measuresCache.get(productId)!;
+      const list = await productsService.getBaseMeasures(productId);
+      measuresCache.set(productId, list);
+      return list;
+    };
+
+    const unitLabelByValue = (value: string): string => {
+      const entry = Object.values(PRODUCT_UNITS).find(u => u.value === value);
+      return entry?.label ?? '';
+    };
+
+    // Маппинг ингредиентов формы -> UpdateRecipeIngredientDto (API)
+    const mapIngredients = async (ings: CreateRecipeDto['ingredients']) => {
+      const result: Array<{ id: string; count: number; isVariate: boolean; productMeasureId: string }> = [];
+      for (const ing of ings) {
+        const measures = await getMeasures(ing.id);
+        const wantedLabel = unitLabelByValue((ing as any).productUnit as string);
+        const found = measures.find(m => m.name === wantedLabel);
+        if (!found) {
+          setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
+          return null;
+        }
+        result.push({ id: ing.id, count: ing.count, isVariate: false, productMeasureId: found.id });
+      }
+      return result;
+    };
+
+    // Основные ингредиенты
+    const apiIngredients = await mapIngredients(formData.ingredients);
+    if (!apiIngredients) return; // уже выставили ошибку
+
+    // Шаги (переносим ингредиенты шагов при наличии)
+    const apiSteps: ApiUpdateStepDto[] = await (async () => {
+      const steps: ApiUpdateStepDto[] = [];
+      for (const s of formData.steps) {
+        let stepIngredients: Array<{ id: string; count: number; isVariate: boolean; productMeasureId: string }> | undefined;
+        if ((s as any).ingredients?.length) {
+          const mapped = await mapIngredients((s as any).ingredients as any);
+          if (!mapped) return [] as ApiUpdateStepDto[];
+          stepIngredients = mapped;
+        }
+        steps.push({
+          id: (s as any).id,
+          index: s.index,
+          name: s.name,
+          description: s.description,
+          photos: s.photos,
+          ingredients: stepIngredients as any,
+          time: (s as any).time,
+        });
+      }
+      return steps;
+    })();
+
+    const apiDto: ApiCreateRecipeDto = {
+      name: formData.name,
+      description: formData.description,
+      level: formData.level,
+      composition: {
+        ingredients: apiIngredients as any,
+        steps: apiSteps,
+      },
+      metaInfo: {
+        kitchens: formData.kitchens,
+        tags: (formData.tags as any[] | undefined)?.map((t: any) => (typeof t === 'string' ? t : t?.id)).filter(Boolean) as string[] | undefined,
+        photos: formData.photos,
+      },
+      cookingTime: {
+        activeTime: formData.cookTime,
+        allTime: formData.allTime,
+      },
+      serving: {
+        baseUnit: (formData.baseUnit as any) ?? 'GR',
+        totalWeight: (formData.avgWeight as any) ?? 0,
+        recipeUnit: (formData.recipeUnit as any) ?? 'PORTION',
+        unitCount: (formData.unitCount as any) ?? 1,
+      },
+      macros: {
+        calories: formData.macros?.calories ?? 0,
+        proteins: formData.macros?.proteins ?? 0,
+        fats: formData.macros?.fats ?? 0,
+        carbs: formData.macros?.carbs ?? 0,
+      },
+    };
+
+    // Передаём наверх новый формат (временно как any для совместимости)
+    onSubmit(apiDto as unknown as any);
   };
 
   const difficultyOptions = [

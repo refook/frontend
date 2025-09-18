@@ -26,13 +26,16 @@
 }
 
 .content { display: flex; flex-direction: column; justify-content: center; gap: var(--token-space-6); }
+.headerRow { display: flex; align-items: center; justify-content: space-between; gap: var(--token-space-4); flex-wrap: wrap; }
 .title { margin: 0; font-size: clamp(24px, 3.6vw, 40px); line-height: 1.1; color: var(--token-text); letter-spacing: -0.02em; }
+.actions { display: inline-flex; align-items: center; gap: 8px; }
 .description { margin: 0; font-size: var(--token-text-lg); line-height: var(--token-leading-normal); color: var(--token-muted); }
 
 .ratingRow { display: flex; align-items: center; gap: var(--token-space-4); }
 .stars { display: inline-flex; gap: 6px; }
 .starIcon { width: 20px; height: 20px; color: #fbbf24; filter: drop-shadow(0 1px 0 rgba(0,0,0,0.05)); }
 .ratingValue { font-weight: 600; color: var(--token-text); }
+.viewsValue { color: var(--token-muted); font-weight: 500; }
 
 .author { display: flex; align-items: center; gap: var(--token-space-3); color: var(--token-text); }
 .authorAvatar { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--token-radius-full); background: var(--token-surface); border: 1px solid var(--token-border); }
