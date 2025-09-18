@@ -137,8 +137,8 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       } else {
         setUnitWarning(null);
         setAllowedUnits(filteredUnits.length > 0 ? filteredUnits : PRODUCT_UNITS_ARRAY);
-        const defaultUnit = filteredUnits.find(u => u.isDefault) || filteredUnits[0] || PRODUCT_UNITS.GRAM;
-        setUnit(defaultUnit?.value || 'GR');
+        const defaultUnit = filteredUnits[0] || PRODUCT_UNITS.GRAM;
+        setUnit((defaultUnit as any)?.value || 'GR');
       }
     } catch {
       setVariants([]);
