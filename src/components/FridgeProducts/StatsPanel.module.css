@@ -43,7 +43,7 @@
 /* Мобильный режим: 4 карточки в один ряд (прокрутка по горизонтали предотвращается с minmax) */
 @media (max-width: 600px) {
   .stats {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

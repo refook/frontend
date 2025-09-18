@@ -44,7 +44,7 @@
 [data-theme='dark'] .tone_success .icon svg,
 [data-theme='dark'] .tone_warning .icon svg,
 [data-theme='dark'] .tone_info .icon svg {
-  color: var(--token-neutral-900);
+  color: var(--token-neutral-0);
 }
 
 .content {
