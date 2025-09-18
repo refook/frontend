@@ -42,7 +42,7 @@ const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ fullWidth = false }
     setFormData(newFormData);
   };
 
-  const handleSubmit = async (formData: ApiCreateRecipeDto) => {
+  const handleSubmit = async (formData: any) => {
     setIsSubmitting(true);
     
     try {

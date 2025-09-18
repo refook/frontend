@@ -186,7 +186,7 @@ export class RecipesService {
   }
 
   // Проверка валидности формы рецепта
-  static validateRecipeForm(formData: ApiCreateRecipeDto): { isValid: boolean; errors: string[] } {
+  static validateRecipeForm(formData: any): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     if (!formData?.name?.trim()) {
