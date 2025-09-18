@@ -440,7 +440,12 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         {/* Шаги приготовления */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Шаги приготовления *</h2>
-          <StepsEditor steps={formData.steps} onChange={(steps) => updateField('steps', steps)} errors={errors} />
+          <StepsEditor
+            steps={formData.steps}
+            onChange={(steps) => updateField('steps', steps)}
+            errors={errors}
+            baseIngredients={formData.ingredients}
+          />
           {errors.steps && <span className={styles.errorText}>{errors.steps}</span>}
         </section>
 
