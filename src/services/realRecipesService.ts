@@ -282,53 +282,11 @@ class RealRecipesService {
   /**
    * Создать новый рецепт
    */
-  async createRecipe(formData: CreateRecipeDto): Promise<Recipe> {
+  async createRecipe(formData: ApiCreateRecipeDto): Promise<Recipe> {
     try {
       console.log('Создание нового рецепта:', formData.name);
       console.log('📥 Данные из формы:', JSON.stringify(formData, null, 2));
-      
-      // Маппинг локальных данных в формат API CreateRecipeDto
-      const apiRecipeData: ApiCreateRecipeDto = {
-        name: formData.name,
-        description: formData.description,
-        level: formData.level,
-        composition: {
-          ingredients: formData.ingredients || [],
-          steps: (formData.steps || []).map(step => ({
-            index: step.index,
-            name: step.name || undefined,
-            description: step.description,
-            photos: step.photos || [],
-            ingredients: step.ingredients || [],
-            time: step.time || 0
-          }))
-        },
-        metaInfo: {
-          kitchens: formData.kitchens || [],
-          tags: Array.isArray(formData.tags)
-            ? (formData.tags as any[])
-                .map((t) => (typeof t === 'string' ? t : (t?.id ?? t?.name ?? '')))
-                .filter((v) => typeof v === 'string' && v.length > 0)
-            : [],
-          photos: formData.photos || []
-        },
-        cookingTime: {
-          activeTime: formData.cookTime,
-          allTime: formData.allTime
-        },
-        serving: {
-          baseUnit: (formData.baseUnit as any) || 'GR',
-          totalWeight: Number(formData.avgWeight ?? 0),
-          recipeUnit: (formData.recipeUnit as any) || 'PORTION',
-          unitCount: Number((formData as any).unitCount ?? 1)
-        },
-        macros: {
-          calories: Number(formData.macros?.calories ?? 0),
-          proteins: Number(formData.macros?.proteins ?? 0),
-          fats: Number(formData.macros?.fats ?? 0),
-          carbs: Number(formData.macros?.carbs ?? 0)
-        }
-      };
+      const apiRecipeData: ApiCreateRecipeDto = formData;
 
       console.log('📤 Отправляемые данные на API:', JSON.stringify(apiRecipeData, null, 2));
       

@@ -3,28 +3,48 @@
   grid-template-columns: 48px 1fr;
   align-items: center;
   gap: var(--token-space-4);
-  background: var(--token-bg);
-  border: 1px solid var(--token-border);
+  background: var(--token-surface);
+  border: none;
   border-radius: var(--token-radius-lg);
   padding: var(--token-space-4);
   box-shadow: var(--token-shadow-sm);
 }
 
 .iconWrap {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--token-radius-full);
+  border-radius: var(--token-radius-md);
   background: var(--token-surface);
-  border: 1px solid var(--token-border);
+  border: none;
+  line-height: 0;
 }
 
 .icon svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   color: var(--token-muted);
+  display: block;
+}
+
+/* Цветные тона для иконок */
+.tone_accent { background: color-mix(in oklab, var(--token-accent-weak) 35%, transparent); }
+.tone_success { background: color-mix(in oklab, var(--color-success-light) 60%, transparent); }
+.tone_warning { background: color-mix(in oklab, var(--color-warning-light) 60%, transparent); }
+.tone_info { background: color-mix(in oklab, var(--token-purple-300) 35%, transparent); }
+.tone_accent .icon svg { color: var(--token-accent-strong); }
+.tone_success .icon svg { color: var(--color-success); }
+.tone_warning .icon svg { color: var(--color-warning); }
+.tone_info .icon svg { color: var(--token-purple-600); }
+
+/* Тёмная тема: делаем иконки тёмными для контраста на светлых плашках */
+[data-theme='dark'] .tone_accent .icon svg,
+[data-theme='dark'] .tone_success .icon svg,
+[data-theme='dark'] .tone_warning .icon svg,
+[data-theme='dark'] .tone_info .icon svg {
+  color: var(--token-neutral-0);
 }
 
 .content {
@@ -37,9 +57,9 @@
 .value { color: var(--token-text); font-weight: 700; font-size: 20px; }
 
 @media (max-width: 700px) {
-  .card { grid-template-columns: 40px 1fr; padding: var(--token-space-3); gap: var(--token-space-3); }
-  .iconWrap { width: 32px; height: 32px; }
-  .icon svg { width: 16px; height: 16px; }
+  .card { grid-template-columns: 1fr; padding: var(--token-space-3); gap: 6px; }
+  .iconWrap { display: none; }
+  .icon svg { width: 0; height: 0; }
   .value { font-size: 18px; }
 }
 

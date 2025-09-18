@@ -6,7 +6,7 @@ import type {
   RecipeSort,
   PaginatedResponse 
 } from '../../types';
-import type { CreateRecipeDto, UpdateRecipeDto } from '../../types/recipe.types';
+import type { UpdateRecipeDto, ApiCreateRecipeDto } from '../../types/recipe.types';
 import {
   fetchRecipesStart,
   fetchRecipesSuccess,
@@ -83,7 +83,7 @@ export const fetchRecipe = createAsyncThunk(
 // Создание рецепта
 export const createRecipe = createAsyncThunk(
   'recipes/createRecipe',
-  async (formData: CreateRecipeDto, { dispatch }) => {
+  async (formData: ApiCreateRecipeDto, { dispatch }) => {
     try {
       // Валидация формы
       const validation = RecipesService.validateRecipeForm(formData);

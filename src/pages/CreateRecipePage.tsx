@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store';
-import type { CreateRecipeDto } from '../types/recipe.types';
+import type { CreateRecipeDto, ApiCreateRecipeDto } from '../types/recipe.types';
 import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../constants/measures';
 import RecipeForm from '../components/RecipeForm/RecipeForm';
 import RecipePreview from '../components/RecipePreview/RecipePreview';
@@ -42,7 +42,7 @@ const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ fullWidth = false }
     setFormData(newFormData);
   };
 
-  const handleSubmit = async (formData: CreateRecipeDto) => {
+  const handleSubmit = async (formData: ApiCreateRecipeDto) => {
     setIsSubmitting(true);
     
     try {

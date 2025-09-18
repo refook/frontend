@@ -1,24 +1,26 @@
 .card {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: var(--token-surface);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 14px;
+  padding: 10px 12px;
   box-shadow: var(--shadow-sm);
+  min-height: 56px;
 }
 
 .icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 20px;
+  font-size: 18px;
 }
-.body { display: flex; flex-direction: column; gap: 2 px; align-items: flex-start; }
-.title { color: var(--text-secondary); font-weight: 600; line-height: 1.2; min-height: 1.4em; }
-.value { font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.body { display: grid; grid-template-rows: auto 1fr; align-items: center; }
+.title { color: var(--text-secondary); font-weight: 600; line-height: 1; font-size: 11px; }
+.value { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1; }
 .clickable { cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
 .clickable:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .clickable:active { transform: translateY(0); }
@@ -30,17 +32,10 @@
 
 /* Мобильная компоновка: акцент на иконке и числе, заголовок маленьким ниже */
 @media (max-width: 600px) {
-  .card {
-    padding: 12px;
-    gap: 10px;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .icon { width: 52px; height: 52px; font-size: 22px; }
-  .value { font-size: 26px; line-height: 1; }
-  .title { font-size: 11px; opacity: 0.8; min-height: 2.4em;}
-  .body { align-items: center; }
+  .card { grid-template-columns: 36px 1fr; padding: 8px 10px; border-radius: 12px; min-height: 48px; }
+  .icon { width: 36px; height: 36px; font-size: 16px; }
+  .value { font-size: 20px; }
+  .title { font-size: 10px; opacity: 0.85; }
 }
 
 

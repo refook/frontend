@@ -6,6 +6,7 @@ export { FridgeService } from './fridgeService';
 export { ingredientsService } from './ingredientsService';
 export { realRecipesService } from './realRecipesService';
 export * from './storageUtils';
+export { productsService } from './productsService';
 
 // Экспорт типов для удобства
 export type { 

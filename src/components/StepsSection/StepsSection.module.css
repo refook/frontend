@@ -1,9 +1,9 @@
 .section {
-  background: var(--token-bg);
-  border: 1px solid var(--token-border);
-  padding: var(--token-space-6);
-  border-radius: var(--token-radius-lg);
-  box-shadow: var(--token-shadow-sm);
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .title {
@@ -15,7 +15,7 @@
 
 .steps { display: flex; flex-direction: column; gap: var(--spacing-lg); }
 .step { display: flex; gap: var(--spacing-md); }
-.stepCard { background: var(--token-surface); border: 1px solid var(--token-border); border-radius: var(--token-radius-lg); padding: var(--token-space-6); }
+.stepCard { background: var(--token-surface); border: none; border-radius: var(--token-radius-lg); padding: var(--token-space-6); }
 .stepNumber { flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background-color: var(--color-primary); color: var(--text-inverse); border-radius: var(--radius-full); font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); }
 .stepContent { flex: 1; }
 .stepTitle { margin: 0 0 var(--spacing-xs) 0; font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); color: var(--text-primary); }
@@ -25,6 +25,6 @@
 .chipsTitle { margin: var(--token-space-3) 0 0 0; font-size: var(--token-text-sm); color: var(--token-muted); }
 
 .image { margin-top: var(--spacing-md); }
-.img { max-width: 200px; height: 120px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-primary); }
+.img { max-width: 200px; height: 120px; object-fit: cover; border-radius: var(--radius-md); border: none; }
 
 

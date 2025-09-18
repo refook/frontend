@@ -1,0 +1,10 @@
+.mt16 { margin-top: 16px; }
+.actionsRow { margin-top: 12px; display: flex; gap: 8px; }
+.row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.measuresGrid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 8px; }
+.addBaseGrid { margin-top: 16px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 8px; }
+.addVariantGrid { margin-top: 16px; display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; }
+.sectionTitle { margin: 0; }
+.error { margin-bottom: 12px; color: var(--ui-error, #b91c1c); }
+.ml8 { margin-left: 8px; }
+

@@ -8,6 +8,8 @@ interface Props {
   rating?: number;
   author?: string;
   imageUrl?: string;
+  actionsSlot?: React.ReactNode;
+  viewsCount?: number;
 }
 
 /**
@@ -20,7 +22,7 @@ interface Props {
  * @param rating Необязательный рейтинг по 5‑балльной шкале (по умолчанию 4.8).
  * @param author Необязательное имя автора (по умолчанию «Автор»).
  */
-const HeroCard: React.FC<Props> = ({ title, description, rating = 4.8, author = 'Автор', imageUrl }) => {
+const HeroCard: React.FC<Props> = ({ title, description, rating = 4.8, author = 'Автор', imageUrl, actionsSlot, viewsCount }) => {
   return (
     <div className={styles.card}>
       {imageUrl ? (
@@ -29,13 +31,19 @@ const HeroCard: React.FC<Props> = ({ title, description, rating = 4.8, author = 
         <div className={styles.image} />
       )}
       <div className={styles.content}>
-        <h1 className={styles.title}>{title}</h1>
+        <div className={styles.headerRow}>
+          <h1 className={styles.title}>{title}</h1>
+          {actionsSlot && <div className={styles.actions}>{actionsSlot}</div>}
+        </div>
         {description && <p className={styles.description}>{description}</p>}
         <div className={styles.ratingRow}>
           <div className={styles.stars}>
             {[0,1,2,3,4].map(i => <StarSolidIcon key={i} className={styles.starIcon} />)}
           </div>
           <span className={styles.ratingValue}>{rating.toFixed(1)}</span>
+          {typeof viewsCount === 'number' && (
+            <span className={styles.viewsValue}>· {viewsCount} просмотров</span>
+          )}
         </div>
         <div className={styles.author}>
           <span className={styles.authorAvatar}>👨‍🍳</span>
