@@ -255,27 +255,28 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                 {difficultyMap[difficulty]}
               </span>
             }
+            tone="accent"
           />
           <InfoCard
             icon={<ClockIcon className={styles.infoIcon} />}
             label="Общее время"
             value={<span>{totalTime} мин</span>}
+            tone="info"
           />
           <InfoCard
             icon={<ClockIcon className={styles.infoIcon} />}
             label="Активное время"
             value={<span>{cookTime} мин</span>}
+            tone="warning"
           />
           <InfoCard
             icon={<UserGroupIcon className={styles.infoIcon} />}
             label="Порции"
             value={<span>{servings}</span>}
+            tone="success"
           />
           {/* блок лайков/избранного/рейтинга перенесён в заголовок HeroCard */}
         </div>
-
-        {/* Теги */}
-        <RecipeTags tags={tags} />
 
         <div className={styles.contentGrid}>
           {/* Ингредиенты */}
@@ -301,19 +302,12 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             isFormData={isFormData}
             getIngredientName={(id: string) => availableIngredients.find(ai => ai.id === id)?.name}
           />
+
+          {/* Теги */}
+          <RecipeTags tags={tags} />
         </div>
 
-        {/* Дополнительная информация */}
-        <div className={styles.additionalInfo}>
-          <div className={styles.timing}>
-            <h4 className={styles.timingTitle}>Время приготовления</h4>
-            <div className={styles.timingDetails}>
-              <span>Подготовка: {prepTime} мин</span>
-              <span>Готовка: {cookTime} мин</span>
-              <span>Общее время: {totalTime} мин</span>
-            </div>
-          </div>
-        </div>
+        {/* Блок времени приготовления удалён по требованию */}
 
         {/* Блок рейтинга и отзыва (заглушка) */}
         {!isFormData && (

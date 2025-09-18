@@ -77,9 +77,15 @@ const IngredientsSection: React.FC<Props> = ({ title, ingredients, baseServings 
         <h3 className={styles.sectionTitle}>Ингредиенты ({ingredients.length})</h3>
         <div className={styles.servingsControl}>
           <span className={styles.servingsLabel}>Порции:</span>
-          <button type="button" className={`ui-btn ui-btn--ghost ${styles.servingsBtn}`} onClick={() => setServings(v => Math.max(1, v - 1))}>−</button>
-          <span className={styles.servingsValue}>{servings}</span>
-          <button type="button" className={`ui-btn ui-btn--ghost ${styles.servingsBtn}`} onClick={() => setServings(v => v + 1)}>+</button>
+          <select
+            className={styles.servingsSelect}
+            value={servings}
+            onChange={(e) => setServings(Number(e.target.value))}
+          >
+            {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>{n}</option>
+            ))}
+          </select>
         </div>
       </div>
 

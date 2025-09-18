@@ -127,8 +127,8 @@
 .servingsValue { min-width: 28px; text-align: center; font-weight: 700; }
 
 .section {
-  background: var(--token-bg);
-  border: 1px solid var(--token-border);
+  background: var(--token-surface);
+  border: none;
   padding: var(--token-space-6);
   border-radius: var(--token-radius-lg);
   box-shadow: var(--token-shadow-sm);
@@ -218,7 +218,7 @@
   height: 120px;
   object-fit: cover;
   border-radius: var(--radius-md);
-  border: 1px solid var(--border-primary);
+  border: none;
 }
 
 .emptyState {

@@ -27,7 +27,38 @@
 
 /* Без обводки, на token-surface */
 .ui-btn--flat { background: var(--token-surface); border: none; box-shadow: none; }
+.ui-btn--flat-alt { background: color-mix(in oklab, var(--token-accent-weak) 35%, transparent); border: none; box-shadow: none; }
+.ui-btn--flat-bg { background: var(--token-bg); border: none; box-shadow: none; }
 .ui-btn--flat:hover { filter: brightness(0.98); }
+.ui-btn--flat-alt:hover { filter: brightness(0.97); }
+.ui-btn--flat-bg:hover { filter: brightness(0.98); }
+
+/* Унифицированные стили для select по всему проекту */
+select.ui-select,
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--token-surface);
+  border: 1px solid var(--token-border);
+  border-radius: var(--token-radius-full);
+  height: 36px;
+  padding: 0 36px 0 12px; /* справа больше места под стрелку */
+  box-shadow: var(--token-shadow-sm);
+  color: var(--token-text);
+  font: inherit;
+  line-height: 1;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3e%3cpath d='M6 9l6 6 6-6' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+select.ui-select:focus,
+select:not([multiple]):not([size]):focus {
+  outline: none;
+  border-color: var(--token-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--token-accent) 20%, transparent);
+}
 
 .ui-input {
   width: 100%;

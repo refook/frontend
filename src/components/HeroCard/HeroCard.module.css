@@ -2,8 +2,8 @@
   display: grid;
   grid-template-columns: 340px 1fr;
   gap: var(--token-space-8);
-  background: var(--token-bg);
-  border: 1px solid var(--token-border);
+  background: var(--token-surface);
+  border: none;
   border-radius: var(--token-radius-lg);
   padding: var(--token-space-8);
   box-shadow: var(--token-shadow-md);
@@ -38,7 +38,7 @@
 .viewsValue { color: var(--token-muted); font-weight: 500; }
 
 .author { display: flex; align-items: center; gap: var(--token-space-3); color: var(--token-text); }
-.authorAvatar { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--token-radius-full); background: var(--token-surface); border: 1px solid var(--token-border); }
+.authorAvatar { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--token-radius-full); background: var(--token-surface); border: none; }
 .authorText { font-size: var(--token-text-lg); color: var(--token-text); }
 
 @media (max-width: 900px) {

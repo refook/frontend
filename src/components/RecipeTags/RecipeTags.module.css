@@ -1,6 +1,6 @@
 .section { margin-bottom: var(--spacing-3xl, 24px); }
 .title { font-size: var(--font-size-xl, 18px); font-weight: 600; color: var(--text-primary); margin: 0 0 12px 0; }
 .container { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { padding: 4px 8px; background-color: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+.chip { padding: 8px 12px; background-color: transparent; border: none; border-radius: var(--token-radius-full); font-size: 14px; font-weight: 600; color: var(--token-text); box-shadow: none; background: var(--token-surface); }
 .empty { color: var(--text-tertiary); font-style: italic; font-size: 13px; }
 

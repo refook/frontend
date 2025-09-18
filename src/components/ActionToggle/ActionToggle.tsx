@@ -21,7 +21,7 @@ const ActionToggle: React.FC<ActionToggleProps> = ({ type, active, loading, disa
   return (
     <button
       type="button"
-      className="ui-btn ui-btn--flat"
+      className="ui-btn ui-btn--flat-bg"
       onClick={onToggle}
       disabled={isDisabled}
       aria-pressed={active}
