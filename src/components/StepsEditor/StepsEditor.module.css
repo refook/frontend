@@ -144,6 +144,23 @@
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
 }
 
+.inputError {
+  border-color: var(--color-danger);
+  background-color: rgba(220, 38, 38, 0.04);
+}
+
+.inlineError {
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.remainingHint {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+}
+
 .stepIngredients {
   background-color: var(--bg-primary);
   border: 1px solid var(--border-primary);

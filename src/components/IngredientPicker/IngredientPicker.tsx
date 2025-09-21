@@ -15,12 +15,39 @@ interface IngredientPickerProps {
   compact?: boolean;
 }
 
+/**
+ * React-компонент для управления списком ингредиентов рецепта.
+ *
+ * Позволяет:
+ * - искать ингредиенты в каталоге продуктов и добавлять их в рецепт;
+ * - выбирать допустимые единицы измерения из API (с учётом выбранного варианта продукта);
+ * - редактировать количество и меру уже добавленных ингредиентов без пересоздания записи;
+ * - отображать сообщения об ошибках валидации, приходящие «сверху».
+ *
+ * Компонент кэширует справочную информацию по единицам измерения (`fetchUnitsInfo`)
+ * и повторно использует её для уже добавленных ингредиентов, чтобы исключить лишние запросы.
+ * Поэтому при редактировании меры показывается только тот набор, который возвращает API.
+ * Пока данные ещё загружаются, переключатель меры блокируется и отображает «Загрузка…».
+ *
+ * @param {IngredientPickerProps} props
+ * @param {CreateRecipeIngredientDto[]} props.ingredients Текущий список ингредиентов рецепта.
+ * @param {(ingredients: CreateRecipeIngredientDto[]) => void} props.onChange Колбэк для уведомления родителя об изменении списка.
+ * @param {Record<string, string>} [props.errors] Ошибки валидации по конкретным полям ингредиентов (например `ingredients.0.count`).
+ * @param {boolean} [props.compact=false] Флаг для упрощённого режима отображения (не используется в текущей реализации, зарезервирован для будущего).
+ */
 const IngredientPicker: React.FC<IngredientPickerProps> = ({
   ingredients,
   onChange,
   errors = {},
   compact = false
 }) => {
+  const getIngredientKey = (productId: string, variant?: string | null) => (variant ? `${productId}::${variant}` : productId);
+
+  type UnitsInfo = {
+    units: typeof PRODUCT_UNITS_ARRAY;
+    warning: string | null;
+  };
+
   const [showForm, setShowForm] = useState(false);
   const [selectedIngredient, setSelectedIngredient] = useState<ApiIngredient | null>(null);
   const [amount, setAmount] = useState('');
@@ -34,6 +61,41 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
+  const [ingredientUnitsMap, setIngredientUnitsMap] = useState<Record<string, UnitsInfo>>({});
+  const ingredientUnitsMapRef = useRef<Record<string, UnitsInfo>>({});
+
+  useEffect(() => {
+    ingredientUnitsMapRef.current = ingredientUnitsMap;
+  }, [ingredientUnitsMap]);
+
+  const fetchUnitsInfo = async (productId: string, variant?: string | null): Promise<UnitsInfo> => {
+    try {
+      const headers = getAuthHeaders();
+      let measures: Array<{ name?: string }> = [];
+      if (variant) {
+        const resp = await authorizedFetch(`${API_BASE_URL}/products/measures/variant/${variant}/all?onlyUnique=true`, { headers });
+        measures = resp.ok ? await resp.json() : [];
+      } else {
+        const resp = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
+        measures = resp.ok ? await resp.json() : [];
+      }
+
+      const allowedLabels = new Set((measures || []).map((m: any) => String(m?.name ?? '').trim()).filter(Boolean));
+      const filtered = PRODUCT_UNITS_ARRAY.filter(u => allowedLabels.has(u.label));
+
+      if (variant && filtered.length === 0) {
+        return { units: [], warning: 'Для выбранного варианта нет доступных мер. Выберите другой вариант или продукт.' };
+      }
+
+      return {
+        units: filtered.length > 0 ? filtered : PRODUCT_UNITS_ARRAY,
+        warning: null,
+      };
+    } catch (error) {
+      console.error('IngredientPicker: не удалось загрузить меры продукта', error);
+      return { units: PRODUCT_UNITS_ARRAY, warning: null };
+    }
+  };
 
   // Загружаем продукты (ингредиенты) из нового API
   useEffect(() => {
@@ -62,29 +124,63 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   }, []);
 
   // Список продуктовых единиц измерения
-  const units = PRODUCT_UNITS_ARRAY.map(u => u.value);
-
   const suggestions = availableIngredients.filter(ingredient => 
     ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
     !ingredients.some(ing => ing.id === ingredient.id) &&
     searchTerm.length > 0
   );
 
+  useEffect(() => {
+    const loadUnitsForExisting = async () => {
+      for (const ingredient of ingredients) {
+        const variant = (ingredient as any)?.variantId ?? null;
+        const key = getIngredientKey(ingredient.id, variant);
+        if (!key || ingredientUnitsMapRef.current[key]) continue;
+        const info = await fetchUnitsInfo(ingredient.id, variant);
+        setIngredientUnitsMap(prev => {
+          if (prev[key]) return prev;
+          const next = { ...prev, [key]: info };
+          ingredientUnitsMapRef.current = next;
+          return next;
+        });
+      }
+    };
+
+    void loadUnitsForExisting();
+  }, [ingredients]);
+
   const addIngredient = () => {
-    if (selectedIngredient && amount.trim()) {
+    if (selectedIngredient && amount.trim() && unit) {
       const newIngredient: CreateRecipeIngredientDto = {
         id: selectedIngredient.id,
         count: parseInt(amount.trim()) || 0,
         productUnit: unit as ProductUnitType
       };
       
-      onChange([...ingredients, newIngredient]);
+      const payload: any = { ...newIngredient };
+      if (variantId) payload.variantId = variantId;
+
+      onChange([...ingredients, payload]);
+
+      const key = getIngredientKey(selectedIngredient.id, variantId || null);
+      const info: UnitsInfo = unitWarning
+        ? { units: [], warning: unitWarning }
+        : { units: allowedUnits.length > 0 ? allowedUnits : PRODUCT_UNITS_ARRAY, warning: null };
+      setIngredientUnitsMap(prev => {
+        const next = { ...prev, [key]: info };
+        ingredientUnitsMapRef.current = next;
+        return next;
+      });
       
       // Сбрасываем форму
       setSelectedIngredient(null);
       setSearchTerm('');
       setAmount('');
       setUnit('');
+      setVariantId('');
+      setVariants([]);
+      setAllowedUnits(PRODUCT_UNITS_ARRAY);
+      setUnitWarning(null);
       setShowForm(false);
       setShowSuggestions(false);
     }
@@ -92,6 +188,12 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
 
   const removeIngredient = (id: string) => {
     onChange(ingredients.filter(ing => ing.id !== id));
+  };
+
+  const updateIngredient = (index: number, updates: Partial<CreateRecipeIngredientDto>) => {
+    const next = [...ingredients];
+    next[index] = { ...next[index], ...updates } as CreateRecipeIngredientDto;
+    onChange(next);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,28 +220,27 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       const variantList: Array<{ id: string; name: string }> = respVar.ok ? await respVar.json() : [];
       setVariants((variantList || []).map((v: any) => ({ id: v.id ?? v.uuid ?? v.value, name: v.name ?? v.title ?? 'Вариант' })).filter(v => v.id));
 
-      // загрузим меры для продукта или варианта
-      let measures: Array<{ name: string }> = [];
-      if (nextVariantId) {
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/measures/variant/${nextVariantId}/all?onlyUnique=true`, { headers });
-        measures = resp.ok ? await resp.json() : [];
-      } else {
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
-        measures = resp.ok ? await resp.json() : [];
-      }
-      const allowedLabels = new Set((measures || []).map((m: any) => m.name).filter(Boolean));
-      const filteredUnits = PRODUCT_UNITS_ARRAY.filter(u => allowedLabels.has(u.label));
-      // если выбран вариант и мер нет — показываем предупреждение и не рендерим селект единиц
-      if (nextVariantId && filteredUnits.length === 0) {
-        setUnitWarning('Для выбранного варианта нет доступных мер. Выберите другой вариант или продукт.');
-        setAllowedUnits([]);
-        setUnit('');
+      const variantKey = nextVariantId || null;
+      const unitsInfo = await fetchUnitsInfo(productId, variantKey);
+      if (variantKey) {
+        setUnitWarning(unitsInfo.warning);
       } else {
         setUnitWarning(null);
-        setAllowedUnits(filteredUnits.length > 0 ? filteredUnits : PRODUCT_UNITS_ARRAY);
-        const defaultUnit = filteredUnits[0] || PRODUCT_UNITS.GRAM;
-        setUnit((defaultUnit as any)?.value || 'GR');
       }
+      setAllowedUnits(unitsInfo.units);
+      if (unitsInfo.units.length > 0) {
+        const defaultUnit = unitsInfo.units.find(u => u.value === unit) || unitsInfo.units[0] || PRODUCT_UNITS.GRAM;
+        setUnit((defaultUnit as any)?.value || 'GR');
+      } else {
+        setUnit('');
+      }
+
+      const key = getIngredientKey(productId, variantKey);
+      setIngredientUnitsMap(prev => {
+        const next = { ...prev, [key]: unitsInfo };
+        ingredientUnitsMapRef.current = next;
+        return next;
+      });
     } catch {
       setVariants([]);
       setAllowedUnits(PRODUCT_UNITS_ARRAY);
@@ -170,9 +271,72 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
               <span className={styles.ingredientName}>
                 {availableIngredients.find(i => i.id === ingredient.id)?.name || 'Неизвестный ингредиент'}
               </span>
-              <span className={styles.ingredientAmount}>
-                {ingredient.count} {PRODUCT_UNITS_ARRAY.find(m => m.value === (ingredient as any).productUnit)?.label}
-              </span>
+              {(() => {
+                const variant = (ingredient as any)?.variantId ?? null;
+                const key = getIngredientKey(ingredient.id, variant);
+                const info = ingredientUnitsMap[key];
+                const hasInfo = Boolean(info);
+                const warningMessage = info?.warning ?? null;
+                let unitsList = hasInfo ? (info?.units ?? PRODUCT_UNITS_ARRAY) : PRODUCT_UNITS_ARRAY.filter(u => u.value === (ingredient as any).productUnit);
+
+                if (unitsList.length > 0 && !(unitsList.some(u => u.value === (ingredient as any).productUnit))) {
+                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === (ingredient as any).productUnit);
+                  if (currentUnit) {
+                    unitsList = [...unitsList, currentUnit];
+                  }
+                }
+
+                if (unitsList.length === 0) {
+                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === (ingredient as any).productUnit);
+                  if (currentUnit) {
+                    unitsList = [currentUnit];
+                  }
+                }
+
+                const uniqueUnits: typeof PRODUCT_UNITS_ARRAY = [];
+                const seenUnits = new Set<string>();
+                unitsList.forEach(u => {
+                  if (!seenUnits.has(u.value)) {
+                    seenUnits.add(u.value);
+                    uniqueUnits.push(u);
+                  }
+                });
+
+                return (
+                  <div className={styles.ingredientControls}>
+                    <label className={styles.controlLabel}>
+                      Кол-во
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={Number(ingredient.count) || 0}
+                        onChange={(e) => updateIngredient(index, { count: Math.max(0, parseInt(e.target.value, 10) || 0) })}
+                        className={styles.controlInput}
+                      />
+                    </label>
+                    <label className={styles.controlLabel}>
+                      Мера
+                      <select
+                        className={styles.controlSelect}
+                        value={(ingredient as any).productUnit || ''}
+                        onChange={(e) => updateIngredient(index, { productUnit: e.target.value as ProductUnitType })}
+                        disabled={!hasInfo || (Boolean(warningMessage) && (info?.units?.length ?? 0) === 0)}
+                      >
+                        {uniqueUnits.map(unitOption => (
+                          <option key={unitOption.value} value={unitOption.value}>{unitOption.label}</option>
+                        ))}
+                        {!hasInfo && (
+                          <option value="" disabled>Загрузка…</option>
+                        )}
+                      </select>
+                    </label>
+                    {warningMessage && (
+                      <div className={styles.controlWarning}>{warningMessage}</div>
+                    )}
+                  </div>
+                );
+              })()}
               {errors[`ingredients.${index}.count`] && (
                 <span className={styles.errorText}>
                   {errors[`ingredients.${index}.count`]}
@@ -308,27 +472,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
             <button
               type="button"
               className={styles.addButton}
-              onClick={() => {
-                // добавляем выбранный вариант в структуру ингредиента для последующего маппинга
-                if (selectedIngredient && amount.trim()) {
-                  const newIngredient: any = {
-                    id: selectedIngredient.id,
-                    count: parseInt(amount.trim()) || 0,
-                    productUnit: unit as ProductUnitType,
-                  };
-                  if (variantId) newIngredient.variantId = variantId;
-                  onChange([...ingredients, newIngredient]);
-                  setSelectedIngredient(null);
-                  setSearchTerm('');
-                  setAmount('');
-                  setUnit('');
-                  setVariantId('');
-                  setVariants([]);
-                  setAllowedUnits(PRODUCT_UNITS_ARRAY);
-                  setShowForm(false);
-                  setShowSuggestions(false);
-                }
-              }}
+              onClick={addIngredient}
               disabled={!selectedIngredient || !amount.trim() || !unit}
             >
               Добавить

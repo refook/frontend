@@ -112,6 +112,19 @@
   font-weight: var(--font-weight-medium);
 }
 
+.errorList {
+  margin: var(--spacing-xs) 0 0 18px;
+  padding: 0;
+  list-style: disc;
+  font-weight: 400;
+  font-size: var(--font-size-xs);
+}
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .actions {
   display: flex;
   justify-content: center;

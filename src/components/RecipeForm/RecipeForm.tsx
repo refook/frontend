@@ -5,7 +5,7 @@ import type { CreateRecipeDto, KitchenType, DifficultyLevel, ApiCreateRecipeDto,
 import type { ProductMeasureResponseDto } from '../../types/api.types';
 import { productsService } from '../../services';
 import IngredientPicker from '../IngredientPicker/IngredientPicker';
-import StepsEditor from '../StepsEditor/StepsEditor';
+import StepsEditor, { type StepIngredientOveruse } from '../StepsEditor/StepsEditor';
 import TagsInput from '../TagsInput/TagsInput';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import styles from './RecipeForm.module.css';
@@ -46,6 +46,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     unitCount: (initialData as any).unitCount ?? 1
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [stepIngredientOveruses, setStepIngredientOveruses] = useState<StepIngredientOveruse[]>([]);
 
   // Синхронизируем локальное состояние с пропсом при изменении initialData
   useEffect(() => {
@@ -69,6 +70,24 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       unitCount: (initialData as any).unitCount ?? 1
     });
   }, [initialData]);
+
+  useEffect(() => {
+    setErrors(prev => {
+      const hasOver = stepIngredientOveruses.length > 0;
+      const hasPrev = Boolean(prev['steps.overuse']);
+      if (hasOver && !hasPrev) {
+        return {
+          ...prev,
+          'steps.overuse': 'Суммарное количество ингредиентов в шагах превышает доступное количество из основного списка',
+        };
+      }
+      if (!hasOver && hasPrev) {
+        const { ['steps.overuse']: _, ...rest } = prev;
+        return rest;
+      }
+      return prev;
+    });
+  }, [stepIngredientOveruses]);
 
   const updateField = <K extends keyof CreateRecipeDto>(
     field: K,
@@ -108,6 +127,9 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         if (!step.description?.trim()) newErrors[`steps.${index}.description`] = 'Описание шага обязательно';
         if (!step.index || step.index <= 0) newErrors[`steps.${index}.index`] = 'Индекс шага должен быть положительным числом';
       });
+    }
+    if (stepIngredientOveruses.length > 0) {
+      newErrors['steps.overuse'] = 'Суммарное количество ингредиентов в шагах превышает допустимое значение';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -445,13 +467,30 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
             onChange={(steps) => updateField('steps', steps)}
             errors={errors}
             baseIngredients={formData.ingredients}
+            onValidationChange={setStepIngredientOveruses}
           />
           {errors.steps && <span className={styles.errorText}>{errors.steps}</span>}
+          {stepIngredientOveruses.length > 0 && (
+            <div className={styles.errorText}>
+              <span>Суммарно превышено количество для ингредиентов:</span>
+              <ul className={styles.errorList}>
+                {stepIngredientOveruses.map((item) => (
+                  <li key={item.key}>
+                    {`${item.name}: превышение на ${Number.isInteger(item.over) ? item.over : item.over.toFixed(2)} (использовано ${Number.isInteger(item.used) ? item.used : item.used.toFixed(2)} из ${Number.isInteger(item.base) ? item.base : item.base.toFixed(2)})`}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
 
         {/* Кнопки */}
         <div className={styles.actions}>
-          <button type="submit" className={`${styles.submitButton} ${!isValid ? styles.disabled : ''}`} disabled={!isValid || isSubmitting}>
+          <button
+            type="submit"
+            className={`${styles.submitButton} ${(!isValid || stepIngredientOveruses.length > 0) ? styles.disabled : ''}`}
+            disabled={!isValid || isSubmitting || stepIngredientOveruses.length > 0}
+          >
             {isSubmitting ? 'Создаем рецепт...' : 'Создать рецепт'}
           </button>
         </div>
