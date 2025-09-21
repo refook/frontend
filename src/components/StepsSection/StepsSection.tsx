@@ -3,6 +3,7 @@ import styles from './StepsSection.module.css';
 import Chip from '../Chip/Chip';
 import { getEmojiByKey } from '../../utils/emoji';
 import type { CreateRecipeIngredientDto, RecipeIngredientDto, StepResponseDto } from '../../types';
+import { formatMeasureLabel } from '../../utils/measureLabel';
 
 /**
  * Пропсы компонента StepsSection.
@@ -14,6 +15,7 @@ interface Props {
   steps: StepResponseDto[] | any[];
   isFormData: boolean;
   getIngredientName: (id: string) => string | undefined;
+  measureLabels?: Record<string, string>;
 }
 
 // Используем единый набор эмодзи для ингредиентов
@@ -30,7 +32,7 @@ interface Props {
  * @param isFormData Если true — интерпретировать ингредиенты как CreateRecipeIngredientDto
  * @param getIngredientName Функция для получения имени ингредиента по id (используется при isFormData=true)
  */
-const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName }) => {
+const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName, measureLabels = {} }) => {
   return (
     <div className={styles.section}>
       <h3 className={styles.title}>Приготовление ({steps.length} шагов)</h3>
@@ -49,10 +51,13 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName })
                         const name = isFormData
                           ? (getIngredientName((ing as CreateRecipeIngredientDto).id) || 'Ингредиент')
                           : ((ing as RecipeIngredientDto).name || 'Ингредиент');
-                        const unit = isFormData
+                        const unitRaw = isFormData
                           ? ((ing as any).productUnit || (ing as any).measure || '')
-                          : ((ing as any).productUnit || (ing as any).measure || '');
-                        const amount = `${(ing as any).count} ${String(unit).toLowerCase()}`;
+                          : ((ing as RecipeIngredientDto).productMeasureId && measureLabels[(ing as RecipeIngredientDto).productMeasureId as string])
+                            || ((ing as any).productUnit || (ing as any).measure || '');
+                        const unit = formatMeasureLabel(unitRaw ? String(unitRaw) : undefined);
+                        const suffix = unit ? ` ${unit}` : '';
+                        const amount = `${(ing as any).count}${suffix}`;
                         return <Chip key={i} emoji={getEmojiByKey(name)} label={name} amount={amount} />;
                       })}
                     </div>
@@ -75,5 +80,3 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName })
 };
 
 export default StepsSection;
-
-

@@ -188,6 +188,8 @@ export interface RecipeIngredientDto {
   description?: string;
   count: number;
   productUnit?: ProductUnitType;
+  productMeasureId?: string;
+  isVariant?: boolean;
 }
 
 // DTO для информации о пользователе
