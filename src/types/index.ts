@@ -1,4 +1,4 @@
-import type {DifficultyLevel, KitchenType, RecipeIngredientDto, StepResponseDto} from "./recipe.types.ts";
+import type {DifficultyLevel, KitchenType, RecipeIngredientDto, StateDto, StepResponseDto} from "./recipe.types.ts";
 
 export * from './common.types.ts'
 export * from './favorite.types.ts'
@@ -30,6 +30,7 @@ export interface Recipe extends BaseEntity {
   tags: string[];
   ingredients: RecipeIngredientDto[];
   steps: StepResponseDto[];
+  state?: StateDto;
   author: {
     id: string;
     name: string;

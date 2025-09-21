@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { ingredientsService } from '../../services/ingredientsService';
 import type { Recipe } from '../../types';
 import type { CreateRecipeDto, CreateRecipeIngredientDto, RecipeIngredientDto } from '../../types/recipe.types';
@@ -22,8 +22,11 @@ import styles from './RecipePreview.module.css';
 import InfoCard from '../InfoCard/InfoCard';
 import RecipeTags from '../RecipeTags/RecipeTags';
 import { RecipesService } from '../../services/recipesService';
+import { productsService } from '../../services/productsService';
 import { KeycloakContext } from '../../providers/KeycloakProvider';
 import CommentCard, { type CommentItem } from '../../pages/AdvancedProfile/components/CommentCard';
+import type { ProductMeasureResponseDto } from '../../types/api.types';
+import { formatMeasureLabel } from '../../utils/measureLabel';
 
 interface RecipePreviewProps {
   formData?: CreateRecipeDto;
@@ -66,6 +69,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   if (!data) return null;
 
   const isFormData = isFormDataMode;
+  const recipeData = !isFormData ? (data as Recipe) : undefined;
   
   const title = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
   const description = isFormData ? (data as CreateRecipeDto).description : (data as Recipe).description;
@@ -111,19 +115,88 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
 
   // Эмодзи для шагов теперь берутся в дочернем компоненте через utils/emoji
 
+  const recipeId = recipeData?.id;
+  const recipeLikes = recipeData?.stats?.likes;
+  const recipeAvgRating = recipeData?.stats?.rating;
+  const recipeStateLiked = recipeData?.state?.liked;
+  const recipeStateFavorite = recipeData?.state?.favorite;
+  const recipeStateRate = recipeData?.state?.rate;
+
+  const measuresCacheRef = useRef<Map<string, ProductMeasureResponseDto[]>>(new Map());
+  const [measureLabels, setMeasureLabels] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isFormData || !recipeData) return;
+
+    const stepIngredients = (recipeData.steps || []).flatMap((step) => step?.ingredients || []);
+    const allIngredients = [...(recipeData.ingredients || []), ...stepIngredients];
+
+    if (allIngredients.length === 0) return;
+
+    const ingredientsToCheck = allIngredients.filter(
+      (ing) => ing?.productMeasureId && !measureLabels[ing.productMeasureId as string]
+    );
+    if (ingredientsToCheck.length === 0) return;
+
+    let cancelled = false;
+
+    const loadMeasureLabels = async () => {
+      const updates: Record<string, string> = {};
+
+      for (const ing of ingredientsToCheck) {
+        const measureId = ing.productMeasureId;
+        if (!measureId) continue;
+
+        const cacheKey = `${ing.isVariant ? 'variant' : 'base'}:${ing.id}`;
+        try {
+          let measures = measuresCacheRef.current.get(cacheKey);
+          if (!measures) {
+            measures = ing.isVariant
+              ? await productsService.getVariantMeasures(String(ing.id))
+              : await productsService.getBaseMeasures(String(ing.id));
+            measuresCacheRef.current.set(cacheKey, measures);
+          }
+          const found = measures?.find((m) => m.id === measureId);
+          if (found?.name) {
+            updates[measureId] = found.name;
+          }
+        } catch (error) {
+          console.error('Не удалось загрузить меры продукта', { productId: ing.id, measureId }, error);
+        }
+      }
+
+      if (!cancelled && Object.keys(updates).length > 0) {
+        setMeasureLabels((prev) => ({ ...prev, ...updates }));
+      }
+    };
+
+    void loadMeasureLabels();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isFormData, recipeId, recipeData?.ingredients, recipeData?.steps, measureLabels]);
+
   type NormalizedIngredient = { id: string; name: string; amount: string };
   const normalizeIngredient = (ingredient: CreateRecipeIngredientDto | RecipeIngredientDto): NormalizedIngredient => {
     if (isFormData) {
       const ing = ingredient as CreateRecipeIngredientDto;
       const ai = availableIngredients.find(i => i.id === ing.id);
       const name = ai?.name || 'Ингредиент';
-      const unit = (ing as any).productUnit || (ing as any).measure || '';
-      return { id: `form:${ing.id}:${unit}:${ing.count}`, name, amount: `${ing.count} ${String(unit).toLowerCase()}` };
+      const unitRaw = (ing as any).productUnit || (ing as any).measure || '';
+      const unit = formatMeasureLabel(unitRaw ? String(unitRaw) : undefined);
+      const suffix = unit ? ` ${unit}` : '';
+      return { id: `form:${ing.id}:${unitRaw}:${ing.count}`, name, amount: `${ing.count}${suffix}` };
     } else {
       const ing = ingredient as RecipeIngredientDto;
       const name = ing.name || 'Ингредиент';
-      const unit = (ing as any).productUnit || (ing as any).measure || '';
-      return { id: `api:${ing.id}`, name, amount: `${ing.count} ${String(unit).toLowerCase()}` };
+      const measureId = ing.productMeasureId;
+      const measureLabel = measureId ? measureLabels[measureId] : undefined;
+      const fallbackUnit = (ing as any).productUnit || (ing as any).measure || '';
+      const unitLabelRaw = measureLabel || fallbackUnit;
+      const unitLabel = formatMeasureLabel(unitLabelRaw ? String(unitLabelRaw) : undefined);
+      const unitSuffix = unitLabel ? ` ${unitLabel}` : '';
+      return { id: `api:${ing.id}`, name, amount: `${ing.count}${unitSuffix}` };
     }
   };
 
@@ -133,19 +206,48 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const recipeTitle = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
 
   // Лайки
-  const initialLikes = !isFormData ? ((data as Recipe).stats?.likes ?? 0) : 0;
+  const initialLikes = !isFormData ? (recipeLikes ?? 0) : 0;
   const [likesCount, setLikesCount] = useState<number>(initialLikes);
-  const [liked, setLiked] = useState<boolean>(false);
+  const [liked, setLiked] = useState<boolean>(() => (!isFormData ? Boolean(recipeStateLiked) : false));
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
-  const [favorite, setFavorite] = useState<boolean>(false);
+  const [favorite, setFavorite] = useState<boolean>(() => (!isFormData ? Boolean(recipeStateFavorite) : false));
   const [favoriteLoading, setFavoriteLoading] = useState<boolean>(false);
-  const [rating, setRating] = useState<number>(Math.round((!isFormData ? ((data as Recipe).stats?.rating ?? 0) : 0)) || 0);
+  const [rating, setRating] = useState<number>(() => {
+    if (isFormData) return 0;
+    if (recipeStateRate !== null && recipeStateRate !== undefined) {
+      return recipeStateRate;
+    }
+    if (recipeAvgRating !== null && recipeAvgRating !== undefined) {
+      return Math.round(recipeAvgRating) || 0;
+    }
+    return 0;
+  });
   const [ratingLoading, setRatingLoading] = useState<boolean>(false);
   const keycloakCtx = useContext(KeycloakContext);
   const isAuthenticated = !!keycloakCtx?.authenticated;
 
+  useEffect(() => {
+    if (isFormData || !recipeId) return;
+    setLikesCount(recipeLikes ?? 0);
+    setLiked(Boolean(recipeStateLiked));
+    setFavorite(Boolean(recipeStateFavorite));
+    if (recipeStateRate !== null && recipeStateRate !== undefined) {
+      setRating(recipeStateRate);
+    } else {
+      setRating(Math.round(recipeAvgRating ?? 0) || 0);
+    }
+  }, [
+    isFormData,
+    recipeId,
+    recipeLikes,
+    recipeAvgRating,
+    recipeStateLiked,
+    recipeStateFavorite,
+    recipeStateRate
+  ]);
+
   const handleToggleLike = async () => {
-    if (isFormData || !(data as Recipe).id) return;
+    if (isFormData || !recipeId) return;
     if (!isAuthenticated) {
       console.warn('Действие LIKE недоступно: пользователь не авторизован');
       return;
@@ -156,7 +258,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     setLikesCount((c) => c + (next ? 1 : -1));
     setLikeLoading(true);
     try {
-      await RecipesService.toggleLike((data as Recipe).id, next);
+      await RecipesService.toggleLike(recipeId, next);
     } catch (e) {
       // откат
       setLiked(!next);
@@ -168,14 +270,14 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   };
 
   const handleToggleFavorite = async () => {
-    if (isFormData || !(data as Recipe).id) return;
+    if (isFormData || !recipeId) return;
     if (!isAuthenticated) return;
     if (favoriteLoading) return;
     const next = !favorite;
     setFavorite(next);
     setFavoriteLoading(true);
     try {
-      await RecipesService.toggleFavorite((data as Recipe).id, next);
+      await RecipesService.toggleFavorite(recipeId, next);
     } catch (e) {
       setFavorite(!next);
       console.error('Не удалось выполнить действие FAVORITE:', e);
@@ -185,14 +287,14 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   };
 
   const handleSetRating = async (value: number) => {
-    if (isFormData || !(data as Recipe).id) return;
+    if (isFormData || !recipeId) return;
     if (!isAuthenticated) return;
     if (ratingLoading) return;
     const prev = rating;
     setRating(value);
     setRatingLoading(true);
     try {
-      await RecipesService.setRating((data as Recipe).id, value);
+      await RecipesService.setRating(recipeId, value);
     } catch (e) {
       setRating(prev);
       console.error('Не удалось выполнить действие SET_RATE:', e);
@@ -301,6 +403,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             steps={steps}
             isFormData={isFormData}
             getIngredientName={(id: string) => availableIngredients.find(ai => ai.id === id)?.name}
+            measureLabels={measureLabels}
           />
 
           {/* Теги */}

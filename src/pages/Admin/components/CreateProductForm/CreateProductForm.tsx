@@ -157,26 +157,6 @@ const CreateProductForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className={styles.formGrid}>
       {/* Основная информация о продукте */}
-      <label className={styles.label}>
-        Название*
-        <input
-          className={styles.input}
-          type="text"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          required
-        />
-      </label>
-      <label className={styles.label}>
-        Описание
-        <textarea
-          className={styles.textarea}
-          rows={3}
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          maxLength={1000}
-        />
-      </label>
       
       {/* Меры продукта (минимум одна) */}
       <fieldset className={styles.fieldset}>
@@ -328,5 +308,4 @@ const CreateProductForm: React.FC = () => {
 };
 
 export default CreateProductForm;
-
 

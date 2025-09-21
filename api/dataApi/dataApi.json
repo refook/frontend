@@ -518,7 +518,7 @@
           "Меры продуктов"
         ],
         "summary": "Добавление меры к частному продукту",
-        "operationId": "addVariateMeasure",
+        "operationId": "addVariantMeasure",
         "parameters": [
           {
             "name": "productVariantId",
@@ -2678,7 +2678,7 @@
             "type": "string",
             "description": "Фото ингредиента"
           },
-          "isVariate": {
+          "isVariant": {
             "type": "boolean",
             "description": "Является ли вариантом продукта"
           },
@@ -2699,7 +2699,7 @@
         "required": [
           "count",
           "id",
-          "isVariate",
+          "isVariant",
           "macros",
           "name",
           "productMeasureId"
@@ -2944,11 +2944,17 @@
           "favorite": {
             "type": "boolean",
             "description": "В избранное"
+          },
+          "rate": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Рейтинг, который поставил пользователь"
           }
         },
         "required": [
           "favorite",
-          "liked"
+          "liked",
+          "rate"
         ]
       },
       "StepIngredientDto": {
@@ -2975,7 +2981,7 @@
             "type": "string",
             "description": "Фото ингредиента"
           },
-          "isVariate": {
+          "isVariant": {
             "type": "boolean",
             "description": "Является ли вариантом продукта"
           },
@@ -2992,7 +2998,7 @@
         "required": [
           "count",
           "id",
-          "isVariate",
+          "isVariant",
           "name",
           "productMeasureId"
         ]
@@ -3218,7 +3224,7 @@
             "description": "Количество ингредиента",
             "example": 1.0
           },
-          "isVariate": {
+          "isVariant": {
             "type": "boolean",
             "description": "Является ли вариантом продукта"
           },
@@ -3231,7 +3237,7 @@
         "required": [
           "count",
           "id",
-          "isVariate",
+          "isVariant",
           "productMeasureId"
         ]
       },
@@ -3623,53 +3629,17 @@
             "description": "Название ингредиента",
             "minLength": 1
           },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
+          "isVariant": {
+            "type": "boolean",
+            "description": "Является ли продукт - вариантом продукта"
           },
           "count": {
             "type": "number",
-            "description": "Средний вес/штук",
-            "example": 2.0
+            "description": "Количество меры"
           },
-          "productUnit": {
-            "type": "string",
-            "description": "Конкретная мера продукта",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+          "measure": {
+            "$ref": "#/components/schemas/ProductMeasureResponseDto",
+            "description": "Конкретная мера"
           },
           "expiryDate": {
             "type": "string",
@@ -3699,14 +3669,14 @@
           }
         },
         "required": [
-          "baseUnit",
           "count",
           "createdAt",
           "id",
+          "isVariant",
+          "measure",
           "name",
           "ownerId",
           "productId",
-          "productUnit",
           "updatedAt"
         ]
       },
@@ -3719,53 +3689,18 @@
             "format": "uuid",
             "description": "id продукта"
           },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
+          "isVariant": {
+            "type": "boolean",
+            "description": "Является ли продукт - вариантом продукта"
           },
           "count": {
             "type": "number",
-            "description": "Вес или штуки",
-            "example": 80.0
+            "description": "Количество меры"
           },
-          "productUnit": {
+          "measureId": {
             "type": "string",
-            "description": "Конкретная мера продукта",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id Конкретная мера"
           },
           "expiryDate": {
             "type": "string",
@@ -3780,10 +3715,10 @@
           }
         },
         "required": [
-          "baseUnit",
           "count",
-          "productId",
-          "productUnit"
+          "isVariant",
+          "measureId",
+          "productId"
         ]
       },
       "CreateTagDto": {
@@ -4086,53 +4021,18 @@
             "format": "uuid",
             "description": "id продукта/ингредиента"
           },
-          "baseUnit": {
-            "type": "string",
-            "description": "Базовая мера продукта",
-            "enum": [
-              "ML",
-              "GR"
-            ],
-            "examples": [
-              "ML",
-              "GR"
-            ]
+          "isVariant": {
+            "type": "boolean",
+            "description": "Является ли продукт - вариантом продукта"
           },
-          "avgWeight": {
+          "count": {
             "type": "number",
-            "description": "Средний вес",
-            "example": 80.0
+            "description": "Количество меры"
           },
-          "productUnit": {
+          "measureId": {
             "type": "string",
-            "description": "Конкретная мера продукта",
-            "enum": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM",
-              "MILLILITER",
-              "LITER",
-              "TEASPOON",
-              "TABLESPOON",
-              "CUP",
-              "PIECE",
-              "PACKAGE",
-              "BUNCH",
-              "SLICE",
-              "LEAF",
-              "PIECE_PART",
-              "PORTION",
-              "PINCH",
-              "HANDFUL",
-              "PLATE",
-              "TO_TASTE",
-              "APPROX"
-            ],
-            "examples": [
-              "GRAM",
-              "KILOGRAM",
-              "MILLIGRAM"
-            ]
+            "format": "uuid",
+            "description": "id Конкретная мера"
           },
           "expiryDate": {
             "type": "string",
@@ -4147,10 +4047,10 @@
           }
         },
         "required": [
-          "avgWeight",
-          "baseUnit",
-          "productId",
-          "productUnit"
+          "count",
+          "isVariant",
+          "measureId",
+          "productId"
         ]
       },
       "RecipeShortResponseDto": {

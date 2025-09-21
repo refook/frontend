@@ -6,19 +6,57 @@
   box-shadow: none;
 }
 
-.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--token-space-4); margin-bottom: var(--spacing-lg); }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--token-space-4); margin-bottom: var(--spacing-lg); flex-wrap: wrap; }
 .sectionTitle { font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--text-primary); margin: 0; }
+.headerControls { display: flex; align-items: center; gap: var(--token-space-3); flex-wrap: wrap; }
+
+.viewToggle {
+  border: 1px solid var(--token-border);
+  background: var(--token-surface);
+  color: var(--token-text);
+  border-radius: var(--token-radius-full);
+  padding: 6px 14px;
+  font-size: var(--token-text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--token-duration-fast), color var(--token-duration-fast), border-color var(--token-duration-fast);
+}
+
+.viewToggleActive {
+  background: color-mix(in oklab, var(--token-accent) 15%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent) 40%, var(--token-border));
+  color: var(--token-accent-strong, var(--token-text));
+}
 
 .ingredientsGrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--token-space-4); }
 
-.ingredientCard { display: grid; place-items: center; gap: var(--token-space-2); padding: var(--token-space-4) var(--token-space-3); border: none; border-radius: var(--token-radius-md); background: var(--token-surface); box-shadow: var(--token-shadow-sm); cursor: pointer; transition: transform var(--token-duration-fast), box-shadow var(--token-duration-fast); }
+.ingredientCard { display: grid; place-items: center; gap: var(--token-space-3); padding: var(--token-space-4) var(--token-space-3); border: none; border-radius: var(--token-radius-md); background: var(--token-surface); box-shadow: var(--token-shadow-sm); cursor: pointer; transition: transform var(--token-duration-fast), box-shadow var(--token-duration-fast); width: 100%; }
 .ingredientCard:hover { transform: translateY(-2px); box-shadow: var(--token-shadow-md); }
 .ingredientCardSelected { box-shadow: 0 0 0 3px color-mix(in oklab, var(--token-accent) 22%, transparent); }
 
-.ingredientEmojiWrap { width: 52px; height: 52px; border-radius: var(--token-radius-full); background: var(--token-surface); border: none; display: inline-flex; align-items: center; justify-content: center; }
+.ingredientRow { display: flex; align-items: center; justify-content: flex-start; gap: var(--token-space-4); padding: var(--token-space-3) var(--token-space-4); text-align: left; }
+.ingredientRowContent { width: 100%; }
+
+.ingredientsList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--token-space-3); }
+
+.ingredientEmojiWrap { width: 52px; height: 52px; border-radius: var(--token-radius-full); background: var(--token-surface); border: none; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .ingredientEmoji { font-size: 26px; }
 .ingredientTitle { font-weight: 700; color: var(--token-text); font-size: var(--token-text-base); }
 .ingredientSubtitle { color: var(--token-muted); font-size: var(--token-text-sm); }
+
+.ingredientText {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.ingredientsList .ingredientText {
+  justify-content: flex-start;
+  text-align: left;
+}
 
 .shoppingBox { margin-top: var(--token-space-8); border: none; background: color-mix(in oklab, var(--token-accent) 6%, transparent); border-radius: var(--token-radius-lg); padding: var(--token-space-6); }
 .shoppingHeaderRow { display: flex; align-items: center; gap: var(--token-space-4); margin-bottom: var(--token-space-4); }
@@ -47,6 +85,8 @@
 }
 
 @media (max-width: 1100px) { .ingredientsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 650px) { .ingredientsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-3); } }
-
-
+@media (max-width: 650px) {
+  .ingredientsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-3); }
+  .ingredientRow { padding: var(--token-space-3); }
+  .ingredientEmojiWrap { width: 44px; height: 44px; }
+}

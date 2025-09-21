@@ -27,7 +27,7 @@
 .ingredientInfo {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .ingredientName {
@@ -40,6 +40,50 @@
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   margin-right: var(--spacing-sm);
+}
+
+.ingredientControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.controlLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.controlInput,
+.controlSelect {
+  min-width: 110px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+}
+
+.controlInput:focus,
+.controlSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.controlSelect {
+  cursor: pointer;
+}
+
+.controlWarning {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  max-width: 220px;
 }
 
 .errorText {

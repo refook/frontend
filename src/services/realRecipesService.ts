@@ -382,6 +382,16 @@ class RealRecipesService {
             .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
             .filter((s: any) => typeof s === 'string' && s.length > 0);
 
+          const apiState = (apiRecipe as any)?.state || {};
+          const rawRate = (apiState as any)?.rate;
+          let userRate: number | null = null;
+          if (typeof rawRate === 'number') {
+            userRate = rawRate;
+          } else if (typeof rawRate === 'string' && rawRate.trim() !== '') {
+            const parsed = Number(rawRate);
+            userRate = Number.isFinite(parsed) ? parsed : null;
+          }
+
           return {
         id: apiRecipe.id,
         title: apiRecipe.name,
@@ -410,6 +420,11 @@ class RealRecipesService {
           fats: Number((apiRecipe as any).macros?.fats ?? 0),
           carbs: Number((apiRecipe as any).macros?.carbs ?? 0),
         } : undefined,
+        state: {
+          liked: Boolean((apiState as any)?.liked),
+          favorite: Boolean((apiState as any)?.favorite),
+          rate: userRate,
+        },
         author: {
           id: apiRecipe.ownerUser.id.toString(),
           name: apiRecipe.ownerUser.name,

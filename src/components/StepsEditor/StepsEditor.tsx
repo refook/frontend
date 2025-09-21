@@ -14,14 +14,36 @@ import { API_BASE_URL } from '../../services/api';
 import { authorizedFetch, getAuthHeaders } from '../../services/auth';
 import { PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 
+export type StepIngredientOveruse = {
+  key: string;
+  ingredientId: string;
+  variantId?: string;
+  name: string;
+  over: number;
+  base: number;
+  used: number;
+};
+
+const getIngredientKey = (ingredient: { id?: string; variantId?: string } | null | undefined): string => {
+  if (!ingredient?.id) return '';
+  return ingredient.variantId ? `${ingredient.id}::${ingredient.variantId}` : ingredient.id;
+};
+
+const formatCount = (value: number): string => {
+  if (!Number.isFinite(value)) return '';
+  if (Number.isInteger(value)) return String(value);
+  return value.toFixed(2).replace(/\.0+$/, '').replace(/(\d)0+$/, '$1');
+};
+
 interface StepsEditorProps {
   steps: CreateStepDto[];
   onChange: (steps: CreateStepDto[]) => void;
   errors?: Record<string, string>;
   baseIngredients?: CreateRecipeIngredientDto[];
+  onValidationChange?: (overuses: StepIngredientOveruse[]) => void;
 }
 
-const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {}, baseIngredients = [] }) => {
+const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {}, baseIngredients = [], onValidationChange }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingText, setEditingText] = useState('');
   const [editingName, setEditingName] = useState('');
@@ -48,6 +70,89 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
   }, []);
 
   const selectableBaseIngredients = useMemo(() => baseIngredients || [], [baseIngredients]);
+
+  const baseTotals = useMemo(() => {
+    const map = new Map<string, number>();
+    (baseIngredients || []).forEach((ingredient) => {
+      const key = getIngredientKey(ingredient as any);
+      if (!key) return;
+      const count = Number((ingredient as any)?.count) || 0;
+      map.set(key, (map.get(key) || 0) + count);
+    });
+    return map;
+  }, [baseIngredients]);
+
+  const usedTotals = useMemo(() => {
+    const map = new Map<string, number>();
+    (steps || []).forEach((step) => {
+      (step.ingredients || []).forEach((ingredient) => {
+        const key = getIngredientKey(ingredient as any);
+        if (!key) return;
+        const count = Number((ingredient as any)?.count) || 0;
+        map.set(key, (map.get(key) || 0) + count);
+      });
+    });
+    return map;
+  }, [steps]);
+
+  const ingredientMeta = useMemo(() => {
+    const map = new Map<string, { ingredientId: string; variantId?: string }>();
+    (baseIngredients || []).forEach((ingredient) => {
+      const key = getIngredientKey(ingredient as any);
+      if (!key) return;
+      if (!map.has(key)) {
+        map.set(key, { ingredientId: ingredient.id, variantId: (ingredient as any)?.variantId });
+      }
+    });
+    (steps || []).forEach((step) => {
+      (step.ingredients || []).forEach((ingredient) => {
+        const key = getIngredientKey(ingredient as any);
+        if (!key) return;
+        if (!map.has(key)) {
+          map.set(key, { ingredientId: ingredient.id, variantId: (ingredient as any)?.variantId });
+        }
+      });
+    });
+    return map;
+  }, [baseIngredients, steps]);
+
+  const usageSummary = useMemo(() => {
+    const map = new Map<string, { base: number; used: number }>();
+    const keys = new Set<string>([...baseTotals.keys(), ...usedTotals.keys()]);
+    keys.forEach((key) => {
+      map.set(key, {
+        base: baseTotals.get(key) ?? 0,
+        used: usedTotals.get(key) ?? 0,
+      });
+    });
+    return map;
+  }, [baseTotals, usedTotals]);
+
+  const overusedList = useMemo<StepIngredientOveruse[]>(() => {
+    const list: StepIngredientOveruse[] = [];
+    usageSummary.forEach((entry, key) => {
+      const over = entry.used - entry.base;
+      if (over > 0) {
+        const meta = ingredientMeta.get(key);
+        const ingredientId = meta?.ingredientId || key;
+        const name = idToName[ingredientId] || ingredientId;
+        list.push({
+          key,
+          ingredientId,
+          variantId: meta?.variantId,
+          name,
+          over,
+          base: entry.base,
+          used: entry.used,
+        });
+      }
+    });
+    return list;
+  }, [usageSummary, ingredientMeta, idToName]);
+
+  useEffect(() => {
+    onValidationChange?.(overusedList);
+  }, [overusedList, onValidationChange]);
 
   const addStep = () => {
     const newStep: CreateStepDto = {
@@ -264,37 +369,49 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
                       <div className={styles.stepIngredients}>
                         <h5 className={styles.ingredientsTitle}>Ингредиенты для этого шага</h5>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          {(step.ingredients || []).map((ing, si) => (
-                            <div key={`${ing.id}-${si}`} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 100px auto', gap: 8, alignItems: 'center' }}>
-                              <div style={{ color: 'var(--token-text)' }}>
-                                {idToName[ing.id] || ing.id}
-                                <span style={{ marginLeft: 6, color: 'var(--token-muted)', fontSize: 12 }}>
-                                  {PRODUCT_UNITS_ARRAY.find(u => u.value === (ing as any).productUnit)?.label}
-                                </span>
-                              </div>
-                              <input
-                                type="number"
-                                min={0}
-                                step={1}
-                                value={Number(ing.count) || 0}
-                                onChange={(e) => {
-                                  const next = [...(step.ingredients || [])];
-                                  (next[si] as any).count = Math.max(0, parseInt(e.target.value) || 0);
+                          {(step.ingredients || []).map((ing, si) => {
+                            const ingredientKey = getIngredientKey(ing as any);
+                            const summaryEntry = usageSummary.get(ingredientKey);
+                            const over = summaryEntry ? summaryEntry.used - summaryEntry.base : 0;
+                            const hasOver = over > 0;
+                            return (
+                              <div key={`${ing.id}-${si}`} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 100px auto', gap: 8, alignItems: 'center' }}>
+                                <div style={{ color: 'var(--token-text)' }}>
+                                  {idToName[ing.id] || ing.id}
+                                  <span style={{ marginLeft: 6, color: 'var(--token-muted)', fontSize: 12 }}>
+                                    {PRODUCT_UNITS_ARRAY.find(u => u.value === (ing as any).productUnit)?.label}
+                                  </span>
+                                </div>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  step={1}
+                                  value={Number(ing.count) || 0}
+                                  onChange={(e) => {
+                                    const desired = Math.max(0, parseInt(e.target.value, 10) || 0);
+                                    const next = [...(step.ingredients || [])];
+                                    (next[si] as any).count = desired;
+                                    updateStep(index, { ingredients: next as any });
+                                  }}
+                                  className={`${styles.input} ${hasOver ? styles.inputError : ''}`}
+                                />
+                                <div style={{ color: 'var(--token-muted)', fontSize: 12 }}>
+                                  {(ing as any).variantId ? 'Вариант' : 'Оригинал'}
+                                </div>
+                                <button type="button" className={styles.removeButton} onClick={() => {
+                                  const next = (step.ingredients || []).filter((_, j) => j !== si);
                                   updateStep(index, { ingredients: next as any });
-                                }}
-                                className={styles.input}
-                              />
-                              <div style={{ color: 'var(--token-muted)', fontSize: 12 }}>
-                                {(ing as any).variantId ? 'Вариант' : 'Оригинал'}
+                                }}>
+                                  <XMarkIcon className={styles.icon} />
+                                </button>
+                                {hasOver && (
+                                  <div className={styles.inlineError} style={{ gridColumn: '1 / -1' }}>
+                                    Превышение на {formatCount(over)} (используется {formatCount(summaryEntry?.used ?? 0)} из {formatCount(summaryEntry?.base ?? 0)})
+                                  </div>
+                                )}
                               </div>
-                              <button type="button" className={styles.removeButton} onClick={() => {
-                                const next = (step.ingredients || []).filter((_, j) => j !== si);
-                                updateStep(index, { ingredients: next as any });
-                              }}>
-                                <XMarkIcon className={styles.icon} />
-                              </button>
-                            </div>
-                          ))}
+                            );
+                          })}
 
                           {/* Добавление нового ингредиента из общего списка */}
                           {selectableBaseIngredients.length > 0 && (
@@ -302,10 +419,17 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
                               baseIngredients={selectableBaseIngredients}
                               usedIds={(step.ingredients || []).map(i => i.id)}
                               idToName={idToName}
+                              getRemaining={(ingredient) => {
+                                const key = getIngredientKey(ingredient as any);
+                                const summaryEntry = usageSummary.get(key);
+                                if (!summaryEntry) return 0;
+                                return summaryEntry.base - summaryEntry.used;
+                              }}
                               onAdd={(base) => {
                                 const next = [...(step.ingredients || [])];
-                                // копируем продукт с unit/variantId из общего списка, меняем только count
-                                next.push({ id: base.id, count: base.count || 0, productUnit: (base as any).productUnit, ...(base as any).variantId ? { variantId: (base as any).variantId } : {} } as any);
+                                const payload: any = { id: base.id, count: Number((base as any).count) || 0, productUnit: (base as any).productUnit };
+                                if ((base as any).variantId) payload.variantId = (base as any).variantId;
+                                next.push(payload);
                                 updateStep(index, { ingredients: next as any });
                               }}
                             />
@@ -409,14 +533,25 @@ interface AddRowProps {
   baseIngredients: CreateRecipeIngredientDto[];
   usedIds: string[];
   idToName: Record<string, string>;
+  getRemaining: (ingredient: CreateRecipeIngredientDto) => number;
   onAdd: (base: CreateRecipeIngredientDto) => void;
 }
 
-const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds, idToName, onAdd }) => {
+const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds, idToName, getRemaining, onAdd }) => {
   const [selectedId, setSelectedId] = useState<string>('');
   const [count, setCount] = useState<number>(0);
   const candidates = useMemo(() => baseIngredients.filter(b => !usedIds.includes(b.id)), [baseIngredients, usedIds]);
   const current = candidates.find(c => c.id === selectedId);
+  useEffect(() => {
+    if (!current) return;
+    const remaining = getRemaining(current);
+    if (typeof remaining === 'number' && Number.isFinite(remaining) && remaining >= 0) {
+      setCount(prev => Math.min(prev, remaining));
+    }
+  }, [current, getRemaining]);
+
+  const remainingForCurrent = current ? getRemaining(current) : undefined;
+  const hasFiniteRemaining = typeof remainingForCurrent === 'number' && Number.isFinite(remainingForCurrent);
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px auto', gap: 8, alignItems: 'center', marginTop: 6 }}>
       <select className="ui-select" value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
@@ -425,8 +560,45 @@ const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds,
           <option key={c.id} value={c.id}>{idToName[c.id] || c.id}</option>
         ))}
       </select>
-      <input type="number" min={0} step={1} value={count} onChange={(e) => setCount(Math.max(0, parseInt(e.target.value) || 0))} className={styles.input} />
-      <button type="button" className={styles.addButton} disabled={!selectedId} onClick={() => { if (current) onAdd({ ...current, count } as any); }}>Добавить</button>
+      <input
+        type="number"
+        min={0}
+        step={1}
+        value={count}
+        onChange={(e) => {
+          const raw = Math.max(0, parseInt(e.target.value, 10) || 0);
+          if (!current) {
+            setCount(raw);
+            return;
+          }
+          const remaining = getRemaining(current);
+          const limited = typeof remaining === 'number' && Number.isFinite(remaining) && remaining >= 0 ? Math.min(raw, remaining) : raw;
+          setCount(limited);
+        }}
+        className={styles.input}
+      />
+      <button
+        type="button"
+        className={styles.addButton}
+        disabled={!selectedId}
+        onClick={() => {
+          if (!current) return;
+          const remaining = getRemaining(current);
+          const payload: any = { ...current, count: (typeof remaining === 'number' && Number.isFinite(remaining) && remaining >= 0) ? Math.min(count, remaining) : count };
+          onAdd(payload as any);
+          setCount(0);
+          setSelectedId('');
+        }}
+      >
+        Добавить
+      </button>
+      {current && hasFiniteRemaining && (
+        <div className={remainingForCurrent! >= 0 ? styles.remainingHint : styles.inlineError} style={{ gridColumn: '1 / -1' }}>
+          {remainingForCurrent! >= 0
+            ? `Остаток: ${formatCount(remainingForCurrent!)}`
+            : `Превышение на ${formatCount(Math.abs(remainingForCurrent!))}`}
+        </div>
+      )}
     </div>
   );
-}; 
+};
