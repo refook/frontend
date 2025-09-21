@@ -161,6 +161,13 @@ export interface RecipeResponseDto {
   lastUpdaterId: number;
   createdAt: string;
   updatedAt: string;
+  state: StateDto;
+}
+
+export interface StateDto {
+  liked: boolean;
+  favorite: boolean;
+  rate: number | null;
 }
 
 // DTO для шага в ответе

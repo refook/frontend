@@ -66,6 +66,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   if (!data) return null;
 
   const isFormData = isFormDataMode;
+  const recipeData = !isFormData ? (data as Recipe) : undefined;
   
   const title = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
   const description = isFormData ? (data as CreateRecipeDto).description : (data as Recipe).description;
@@ -133,19 +134,55 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const recipeTitle = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
 
   // Лайки
-  const initialLikes = !isFormData ? ((data as Recipe).stats?.likes ?? 0) : 0;
+  const recipeId = recipeData?.id;
+  const recipeLikes = recipeData?.stats?.likes;
+  const recipeAvgRating = recipeData?.stats?.rating;
+  const recipeStateLiked = recipeData?.state?.liked;
+  const recipeStateFavorite = recipeData?.state?.favorite;
+  const recipeStateRate = recipeData?.state?.rate;
+
+  const initialLikes = !isFormData ? (recipeLikes ?? 0) : 0;
   const [likesCount, setLikesCount] = useState<number>(initialLikes);
-  const [liked, setLiked] = useState<boolean>(false);
+  const [liked, setLiked] = useState<boolean>(() => (!isFormData ? Boolean(recipeStateLiked) : false));
   const [likeLoading, setLikeLoading] = useState<boolean>(false);
-  const [favorite, setFavorite] = useState<boolean>(false);
+  const [favorite, setFavorite] = useState<boolean>(() => (!isFormData ? Boolean(recipeStateFavorite) : false));
   const [favoriteLoading, setFavoriteLoading] = useState<boolean>(false);
-  const [rating, setRating] = useState<number>(Math.round((!isFormData ? ((data as Recipe).stats?.rating ?? 0) : 0)) || 0);
+  const [rating, setRating] = useState<number>(() => {
+    if (isFormData) return 0;
+    if (recipeStateRate !== null && recipeStateRate !== undefined) {
+      return recipeStateRate;
+    }
+    if (recipeAvgRating !== null && recipeAvgRating !== undefined) {
+      return Math.round(recipeAvgRating) || 0;
+    }
+    return 0;
+  });
   const [ratingLoading, setRatingLoading] = useState<boolean>(false);
   const keycloakCtx = useContext(KeycloakContext);
   const isAuthenticated = !!keycloakCtx?.authenticated;
 
+  useEffect(() => {
+    if (isFormData || !recipeId) return;
+    setLikesCount(recipeLikes ?? 0);
+    setLiked(Boolean(recipeStateLiked));
+    setFavorite(Boolean(recipeStateFavorite));
+    if (recipeStateRate !== null && recipeStateRate !== undefined) {
+      setRating(recipeStateRate);
+    } else {
+      setRating(Math.round(recipeAvgRating ?? 0) || 0);
+    }
+  }, [
+    isFormData,
+    recipeId,
+    recipeLikes,
+    recipeAvgRating,
+    recipeStateLiked,
+    recipeStateFavorite,
+    recipeStateRate
+  ]);
+
   const handleToggleLike = async () => {
-    if (isFormData || !(data as Recipe).id) return;
+    if (isFormData || !recipeId) return;
     if (!isAuthenticated) {
       console.warn('Действие LIKE недоступно: пользователь не авторизован');
       return;
@@ -156,7 +193,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     setLikesCount((c) => c + (next ? 1 : -1));
     setLikeLoading(true);
     try {
-      await RecipesService.toggleLike((data as Recipe).id, next);
+      await RecipesService.toggleLike(recipeId, next);
     } catch (e) {
       // откат
       setLiked(!next);
@@ -168,14 +205,14 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   };
 
   const handleToggleFavorite = async () => {
-    if (isFormData || !(data as Recipe).id) return;
+    if (isFormData || !recipeId) return;
     if (!isAuthenticated) return;
     if (favoriteLoading) return;
     const next = !favorite;
     setFavorite(next);
     setFavoriteLoading(true);
     try {
-      await RecipesService.toggleFavorite((data as Recipe).id, next);
+      await RecipesService.toggleFavorite(recipeId, next);
     } catch (e) {
       setFavorite(!next);
       console.error('Не удалось выполнить действие FAVORITE:', e);
@@ -185,14 +222,14 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   };
 
   const handleSetRating = async (value: number) => {
-    if (isFormData || !(data as Recipe).id) return;
+    if (isFormData || !recipeId) return;
     if (!isAuthenticated) return;
     if (ratingLoading) return;
     const prev = rating;
     setRating(value);
     setRatingLoading(true);
     try {
-      await RecipesService.setRating((data as Recipe).id, value);
+      await RecipesService.setRating(recipeId, value);
     } catch (e) {
       setRating(prev);
       console.error('Не удалось выполнить действие SET_RATE:', e);
