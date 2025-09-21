@@ -173,12 +173,14 @@ const ProductListSubTab: React.FC = () => {
               onSave={saveMeasure}
               disabled={!!updatingId}
             />
-            <AddBaseMeasureForm
-              value={newMeasure}
-              disabled={!!updatingId}
-              onChange={setNewMeasure}
-              onSubmit={addBaseMeasure}
-            />
+            {createMode !== 'variant_update' && (
+              <AddBaseMeasureForm
+                value={newMeasure}
+                disabled={!!updatingId}
+                onChange={setNewMeasure}
+                onSubmit={addBaseMeasure}
+              />
+            )}
             {/* Форма добавления меры варианта (только в режиме variant_update) */}
             {createMode === 'variant_update' && (
               <AddVariantMeasureForm
@@ -246,5 +248,4 @@ const ProductListSubTab: React.FC = () => {
 };
 
 export default ProductListSubTab;
-
 
