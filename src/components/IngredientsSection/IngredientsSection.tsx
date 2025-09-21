@@ -49,6 +49,7 @@ const IngredientsSection: React.FC<Props> = ({ title, ingredients, baseServings 
   const [servings, setServings] = useState<number>(Math.max(1, baseServings || 1));
   const factor = servings / (baseServings || 1);
   const [listTitle, setListTitle] = useState<string>(`Список покупок: ${title}`);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const toggle = (ing: IngredientVM) => {
     setSelected(prev => {
@@ -75,30 +76,64 @@ const IngredientsSection: React.FC<Props> = ({ title, ingredients, baseServings 
     <div className={styles.section}>
       <div className={styles.sectionHeader}>
         <h3 className={styles.sectionTitle}>Ингредиенты ({ingredients.length})</h3>
-        <div className={styles.servingsControl}>
-          <span className={styles.servingsLabel}>Порции:</span>
-          <select
-            className={styles.servingsSelect}
-            value={servings}
-            onChange={(e) => setServings(Number(e.target.value))}
+        <div className={styles.headerControls}>
+          <button
+            type="button"
+            className={`${styles.viewToggle} ${viewMode === 'list' ? styles.viewToggleActive : ''}`}
+            onClick={() => setViewMode((prev) => (prev === 'grid' ? 'list' : 'grid'))}
+            aria-pressed={viewMode === 'list'}
           >
-            {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
+            {viewMode === 'grid' ? 'Список' : 'Карточки'}
+          </button>
+          <div className={styles.servingsControl}>
+            <span className={styles.servingsLabel}>Порции:</span>
+            <select
+              className={styles.servingsSelect}
+              value={servings}
+              onChange={(e) => setServings(Number(e.target.value))}
+            >
+              {Array.from({ length: 16 }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
       {normalized.length > 0 ? (
-        <div className={styles.ingredientsGrid}>
-          {normalized.map((ing, i) => (
-            <button key={i} type="button" className={`${styles.ingredientCard} ${selected[ing.id] ? styles.ingredientCardSelected : ''}`} onClick={() => toggle(ing)}>
-              <span className={styles.ingredientEmojiWrap}><span className={styles.ingredientEmoji}>{getEmojiByKey(ing.name)}</span></span>
-              <span className={styles.ingredientTitle}>{ing.name}</span>
-              <span className={styles.ingredientSubtitle}>{ing.amount}</span>
-            </button>
-          ))}
-        </div>
+        viewMode === 'grid' ? (
+          <div className={styles.ingredientsGrid}>
+            {normalized.map((ing, i) => {
+              const buttonClass = `${styles.ingredientCard} ${selected[ing.id] ? styles.ingredientCardSelected : ''}`;
+              return (
+                <button key={i} type="button" className={buttonClass} onClick={() => toggle(ing)}>
+                  <span className={styles.ingredientEmojiWrap}><span className={styles.ingredientEmoji}>{getEmojiByKey(ing.name)}</span></span>
+                  <div className={styles.ingredientText}>
+                    <span className={styles.ingredientTitle}>{ing.name}</span>
+                    <span className={styles.ingredientSubtitle}>{ing.amount}</span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <ul className={styles.ingredientsList}>
+            {normalized.map((ing, i) => {
+              const buttonClass = `${styles.ingredientCard} ${styles.ingredientRow} ${selected[ing.id] ? styles.ingredientCardSelected : ''}`;
+              return (
+                <li key={i}>
+                  <button type="button" className={buttonClass} onClick={() => toggle(ing)}>
+                    <span className={styles.ingredientEmojiWrap}><span className={styles.ingredientEmoji}>{getEmojiByKey(ing.name)}</span></span>
+                    <div className={`${styles.ingredientRowContent} ${styles.ingredientText}`}>
+                      <span className={styles.ingredientTitle}>{ing.name}</span>
+                      <span className={styles.ingredientSubtitle}>{ing.amount}</span>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )
       ) : (
         <p style={{ margin: 0, color: 'var(--token-muted)' }}>Нет ингредиентов</p>
       )}
@@ -121,5 +156,3 @@ const IngredientsSection: React.FC<Props> = ({ title, ingredients, baseServings 
 };
 
 export default IngredientsSection;
-
-
