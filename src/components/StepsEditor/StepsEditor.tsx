@@ -527,7 +527,6 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
 };
 
 export default StepsEditor; 
-export type { StepIngredientOveruse };
 
 // Вспомогательная строка для добавления ингредиента шага на основе выбранных базовых
 interface AddRowProps {
