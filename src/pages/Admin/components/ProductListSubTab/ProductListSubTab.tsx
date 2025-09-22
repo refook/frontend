@@ -114,7 +114,15 @@ const ProductListSubTab: React.FC = () => {
   const handleSave = handleSaveRow;
 
   const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
-  const [perPage, setPerPage] = useState<number>(PAGE_SIZE);
+  const [perPage, setPerPage] = useState<number>(() => {
+    try {
+      const raw = localStorage.getItem('productList.perPage');
+      const n = raw ? Number.parseInt(raw, 10) : NaN;
+      return Number.isFinite(n) && n > 0 ? n : PAGE_SIZE;
+    } catch {
+      return PAGE_SIZE;
+    }
+  });
 
   const displayedRows = useMemo(() => rows.slice(0, visibleCount), [rows, visibleCount]);
   const hasMore = visibleCount < rows.length;
@@ -122,6 +130,12 @@ const ProductListSubTab: React.FC = () => {
   useEffect(() => {
     setVisibleCount(perPage);
   }, [rows, perPage]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('productList.perPage', String(perPage));
+    } catch {}
+  }, [perPage]);
 
   const handleLoadMore = useCallback(() => {
     setVisibleCount(prev => Math.min(prev + perPage, rows.length));

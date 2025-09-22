@@ -43,33 +43,65 @@ const RecipesList: React.FC<RecipesListProps> = ({
   const effectiveLoading = loadingOverride ?? loading;
   const dataSource = overrideRecipes ?? recipes;
 
+  const [perPage, setPerPage] = useState(() => {
+    try {
+      const raw = localStorage.getItem('recipesList.perPage');
+      const n = raw ? Number.parseInt(raw, 10) : NaN;
+      return Number.isFinite(n) && n > 0 ? n : pageSize;
+    } catch {
+      return pageSize;
+    }
+  });
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const shouldUseLocalPagination = enablePagination && !onLoadMore;
 
   const displayedRecipes = useMemo(() => (
-    shouldUseLocalPagination ? dataSource.slice(0, visibleCount) : dataSource
-  ), [dataSource, visibleCount, shouldUseLocalPagination]);
+    enablePagination ? dataSource.slice(0, visibleCount) : dataSource
+  ), [dataSource, visibleCount, enablePagination]);
 
+  // Не сбрасываем видимое количество при обновлении данных, чтобы избежать мерцаний.
+  // Обновляем только при смене perPage или переключении режима пагинации.
   useEffect(() => {
     if (!enablePagination) return;
-    if (shouldUseLocalPagination) {
-      setVisibleCount(pageSize);
-    }
-  }, [dataSource, enablePagination, shouldUseLocalPagination, pageSize]);
+    setVisibleCount(perPage);
+  }, [enablePagination, perPage]);
 
-  const internalHasMore = shouldUseLocalPagination ? visibleCount < dataSource.length : false;
-  const effectiveHasMore = typeof hasMore === 'boolean' ? hasMore : internalHasMore;
+  // Сохраняем perPage локально
+  useEffect(() => {
+    try {
+      if (enablePagination) {
+        localStorage.setItem('recipesList.perPage', String(perPage));
+      }
+    } catch {}
+  }, [perPage, enablePagination]);
+
+  const internalHasMore = enablePagination ? visibleCount < dataSource.length : false;
+  const effectiveHasMore = useMemo(() => {
+    if (!enablePagination) return false;
+    // Если известен общий счётчик — это главный источник истины
+    if (typeof totalCount === 'number') return displayedRecipes.length < totalCount;
+    // Иначе используем флаг hasMore, если он передан явно
+    if (typeof hasMore === 'boolean') return hasMore;
+    // Для локальной пагинации опираемся на видимое количество
+    if (shouldUseLocalPagination) return internalHasMore;
+    // Для внешней пагинации без totalCount/hasMore оставляем кнопку активной
+    if (onLoadMore) return true;
+    return false;
+  }, [enablePagination, totalCount, displayedRecipes.length, hasMore, shouldUseLocalPagination, internalHasMore, onLoadMore]);
 
   const loadMoreHandler = useCallback(() => {
     if (!enablePagination) return;
+    // Всегда увеличиваем видимый лимит на perPage
+    setVisibleCount(prev => {
+      const hardLimit = typeof totalCount === 'number' ? totalCount : dataSource.length;
+      const next = prev + perPage;
+      return hardLimit ? Math.min(next, hardLimit) : next;
+    });
+    // При внешней пагинации дергаем загрузчик
     if (onLoadMore) {
       onLoadMore();
-      return;
     }
-    if (shouldUseLocalPagination && internalHasMore) {
-      setVisibleCount(prev => Math.min(prev + pageSize, dataSource.length));
-    }
-  }, [enablePagination, onLoadMore, shouldUseLocalPagination, internalHasMore, pageSize, dataSource.length]);
+  }, [enablePagination, onLoadMore, perPage, dataSource.length, totalCount]);
 
   const totalItems = useMemo(() => {
     if (typeof totalCount === 'number') {
@@ -177,6 +209,9 @@ const RecipesList: React.FC<RecipesListProps> = ({
             buttonLabel={loadMoreLabel}
             finishedLabel={finishedLabel}
             note={footerNote}
+            perPageValue={enablePagination ? perPage : undefined}
+            onPerPageChange={enablePagination ? setPerPage : undefined}
+            perPageLabel="Показывать по"
           />
         </div>
       )}
