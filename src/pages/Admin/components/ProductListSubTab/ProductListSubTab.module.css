@@ -8,3 +8,8 @@
 .error { margin-bottom: 12px; color: var(--ui-error, #b91c1c); }
 .ml8 { margin-left: 8px; }
 
+.paginationWrapper {
+  margin-top: var(--token-space-6);
+  display: flex;
+  justify-content: center;
+}

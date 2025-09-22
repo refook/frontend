@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import EditableTable, { type EditableRow } from '../EditableTable/EditableTable';
 import { productsService } from '../../../../services';
 import type { UpdateProductDto, ProductMeasureResponseDto, UpdateBaseProductMeasureDto, AddBaseProductMeasureDto, ChangeProductVariantDto, AddProductVariantMeasureDto } from '../../../../types/api.types';
@@ -13,6 +13,9 @@ import SearchBar from '../SearchBar/SearchBar';
 import styles from './ProductListSubTab.module.css';
 import { useProductEditing } from './hooks/useProductEditing';
 import { useVariantEditing } from './hooks/useVariantEditing';
+import ListPaginationControls from '../../../../components/ListPaginationControls/ListPaginationControls';
+
+const PAGE_SIZE = 20;
 
 const ProductListSubTab: React.FC = () => {
   const {
@@ -110,6 +113,20 @@ const ProductListSubTab: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const handleSave = handleSaveRow;
 
+  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  const [perPage, setPerPage] = useState<number>(PAGE_SIZE);
+
+  const displayedRows = useMemo(() => rows.slice(0, visibleCount), [rows, visibleCount]);
+  const hasMore = visibleCount < rows.length;
+
+  useEffect(() => {
+    setVisibleCount(perPage);
+  }, [rows, perPage]);
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount(prev => Math.min(prev + perPage, rows.length));
+  }, [rows.length, perPage]);
+
   // Источник мер и их редактирования в зависимости от режима
   const displayedMeasures = createMode === 'variant_update' ? variantMeasures : measures;
   const displayedMeasureEditing = createMode === 'variant_update' ? (variantMeasureEditing as unknown as Record<string, MeasureRow>) : (measureEditing as unknown as Record<string, MeasureRow>);
@@ -130,7 +147,7 @@ const ProductListSubTab: React.FC = () => {
         onRefresh={() => fetchAll()}
       />
       <EditableTable
-        rows={rows}
+        rows={displayedRows}
         editing={editing}
         setEditing={setEditing}
         updatingId={updatingId}
@@ -148,6 +165,18 @@ const ProductListSubTab: React.FC = () => {
           await loadVariantsByProduct(id);
         }}
       />
+      <div className={styles.paginationWrapper}>
+        <ListPaginationControls
+          summary={`Показано ${displayedRows.length} из ${rows.length}`}
+          hasMore={hasMore}
+          onLoadMore={hasMore ? handleLoadMore : undefined}
+          buttonLabel="Показать ещё продукты"
+          finishedLabel="Все продукты загружены"
+          perPageValue={perPage}
+          onPerPageChange={setPerPage}
+          perPageLabel="Показывать по"
+        />
+      </div>
       {editingId && form && (
         <div className={styles.mt16}>
           <div className={styles.actionsRow}>
@@ -248,4 +277,3 @@ const ProductListSubTab: React.FC = () => {
 };
 
 export default ProductListSubTab;
-
