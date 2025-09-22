@@ -151,6 +151,7 @@
   background: transparent;
   color: var(--token-text);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: background var(--token-duration-fast), color var(--token-duration-fast);
 }

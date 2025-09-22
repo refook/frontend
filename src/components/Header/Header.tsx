@@ -381,13 +381,9 @@ const Header: React.FC = () => {
                     <SparklesIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Админ-панель</span>
                   </Link>
-                  <Link to="/profile" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                    <UserIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Профиль</span>
-                  </Link>
                   <Link to="/profile/advanced" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <SparklesIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Продвинутый профиль</span>
+                    <span className={styles.menuLabel}>Профиль</span>
                   </Link>
                   <button className={styles.menuItem} role="menuitem" onClick={() => { setIsProfileMenuOpen(false); manageAccount(); }}>
                     <Cog6ToothIcon className={styles.menuIcon} />
