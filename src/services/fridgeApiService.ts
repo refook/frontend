@@ -264,13 +264,15 @@ class FridgeApiService {
     const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
     const updatedAt = updatedAtStr ? new Date(updatedAtStr) : new Date();
 
-    const measure = apiProduct.measure || {
-      id: `${apiProduct.productId}-measure-placeholder`,
-      name: apiProduct.measure?.name || 'Без меры',
-      weight: apiProduct.measure?.weight ?? 0,
-      isDefault: Boolean(apiProduct.measure?.isDefault),
-      density: apiProduct.measure?.density
-    };
+    const measure = (apiProduct as any).measure
+      ? (apiProduct as any).measure
+      : {
+          id: `${apiProduct.productId}-measure-placeholder`,
+          name: 'Без меры',
+          weight: 0,
+          isDefault: false,
+          density: undefined
+        };
 
     const weightPerMeasure = typeof measure.weight === 'number' ? measure.weight : 0;
     const derivedAmount = weightPerMeasure > 0
