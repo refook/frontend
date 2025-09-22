@@ -131,71 +131,64 @@ class FridgeApiService {
   /**
    * Обновить продукт в холодильнике
    */
-  private buildUpdateDto(
-    current: FridgeProduct,
-    updates: Partial<UpdateFridgeProductDto> & {
-      count?: number;
-      comment?: string | null;
-      measureId?: string;
-      expiryDate?: string | null;
-    }
-  ): UpdateFridgeProductDto {
-    const toIsoFromDateInput = (dateStr?: string | null): string | null => {
-      if (!dateStr) return null;
-      const trimmed = dateStr.trim();
-      if (!trimmed) return null;
-      if (trimmed.includes('T')) {
-        return trimmed;
-      }
-      const [year, month, day] = trimmed.split('-').map(Number);
-      if (!year || !month || !day) return null;
-      const pad = (n: number) => String(n).padStart(2, '0');
-      return `${year}-${pad(month)}-${pad(day)}T00:00:00`;
+  private buildUpdateDto(current: FridgeProduct, updates: Partial<UpdateFridgeProductDto> & { count?: number; comment?: string }): UpdateFridgeProductDto {
+    const normalizeProductUnit = (u: string): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' | any => {
+      const U = (u || '').toUpperCase();
+      if (U === 'KG' || U === 'KILOGRAM') return 'KILOGRAM';
+      if (U === 'MG' || U === 'MILLIGRAM') return 'MILLIGRAM';
+      return 'GRAM';
+    };
+    const inferBaseUnit = (u: string): 'GR' | 'ML' => {
+      const U = (u || '').toUpperCase();
+      return (U === 'ML' || U === 'L' || U === 'MILLILITER' || U === 'LITER') ? 'ML' : 'GR';
+    };
+    const toIsoOrNull = (d?: Date): string | null => {
+      if (!d) return null;
+      // Оставляем как есть в ISO
+      return d.toISOString();
     };
 
-    const resolvedExpiryDate: string | null = (() => {
+    // Преобразуем строку от date input (YYYY-MM-DD) в ISO (UTC полночь)
+    const toIsoFromDateInput = (dateStr?: string | null): string | null => {
+      if (!dateStr) return null;
+      const [year, month, day] = dateStr.split('-').map(n => parseInt(n, 10));
+      if (!year || !month || !day) return null;
+      // Формат без таймзоны: YYYY-MM-DDTHH:mm:ss
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const now = new Date();
+      const isToday = now.getFullYear() === year && (now.getMonth() + 1) === month && now.getDate() === day;
+      const time = isToday ? '23:59:59' : '00:00:00';
+      return `${year}-${pad(month)}-${pad(day)}T${time}`;
+    };
+
+    const resolvedProductUnit = ((): 'GRAM' | 'KILOGRAM' | 'MILLIGRAM' => {
+      if (updates.productUnit) return updates.productUnit as any;
+      return normalizeProductUnit(current.unit) as any;
+    })();
+    const resolvedBaseUnit = ((): 'GR' | 'ML' => {
+      if (updates.baseUnit) return updates.baseUnit as any;
+      return inferBaseUnit(current.unit) as any;
+    })();
+
+    // expiryDate: приоритет обновления из формы, иначе текущее значение
+    const resolvedExpiryDateIso: string | null = (() => {
       if (Object.prototype.hasOwnProperty.call(updates, 'expiryDate')) {
-        if (updates.expiryDate === null) return null;
-        return toIsoFromDateInput(updates.expiryDate);
+        return toIsoFromDateInput(updates.expiryDate as any);
       }
-      return current.expiryDate ? current.expiryDate.toISOString() : null;
+      return toIsoOrNull(current.expiryDate);
     })();
-
-    const resolvedComment = (() => {
-      if (Object.prototype.hasOwnProperty.call(updates, 'comment')) {
-        const next = updates.comment;
-        if (next === null) return undefined;
-        const trimmed = (next ?? '').toString().trim();
-        return trimmed || undefined;
-      }
-      return current.comment ?? undefined;
-    })();
-
-    const resolvedMeasureId = updates.measureId || current.measure.id;
 
     return {
-      productId: updates.productId || current.productId,
-      isVariant: typeof updates.isVariant === 'boolean' ? updates.isVariant : current.isVariant,
-      count: typeof updates.count === 'number' && !Number.isNaN(updates.count)
-        ? updates.count
-        : current.count,
-      measureId: resolvedMeasureId,
-      expiryDate: resolvedExpiryDate,
-      comment: resolvedComment
+      productId: current.ingredient.id,
+      baseUnit: resolvedBaseUnit as any,
+      count: typeof updates.count === 'number' ? updates.count : current.amount,
+      productUnit: resolvedProductUnit as any,
+      expiryDate: resolvedExpiryDateIso,
+      comment: typeof updates.comment === 'string' ? updates.comment : current.notes
     };
   }
 
-  async updateFridgeProduct(
-    fridgeId: string,
-    fridgeProductId: string,
-    updateData: Partial<UpdateFridgeProductDto> & {
-      count?: number;
-      comment?: string | null;
-      measureId?: string;
-      expiryDate?: string | null;
-    },
-    current: FridgeProduct
-  ): Promise<FridgeProduct> {
+  async updateFridgeProduct(fridgeId: string, fridgeProductId: string, updateData: Partial<UpdateFridgeProductDto> & { count?: number; comment?: string }, current: FridgeProduct): Promise<FridgeProduct> {
     try {
       console.log('Обновление продукта в холодильнике:', { fridgeId, fridgeProductId, updateData });
       
@@ -264,40 +257,20 @@ class FridgeApiService {
     const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
     const updatedAt = updatedAtStr ? new Date(updatedAtStr) : new Date();
 
-    const measure = apiProduct.measure || {
-      id: `${apiProduct.productId}-measure-placeholder`,
-      name: apiProduct.measure?.name || 'Без меры',
-      weight: apiProduct.measure?.weight ?? 0,
-      isDefault: Boolean(apiProduct.measure?.isDefault),
-      density: apiProduct.measure?.density
-    };
-
-    const weightPerMeasure = typeof measure.weight === 'number' ? measure.weight : 0;
-    const derivedAmount = weightPerMeasure > 0
-      ? apiProduct.count * weightPerMeasure
-      : apiProduct.count;
-    const derivedUnit = 'GR';
-    const derivedBaseUnit = weightPerMeasure > 0 ? ('GR' as const) : undefined;
-
     return {
       id: apiProduct.id,
-      productId: apiProduct.productId,
       ingredient: {
         id: apiProduct.productId,
         name: apiProduct.name,
         description: undefined
       },
-      isVariant: Boolean(apiProduct.isVariant),
-      count: apiProduct.count,
-      measure,
-      amount: derivedAmount,
-      unit: derivedUnit,
-      baseUnit: derivedBaseUnit,
+      amount: apiProduct.count,
+      unit: apiProduct.productUnit,
+      baseUnit: apiProduct.baseUnit,
       expiryDate: apiProduct.expiryDate ? new Date(apiProduct.expiryDate) : undefined,
-      comment: apiProduct.comment ?? undefined,
-      notes: apiProduct.comment ?? undefined,
+      notes: apiProduct.comment,
       addedAt: createdAt,
-      updatedAt
+      updatedAt: updatedAt
     };
   }
 
@@ -305,42 +278,49 @@ class FridgeApiService {
    * Преобразовать локальные данные в формат для API
    */
   transformLocalProductToApi(localProduct: {
-    productId: string;
-    isVariant: boolean;
-    count: number | string;
-    measureId: string;
-    expiryDate?: string | null;
-    comment?: string | null;
+    ingredient: { id: string };
+    amount: number;
+    unit: string;
+    baseUnit?: 'GR' | 'ML';
+    expiryDate?: string;
+    notes?: string;
   }): CreateFridgeProductDto {
-    const toApiDate = (value?: string | null): string | null => {
-      if (value === null) return null;
-      if (!value) return null;
-      const trimmed = value.trim();
-      if (!trimmed) return null;
-      if (trimmed.includes('T')) {
-        return trimmed;
-      }
-      const [year, month, day] = trimmed.split('-').map(Number);
+    const toApiDate = (dateStr?: string): string | null => {
+      if (!dateStr) return null;
+      // Ожидаем формат YYYY-MM-DD из инпута и конвертируем в ISO в UTC полночь
+      const [year, month, day] = dateStr.split('-').map(n => parseInt(n, 10));
       if (!year || !month || !day) return null;
       const pad = (n: number) => String(n).padStart(2, '0');
-      return `${year}-${pad(month)}-${pad(day)}T00:00:00`;
+      // Формат без таймзоны: YYYY-MM-DDTHH:mm:ss
+      const now = new Date();
+      const isToday = now.getFullYear() === year && (now.getMonth() + 1) === month && now.getDate() === day;
+      const time = isToday ? '23:59:59' : '00:00:00';
+      return `${year}-${pad(month)}-${pad(day)}T${time}`;
     };
 
-    const numericCount = Number(localProduct.count);
-    if (!Number.isFinite(numericCount)) {
-      throw new Error('Некорректное значение количества продукта');
-    }
+    // Определяем baseUnit по выбранной единице
+    const unit = (localProduct.unit || '').toUpperCase();
+    const baseUnit = (localProduct.baseUnit as any) || (unit === 'ML' || unit === 'L' || unit === 'MILLILITER' || unit === 'LITER' ? 'ML' : 'GR');
 
-    const comment = localProduct.comment ?? undefined;
-    const normalizedComment = typeof comment === 'string' ? comment.trim() || undefined : comment;
+    // productUnit ограничиваем до: GRAM, KILOGRAM, MILLIGRAM
+    const productUnit = (() => {
+      const u = unit;
+      if (u === 'KG' || u === 'KILOGRAM') return 'KILOGRAM';
+      if (u === 'MG' || u === 'MILLIGRAM') return 'MILLIGRAM';
+      // По умолчанию отправляем в граммах
+      return 'GRAM';
+    })();
+
+    // avgWeight пока задаём эвристически: количество, если есть; иначе 1
+    const avgWeight = Number.isFinite(localProduct.amount) ? Number(localProduct.amount) : 1;
 
     return {
-      productId: localProduct.productId,
-      isVariant: localProduct.isVariant,
-      count: numericCount,
-      measureId: localProduct.measureId,
+      productId: localProduct.ingredient.id,
+      baseUnit: baseUnit as any,
+      avgWeight,
+      productUnit: productUnit as any,
       expiryDate: toApiDate(localProduct.expiryDate),
-      comment: normalizedComment
+      comment: localProduct.notes || undefined
     };
   }
 }

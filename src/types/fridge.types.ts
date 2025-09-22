@@ -1,5 +1,5 @@
-import type { BaseEntity, Ingredient, MeasureType } from './index.ts';
-import type { ProductMeasureResponseDto } from './api.types';
+import type {BaseEntity, Ingredient, MeasureType} from "./index.ts";
+import type { BaseUnitType, ProductUnitType } from './measures.types';
 
 // Fridge types
 export interface FridgeItem extends BaseEntity {
@@ -26,20 +26,20 @@ export interface AddFridgeItemForm {
 // DTO для создания продукта в холодильнике
 export interface CreateFridgeProductDto {
   productId: string;
-  isVariant: boolean;
-  count: number;
-  measureId: string;
-  expiryDate?: string | null;
+  baseUnit: BaseUnitType;
+  avgWeight: number;
+  productUnit: 'GRAM' | 'KILOGRAM' | 'MILLIGRAM';
+  expiryDate?: string | null; // ISO date string or null
   comment?: string;
 }
 
 // DTO для обновления продукта в холодильнике
 export interface UpdateFridgeProductDto {
   productId: string;
-  isVariant: boolean;
+  baseUnit: 'ML' | 'GR';
   count: number;
-  measureId: string;
-  expiryDate?: string | null;
+  productUnit: 'GRAM' | 'KILOGRAM' | 'MILLIGRAM';
+  expiryDate?: string | null; // ISO date string or null
   comment?: string;
 }
 
@@ -48,46 +48,45 @@ export interface FridgeProductResponseDto {
   id: string;
   productId: string;
   name: string;
-  isVariant: boolean;
+  baseUnit: 'ML' | 'GR';
   count: number;
-  measure: ProductMeasureResponseDto;
+  productUnit:
+    | 'GRAM'
+    | 'KILOGRAM'
+    | 'MILLIGRAM'
+    | 'MILLILITER'
+    | 'LITER'
+    | 'TEASPOON'
+    | 'TABLESPOON'
+    | 'CUP'
+    | 'PIECE'
+    | 'PACKAGE'
+    | 'BUNCH'
+    | 'SLICE'
+    | 'LEAF'
+    | 'PIECE_PART'
+    | 'PORTION'
+    | 'PINCH'
+    | 'HANDFUL'
+    | 'PLATE'
+    | 'TO_TASTE'
+    | 'APPROX';
   expiryDate?: string | null;
   comment?: string;
-  ownerId: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // Локальный тип для продукта в холодильнике (для UI)
 export interface FridgeProduct {
   id: string;
-  productId: string;
   ingredient: {
     id: string;
     name: string;
     description?: string;
   };
-  isVariant: boolean;
-  count: number;
-  measure: ProductMeasureResponseDto;
-  /**
-   * Количество продукта в базовых единицах (граммы/мл) для обратной совместимости.
-   * Для большинства мер рассчитывается как count * measure.weight.
-   */
   amount: number;
-  /**
-   * Условная единица измерения для обратной совместимости со старым UI.
-   */
-  unit: string;
-  /**
-   * Базовая единица (если доступна) для обратной совместимости.
-   */
+  unit: string; // productUnit (например, GRAM/KILOGRAM)
   baseUnit?: 'GR' | 'ML';
   expiryDate?: Date;
-  comment?: string;
-  /**
-   * Дублирует comment для старого UI.
-   */
   notes?: string;
   addedAt: Date;
   updatedAt: Date;

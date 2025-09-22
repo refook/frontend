@@ -10,21 +10,38 @@
 .buttonContainer {
   display: flex;
   justify-content: center;
-  margin: var(--token-space-8) 0;
+  margin: var(--spacing-4xl) 0;
 }
 
 .loadMoreButton {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--token-space-2);
-  min-width: 200px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) var(--spacing-3xl);
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 160px;
   position: relative;
 }
 
-.loadMoreButton:hover:not(:disabled) { transform: translateY(-1px); }
+.loadMoreButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
 
-.loadMoreButton:disabled { transform: none; }
+.loadMoreButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
 
 .loadMoreButton.loading {
   pointer-events: none;
@@ -36,7 +53,9 @@
   animation: spin 1s linear infinite;
 }
 
-.buttonText { transition: opacity var(--token-duration-fast); }
+.buttonText {
+  transition: opacity var(--transition-fast);
+}
 
 .loading .buttonText {
   opacity: 0.8;
@@ -44,6 +63,14 @@
 
 /* Responsive styles */
 @media (max-width: 768px) {
-  .loadMoreButton { width: 100%; max-width: 300px; }
-  .buttonContainer { margin: var(--token-space-6) 0; padding: 0 var(--token-space-4); }
-}
+  .loadMoreButton {
+    width: 100%;
+    max-width: 300px;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+  }
+  
+  .buttonContainer {
+    margin: var(--spacing-3xl) 0;
+    padding: 0 var(--spacing-lg);
+  }
+} 

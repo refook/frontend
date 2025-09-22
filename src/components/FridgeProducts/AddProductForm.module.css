@@ -47,117 +47,6 @@
   gap: 6px;
 }
 
-.searchGroup {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.searchInput {
-  width: 100%;
-  padding-right: 36px;
-}
-
-.clearButton {
-  position: absolute;
-  right: 8px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 18px;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
-  border-radius: var(--radius-sm);
-  transition: background-color 0.2s ease;
-}
-
-.clearButton:hover {
-  background-color: var(--color-gray-100);
-  color: var(--text-primary);
-}
-
-.searchStatus {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.searchResults {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 8px;
-  border: 1px solid var(--border-secondary);
-  border-radius: var(--radius-md);
-  background: var(--bg-secondary);
-  max-height: 220px;
-  overflow-y: auto;
-  margin-top: 4px;
-}
-
-.searchResultButton {
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: none;
-  padding: 8px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.searchResultButton:hover,
-.searchResultButton:focus {
-  background-color: var(--color-gray-100);
-  outline: none;
-}
-
-.searchResultButton:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary-light);
-}
-
-.resultName {
-  display: block;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-}
-
-.resultDescription {
-  display: block;
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.selectedInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-secondary);
-}
-
-.selectedLabel {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-}
-
-.selectedName {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-}
-
-.selectedDescription {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-}
-
 .label {
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
@@ -178,10 +67,6 @@
   transition: border-color 0.2s ease;
   background: var(--bg-primary);
   color: var(--text-primary);
-}
-
-.inputError {
-  border-color: var(--color-danger);
 }
 
 .input:focus,

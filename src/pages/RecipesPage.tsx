@@ -8,6 +8,7 @@ import type { QuickFilterId } from '../config/recipeQuickFilters';
 import { QuickFiltersBar } from '../components/QuickFiltersBar';
 import { fetchRecipes } from '../store/thunks';
 import RecipesList from '../components/RecipesList/RecipesList';
+import LoadMoreButton from '../components/LoadMoreButton/LoadMoreButton';
 import styles from './RecipesPage.module.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -199,14 +200,14 @@ const RecipesPage: React.FC = () => {
           loading={loading}
           overrideRecipes={aiRecipes as any}
           loadingOverride={aiLoading}
-          enablePagination
-          pageSize={pagination.limit}
-          hasMore={aiMode ? undefined : pagination.hasMore}
-          onLoadMore={aiMode ? undefined : loadMoreRecipes}
-          loadMoreLabel={aiMode ? 'Показать ещё рецепты' : 'Загрузить ещё'}
-          finishedLabel={aiMode ? 'Это все подобранные рецепты' : 'Все рецепты загружены'}
-          totalCount={aiMode ? aiRecipes?.length : pagination.total}
         />
+
+        {pagination.hasMore && (
+          <LoadMoreButton
+            onClick={loadMoreRecipes}
+            loading={loading}
+          />
+        )}
       </div>
     </div>
   );

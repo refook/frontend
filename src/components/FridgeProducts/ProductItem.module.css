@@ -274,11 +274,6 @@
   gap: 8px;
 }
 
-.editError {
-  font-size: var(--font-size-xs);
-  color: var(--color-danger);
-}
-
 .editInput {
   padding: 8px 12px;
   border: 1px solid var(--border-secondary);
