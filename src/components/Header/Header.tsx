@@ -2,7 +2,21 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setTheme } from '../../store/slices/uiSlice';
-import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon, UserCircleIcon, Cog6ToothIcon, UserIcon, ArrowRightOnRectangleIcon, ArrowLeftOnRectangleIcon, BookmarkIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { createPortal } from 'react-dom';
+import {
+  SunIcon,
+  MoonIcon,
+  Bars3Icon,
+  XMarkIcon,
+  UserCircleIcon,
+  Cog6ToothIcon,
+  UserIcon,
+  ArrowRightOnRectangleIcon,
+  BookmarkIcon,
+  SparklesIcon,
+  HomeModernIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
 
@@ -21,10 +35,6 @@ const Header: React.FC = () => {
   }
 
   const { authenticated, user, login, logout, register, manageAccount } = context;
-
-  const toggleTheme = () => {
-    dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
-  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
@@ -114,13 +124,193 @@ const Header: React.FC = () => {
     setIsProfileMenuOpen((prev) => !prev);
   };
 
+  const mobileNavItems = [
+    {
+      to: '/recipes',
+      label: 'Рецепты',
+      description: 'Коллекция блюд и подборок',
+      icon: Squares2X2Icon,
+      isActive: location.pathname.startsWith('/recipes'),
+    },
+    {
+      to: '/fridge',
+      label: 'Холодильник',
+      description: 'Отслеживайте остатки и срок годности',
+      icon: HomeModernIcon,
+      isActive: location.pathname.startsWith('/fridge'),
+    },
+    {
+      to: '/discover',
+      label: 'Discover',
+      description: 'Идеи на основе ваших предпочтений',
+      icon: SparklesIcon,
+      isActive: location.pathname.startsWith('/discover'),
+    },
+    {
+      to: '/profile/advanced?tab=favorites',
+      label: 'Избранное',
+      description: 'Сохранённые рецепты и подборки',
+      icon: BookmarkIcon,
+      isActive: location.pathname.startsWith('/profile/advanced'),
+    },
+  ];
+
+  const mobileMenu = (
+    <div
+      id="mobileMenu"
+      className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Мобильное меню навигации"
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') closeMobileMenu();
+      }}
+    >
+      <div className={styles.mobileMenuInner}>
+        <div className={styles.mobileMenuTopRow}>
+          <span className={styles.mobileMenuTitle}>Навигация</span>
+          <button
+            type="button"
+            className={styles.mobileCloseButton}
+            onClick={closeMobileMenu}
+            aria-label="Закрыть мобильное меню"
+          >
+            <XMarkIcon className={styles.mobileCloseIcon} />
+          </button>
+        </div>
+
+        <div className={styles.mobileHeaderBlock}>
+          {authenticated ? (
+            <div className={styles.mobileProfileCard}>
+              <div className={styles.mobileProfileMain}>
+                {user?.photoUrl ? (
+                  <img src={user.photoUrl} alt="Avatar" className={styles.mobileAvatar}
+                  />
+                ) : (
+                  <div className={styles.mobileAvatarFallback}>
+                    <UserCircleIcon className={styles.mobileAvatarIcon} />
+                  </div>
+                )}
+                <div className={styles.mobileProfileMeta}>
+                  <span className={styles.mobileGreeting}>С возвращением</span>
+                  <span className={styles.mobileUserName}>{user?.name}</span>
+                </div>
+              </div>
+              <div className={styles.mobileProfileActions}>
+                <Link
+                  to="/profile/advanced"
+                  className={styles.mobileProfileLink}
+                  onClick={closeMobileMenu}
+                >
+                  <UserIcon className={styles.mobileProfileLinkIcon} />
+                  Профиль
+                </Link>
+                <button onClick={handleLogout} className={styles.mobileLogoutButton}>
+                  <ArrowRightOnRectangleIcon className={styles.mobileProfileLinkIcon} />
+                  Выйти
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.mobileAuthCard}>
+              <div className={styles.mobileAuthText}>
+                <span className={styles.mobileGreeting}>Добро пожаловать</span>
+                <span className={styles.mobileAuthHint}>Войдите, чтобы синхронизировать любимые рецепты</span>
+              </div>
+              <div className={styles.mobileAuthButtons}>
+                <button onClick={handleLogin} className="ui-btn ui-btn--ghost">
+                  Войти
+                </button>
+                <button onClick={handleRegister} className="ui-btn ui-btn--primary">
+                  Регистрация
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <nav className={styles.mobileNav}>
+          <ul className={styles.mobileNavList}>
+            {mobileNavItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    onClick={closeMobileMenu}
+                    className={`${styles.mobileNavCard} ${item.isActive ? styles.mobileNavCardActive : ''}`}
+                  >
+                    <div className={styles.mobileNavIconWrap}>
+                      <Icon className={styles.mobileNavIcon} />
+                    </div>
+                    <div className={styles.mobileNavCopy}>
+                      <span className={styles.mobileNavLabel}>{item.label}</span>
+                      <span className={styles.mobileNavDescription}>{item.description}</span>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <div className={styles.mobileMenuFooter}>
+          <span className={styles.mobileFooterLabel}>Быстрые действия</span>
+          <div className={styles.mobileQuickActions}>
+            <button
+              className={styles.mobilePillButton}
+              onClick={handleToggleTheme}
+              type="button"
+            >
+              {theme === 'light' ? (
+                <>
+                  <MoonIcon className={styles.mobilePillIcon} />
+                  Тёмная тема
+                </>
+              ) : (
+                <>
+                  <SunIcon className={styles.mobilePillIcon} />
+                  Светлая тема
+                </>
+              )}
+            </button>
+            {authenticated ? (
+              <button
+                className={styles.mobilePillButton}
+                onClick={() => {
+                  closeMobileMenu();
+                  manageAccount();
+                }}
+                type="button"
+              >
+                <Cog6ToothIcon className={styles.mobilePillIcon} />
+                Управление аккаунтом
+              </button>
+            ) : (
+              <button
+                className={styles.mobilePillButton}
+                onClick={handleRegister}
+                type="button"
+              >
+                <SparklesIcon className={styles.mobilePillIcon} />
+                Создать профиль
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <header className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''}`}>
-      <div className={styles.container}>
-        {/* Logo */}
-        <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
-          <span className={styles.logoText}>Refook</span>
-        </Link>
+    <>
+      <header className={`${styles.header} ${isScrolled ? styles.headerScrolled : ''}`}>
+        <div className={styles.container}>
+          {/* Logo */}
+          <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
+            <img src="/logo.png" alt="Refook" width={28} height={28} style={{ marginRight: 8, borderRadius: 6 }} />
+            <span className={styles.logoText}>Refook</span>
+          </Link>
 
         {/* Desktop Navigation */}
         <nav className={styles.nav}>
@@ -191,13 +381,9 @@ const Header: React.FC = () => {
                     <SparklesIcon className={styles.menuIcon} />
                     <span className={styles.menuLabel}>Админ-панель</span>
                   </Link>
-                  <Link to="/profile" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                    <UserIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Профиль</span>
-                  </Link>
                   <Link to="/profile/advanced" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
                     <SparklesIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Продвинутый профиль</span>
+                    <span className={styles.menuLabel}>Профиль</span>
                   </Link>
                   <button className={styles.menuItem} role="menuitem" onClick={() => { setIsProfileMenuOpen(false); manageAccount(); }}>
                     <Cog6ToothIcon className={styles.menuIcon} />
@@ -243,63 +429,18 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation Menu */}
-      <div
-        id="mobileMenu"
-        className={`${styles.mobileMenu} ${isMobileMenuOpen ? styles.mobileMenuOpen : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Мобильное меню навигации"
-        onKeyDown={(e) => {
-          if (e.key === 'Escape') closeMobileMenu();
-        }}
-      >
-        <nav className={styles.mobileNav}>
-          <Link to="/recipes" className={styles.mobileNavLink} onClick={closeMobileMenu}>
-            Рецепты
-          </Link>
-          <Link to="/fridge" className={styles.mobileNavLink} onClick={closeMobileMenu}>
-            Холодильник
-          </Link>
-          <Link to="/discover" className={styles.mobileNavLink} onClick={closeMobileMenu}>
-            Discover
-          </Link>
-        </nav>
+      </header>
 
-        {/* Mobile User section */}
-        <div className={styles.mobileUserSection}>
-          {authenticated ? (
-            <div className={styles.mobileUserInfo}>
-              <span className={styles.mobileUserName}>{user?.name}</span>
-              {user?.photoUrl && (
-                <img
-                  src={user.photoUrl}
-                  alt="Avatar"
-                  className={styles.mobileAvatar}
-                />
-              )}
-              <button onClick={handleLogout} className="ui-btn ui-btn--ghost">
-                Выйти
-              </button>
-            </div>
-          ) : (
-            <div className={styles.mobileAuthButtons}>
-              <button onClick={handleLogin} className="ui-btn ui-btn--ghost">
-                Войти
-              </button>
-              <button onClick={handleRegister} className="ui-btn ui-btn--primary">
-                Регистрация
-              </button>
-            </div>
+      {createPortal(
+        <>
+          {mobileMenu}
+          {isMobileMenuOpen && (
+            <div className={styles.mobileMenuOverlay} onClick={closeMobileMenu} />
           )}
-        </div>
-      </div>
-
-      {/* Mobile menu overlay */}
-      {isMobileMenuOpen && (
-        <div className={styles.mobileMenuOverlay} onClick={closeMobileMenu} />
+        </>,
+        document.body
       )}
-    </header>
+    </>
   );
 };
 

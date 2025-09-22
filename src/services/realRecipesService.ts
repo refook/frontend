@@ -36,23 +36,15 @@ class RealRecipesService {
       }
       
       const recipesList = await response.json();
-      console.log(`Получен список из ${recipesList.length} рецептов`);
+      if (!Array.isArray(recipesList)) {
+        console.warn('Ожидался массив рецептов, получено:', recipesList);
+        return [];
+      }
 
-      // Загружаем полные данные для каждого рецепта
-      const fullRecipes = await Promise.all(
-        recipesList.map(async (recipeInfo: { id: string }) => {
-          try {
-            const detailedRecipe = await this.getRecipeById(recipeInfo.id);
-            return detailedRecipe;
-          } catch (error) {
-            console.error(`Ошибка при загрузке детальной информации рецепта ${recipeInfo.id}:`, error);
-            return null;
-          }
-        })
-      );
+      console.log(`Получен список из ${recipesList.length} рецептов (краткие данные)`);
 
-      // Фильтруем null значения (рецепты, которые не удалось загрузить)
-      return fullRecipes.filter((recipe): recipe is Recipe => recipe !== null);
+      // Возвращаем короткие карточки без дополнительного запроса деталей
+      return recipesList.map((shortRecipe: any) => this.transformShortApiRecipeToLocal(shortRecipe));
     } catch (error) {
       console.error('Ошибка при загрузке рецептов из API:', error);
       // Возвращаем пустой массив вместо ошибки

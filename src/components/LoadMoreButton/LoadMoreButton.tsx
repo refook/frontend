@@ -18,9 +18,10 @@ const LoadMoreButton: React.FC<LoadMoreButtonProps> = ({
   return (
     <div className={styles.buttonContainer}>
       <button
-        className={`${styles.loadMoreButton} ${loading ? styles.loading : ''}`}
+        className={`ui-btn ui-btn--primary ${styles.loadMoreButton} ${loading ? styles.loading : ''}`}
         onClick={onClick}
         disabled={disabled || loading}
+        aria-busy={loading}
       >
         {loading && (
           <ArrowPathIcon className={styles.loadingIcon} />

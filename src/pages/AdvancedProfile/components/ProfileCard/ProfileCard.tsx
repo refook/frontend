@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styles from './ProfileCard.module.css';
 import { MapPinIcon, CalendarDaysIcon, Cog6ToothIcon, StarIcon } from '@heroicons/react/24/outline';
 
@@ -54,10 +55,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user }) => {
   return (
     <div className={styles.card}>
       <div className={styles.settingsTopRight}>
-        <button className={`ui-btn`} aria-label="Настройки">
+        <Link to="/profile" className={`ui-btn`} aria-label="Профиль">
           <Cog6ToothIcon className={styles.settingsIcon} />
           <span className={styles.settingsLabel}>Settings</span>
-        </button>
+        </Link>
       </div>
       <div className={styles.layout}>
         <div className={styles.leftCol}>

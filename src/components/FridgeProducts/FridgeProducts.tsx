@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { AddProductForm } from './AddProductForm';
+import { AddProductForm, type AddProductFormSubmitPayload } from './AddProductForm';
 import { ProductItem } from './ProductItem';
- 
-import type { MeasureType } from '../../types/measures.types';
+
 import type { FridgeProduct, FridgeResponseDto, CreateFridgeDto } from '../../types/fridge.types';
 import { fridgeApiService } from '../../services/fridgeApiService';
 import styles from './FridgeProducts.module.css';
@@ -110,14 +109,7 @@ export const FridgeProducts: React.FC = () => {
     return () => window.removeEventListener('fridge:sort', onSort as EventListener);
   }, [baseItems]);
 
-  const handleAddProduct = async (productData: {
-    ingredient: any;
-    amount: number;
-    unit: string;
-    baseUnit?: 'GR' | 'ML';
-    expiryDate?: string;
-    notes?: string;
-  }) => {
+  const handleAddProduct = async (productData: AddProductFormSubmitPayload) => {
     try {
       const apiData = fridgeApiService.transformLocalProductToApi(productData);
       if (!activeFridgeId) throw new Error('Холодильник не выбран');
