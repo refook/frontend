@@ -303,18 +303,17 @@
 /* Mobile Menu */
 .mobileMenu {
   position: fixed;
-  top: 64px;
+  inset: 0;
   left: 0;
   right: 0;
-  background-color: var(--token-surface);
-  border-bottom: 1px solid var(--token-border);
-  transform: translateY(-100%);
+  background: color-mix(in oklab, var(--token-surface) 92%, transparent);
+  transform: translateY(-8%);
   opacity: 0;
   visibility: hidden;
-  transition: all var(--transition-normal);
-  z-index: var(--z-sticky);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  transition: transform var(--token-duration-normal) ease, opacity var(--token-duration-normal) ease, visibility var(--token-duration-normal) ease;
+  z-index: calc(var(--z-sticky) + 1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .mobileMenuOpen {
@@ -323,109 +322,311 @@
   visibility: visible;
 }
 
-.mobileNav {
+.mobileMenuInner {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-lg);
-  gap: var(--spacing-lg);
+  gap: var(--token-space-8);
+  padding: calc(var(--spacing-xl) + 24px) var(--spacing-lg) var(--spacing-2xl);
+  overflow-y: auto;
 }
 
-.mobileNavLink {
-  color: var(--token-muted);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  font-size: var(--font-size-base);
-  padding: var(--spacing-md) 0;
-  border-bottom: 1px solid var(--border-secondary);
-  transition: color var(--token-duration-fast);
-}
-
-.mobileNavLink:hover {
-  color: var(--token-text);
-}
-
-.mobileNavLink:last-child {
-  border-bottom: none;
-}
-
-/* Mobile User Section */
-.mobileUserSection {
-  padding: var(--spacing-lg);
-  border-top: 1px solid var(--border-secondary);
-}
-
-.mobileUserInfo {
+.mobileMenuTopRow {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) 0;
+  justify-content: space-between;
 }
 
-.mobileUserName {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
+.mobileMenuTitle {
+  font-size: var(--token-text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--token-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mobileCloseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid color-mix(in oklab, var(--token-border) 80%, transparent);
+  background: var(--token-surface);
   color: var(--token-text);
+  cursor: pointer;
+  transition: transform var(--token-duration-fast), border-color var(--token-duration-fast), box-shadow var(--token-duration-fast);
+}
+
+.mobileCloseButton:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--token-accent) 40%, var(--token-border));
+  box-shadow: var(--token-shadow-sm);
+}
+
+.mobileCloseIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.mobileHeaderBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-4);
+}
+
+.mobileProfileCard {
+  border-radius: 20px;
+  padding: var(--token-space-6);
+  background: linear-gradient(130deg, color-mix(in oklab, var(--token-accent) 60%, transparent), color-mix(in oklab, var(--color-secondary) 45%, transparent));
+  color: var(--token-neutral-0);
+  box-shadow: var(--token-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-4);
+}
+
+.mobileProfileMain {
+  display: flex;
+  align-items: center;
+  gap: var(--token-space-4);
 }
 
 .mobileAvatar {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
+  width: 56px;
+  height: 56px;
+  border-radius: var(--token-radius-full);
   object-fit: cover;
-  border: 2px solid var(--token-border);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: var(--token-shadow-sm);
+}
+
+.mobileAvatarFallback {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--token-radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: var(--token-shadow-sm);
+}
+
+.mobileAvatarIcon {
+  width: 34px;
+  height: 34px;
+}
+
+.mobileProfileMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mobileGreeting {
+  font-size: var(--token-text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mobileUserName {
+  font-size: var(--token-text-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.mobileProfileActions {
+  display: flex;
+  gap: var(--token-space-3);
+}
+
+.mobileProfileLink,
+.mobileLogoutButton {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--token-space-2);
+  padding: 10px 14px;
+  border-radius: var(--token-radius-lg);
+  border: 0;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--token-text-sm);
+  background: rgba(255, 255, 255, 0.16);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--token-duration-fast), background var(--token-duration-fast);
+}
+
+.mobileProfileLink:hover,
+.mobileLogoutButton:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.mobileProfileLinkIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.mobileLogoutButton {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.mobileAuthCard {
+  border-radius: 20px;
+  padding: var(--token-space-6);
+  background: linear-gradient(145deg, color-mix(in oklab, var(--token-surface) 85%, transparent), color-mix(in oklab, var(--token-accent-weak) 45%, transparent));
+  border: 1px solid color-mix(in oklab, var(--token-border) 60%, transparent);
+  box-shadow: var(--token-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-4);
+}
+
+.mobileAuthText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-2);
+}
+
+.mobileAuthHint {
+  font-size: var(--token-text-sm);
+  color: var(--token-muted);
 }
 
 .mobileAuthButtons {
   display: flex;
+  gap: var(--token-space-3);
+}
+
+.mobileNav {
+  display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md) 0;
 }
 
-.mobileLoginButton {
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-secondary);
+.mobileNavList {
+  list-style: none;
+  display: grid;
+  gap: var(--token-space-4);
+  margin: 0;
+  padding: 0;
+}
+
+.mobileNavCard {
+  display: flex;
+  align-items: center;
+  gap: var(--token-space-4);
   text-decoration: none;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-primary);
-  text-align: center;
-  transition: all var(--transition-fast);
+  padding: var(--token-space-4);
+  border-radius: 18px;
+  background: var(--token-surface);
+  border: 1px solid color-mix(in oklab, var(--token-border) 80%, transparent);
+  transition: border-color var(--token-duration-fast), box-shadow var(--token-duration-fast), transform var(--token-duration-fast);
 }
 
-.mobileLoginButton:hover {
-  color: var(--text-primary);
-  background-color: var(--bg-secondary);
+.mobileNavCard:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--token-accent) 35%, var(--token-border));
+  box-shadow: var(--token-shadow-md);
 }
 
-.mobileRegisterButton {
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-inverse);
-  background-color: var(--color-primary);
-  text-decoration: none;
-  border-radius: var(--radius-md);
-  text-align: center;
-  transition: background-color var(--transition-fast);
+.mobileNavCardActive {
+  border-color: color-mix(in oklab, var(--token-accent) 50%, var(--token-border));
+  box-shadow: var(--token-shadow-md);
+  background: color-mix(in oklab, var(--token-accent-weak) 60%, var(--token-surface));
 }
 
-.mobileRegisterButton:hover {
-  background-color: var(--color-primary-hover);
+.mobileNavIconWrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklab, var(--token-accent-weak) 75%, transparent);
+  color: var(--token-accent-strong);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--token-accent) 30%, transparent);
+}
+
+.mobileNavIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.mobileNavCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobileNavLabel {
+  font-size: var(--token-text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--token-text);
+}
+
+.mobileNavDescription {
+  font-size: var(--token-text-sm);
+  color: var(--token-muted);
+}
+
+.mobileMenuFooter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-3);
+}
+
+.mobileFooterLabel {
+  font-size: var(--token-text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--token-muted);
+}
+
+.mobileQuickActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--token-space-3);
+}
+
+.mobilePillButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--token-space-2);
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--token-border) 70%, transparent);
+  background: color-mix(in oklab, var(--token-surface) 90%, transparent);
+  color: var(--token-text);
+  font-size: var(--token-text-sm);
+  cursor: pointer;
+  transition: border-color var(--token-duration-fast), transform var(--token-duration-fast), box-shadow var(--token-duration-fast);
+}
+
+.mobilePillButton:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
+  box-shadow: var(--token-shadow-sm);
+}
+
+.mobilePillIcon {
+  width: 18px;
+  height: 18px;
 }
 
 /* Mobile Menu Overlay */
 .mobileMenuOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: calc(var(--z-sticky) - 1);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  inset: 0;
+  background: rgba(14, 18, 27, 0.45);
+  z-index: var(--z-sticky);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 /* Responsive styles */
@@ -433,10 +634,6 @@
   .container {
     padding: 0 var(--spacing-md);
     height: 56px;
-  }
-
-  .mobileMenu {
-    top: 56px;
   }
 
   .nav {
@@ -465,11 +662,15 @@
     font-size: var(--font-size-lg);
   }
 
-  .mobileNav {
-    padding: var(--spacing-md);
+  .mobileMenuInner {
+    padding: calc(var(--spacing-lg) + 20px) var(--spacing-md) var(--spacing-xl);
   }
 
-  .mobileUserSection {
-    padding: var(--spacing-md);
+  .mobileProfileActions {
+    flex-direction: column;
   }
-} 
+
+  .mobileQuickActions {
+    flex-direction: column;
+  }
+}
