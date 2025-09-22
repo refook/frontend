@@ -54,3 +54,17 @@
     border-color: color-mix(in oklab, var(--token-accent) 60%, var(--token-border) 40%);
   }
 }
+
+/* controls row for per-page input */
+.controlsRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--token-space-2);
+}
+
+.label {
+  font-size: var(--token-text-sm);
+  color: var(--token-muted);
+}

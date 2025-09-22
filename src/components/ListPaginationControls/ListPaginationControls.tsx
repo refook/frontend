@@ -41,11 +41,10 @@ const ListPaginationControls: React.FC<ListPaginationControlsProps> = ({
   return (
     <div className={styles.wrapper}>
       {typeof perPageValue === 'number' && onPerPageChange ? (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <label style={{ fontSize: 14 }}>
-            {perPageLabel}:
-          </label>
+        <div className={styles.controlsRow}>
+          <label className={styles.label}>{perPageLabel}:</label>
           <input
+            className="ui-input"
             type="number"
             min={1}
             step={1}
@@ -55,7 +54,7 @@ const ListPaginationControls: React.FC<ListPaginationControlsProps> = ({
               onPerPageChange(next);
             }}
             disabled={disabled}
-            style={{ width: 90 }}
+            style={{ maxWidth: 120 }}
           />
         </div>
       ) : null}
