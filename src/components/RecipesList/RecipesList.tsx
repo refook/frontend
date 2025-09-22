@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Recipe } from '../../types';
 import RecipeCard from '../RecipeCard/RecipeCard';
 import RecipeCardSkeleton from '../RecipeCard/RecipeCardSkeleton';
+import ListPaginationControls from '../ListPaginationControls/ListPaginationControls';
 import styles from './RecipesList.module.css';
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 
 interface RecipesListProps {
   recipes: Recipe[];
@@ -12,6 +12,15 @@ interface RecipesListProps {
   viewMode?: 'grid' | 'list';
   overrideRecipes?: Recipe[] | null; // данные из ИИ-поиска
   loadingOverride?: boolean; // внешний индикатор загрузки
+  enablePagination?: boolean;
+  pageSize?: number;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  loadMoreLabel?: string;
+  finishedLabel?: string;
+  totalCount?: number;
+  footerSummary?: string;
+  footerNote?: string;
 }
 
 const RecipesList: React.FC<RecipesListProps> = ({
@@ -19,20 +28,80 @@ const RecipesList: React.FC<RecipesListProps> = ({
   loading,
   viewMode = 'grid',
   overrideRecipes,
-  loadingOverride
+  loadingOverride,
+  enablePagination = false,
+  pageSize = 12,
+  hasMore,
+  onLoadMore,
+  loadMoreLabel = 'Показать больше',
+  finishedLabel = 'Больше нет элементов',
+  totalCount,
+  footerSummary,
+  footerNote
 }) => {
   const navigate = useNavigate();
   const effectiveLoading = loadingOverride ?? loading;
+  const dataSource = overrideRecipes ?? recipes;
+
+  const [visibleCount, setVisibleCount] = useState(pageSize);
+  const shouldUseLocalPagination = enablePagination && !onLoadMore;
+
+  const displayedRecipes = useMemo(() => (
+    shouldUseLocalPagination ? dataSource.slice(0, visibleCount) : dataSource
+  ), [dataSource, visibleCount, shouldUseLocalPagination]);
+
+  useEffect(() => {
+    if (!enablePagination) return;
+    if (shouldUseLocalPagination) {
+      setVisibleCount(pageSize);
+    }
+  }, [dataSource, enablePagination, shouldUseLocalPagination, pageSize]);
+
+  const internalHasMore = shouldUseLocalPagination ? visibleCount < dataSource.length : false;
+  const effectiveHasMore = typeof hasMore === 'boolean' ? hasMore : internalHasMore;
+
+  const loadMoreHandler = useCallback(() => {
+    if (!enablePagination) return;
+    if (onLoadMore) {
+      onLoadMore();
+      return;
+    }
+    if (shouldUseLocalPagination && internalHasMore) {
+      setVisibleCount(prev => Math.min(prev + pageSize, dataSource.length));
+    }
+  }, [enablePagination, onLoadMore, shouldUseLocalPagination, internalHasMore, pageSize, dataSource.length]);
+
+  const totalItems = useMemo(() => {
+    if (typeof totalCount === 'number') {
+      return totalCount;
+    }
+    if (shouldUseLocalPagination) {
+      return dataSource.length;
+    }
+    return undefined;
+  }, [totalCount, shouldUseLocalPagination, dataSource.length]);
+
+  const summaryText = useMemo(() => {
+    if (!enablePagination) return null;
+    if (footerSummary) return footerSummary;
+    if (typeof totalItems === 'number') {
+      return `Показано ${displayedRecipes.length} из ${totalItems}`;
+    }
+    return `Показано ${displayedRecipes.length}`;
+  }, [enablePagination, footerSummary, totalItems, displayedRecipes.length]);
 
   const handleRandomRecipe = () => {
-    if (!recipes || recipes.length === 0) return;
-    const random = recipes[Math.floor(Math.random() * recipes.length)];
+    if (!dataSource || dataSource.length === 0) return;
+    const random = dataSource[Math.floor(Math.random() * dataSource.length)];
     if (random?.id) {
       navigate(`/recipe/${random.id}`);
     }
   };
-  const dataSource = overrideRecipes ?? recipes;
-  if (effectiveLoading && dataSource.length === 0) {
+
+  const isInitialLoading = effectiveLoading && displayedRecipes.length === 0;
+  const isEmptyState = !effectiveLoading && displayedRecipes.length === 0;
+
+  if (isInitialLoading) {
     return (
       <div className={`${styles.recipesList} ${styles[viewMode]}`}>
         {Array.from({ length: 12 }).map((_, index) => (
@@ -42,7 +111,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
     );
   }
 
-  if (dataSource.length === 0) {
+  if (isEmptyState) {
     return (
       <div className={styles.emptyState}>
         <div className={styles.emptyIcon}>🔍</div>
@@ -58,7 +127,7 @@ const RecipesList: React.FC<RecipesListProps> = ({
   const elements: React.ReactNode[] = [];
   let rowIndex = 0;
 
-  dataSource.forEach((recipe, index) => {
+  displayedRecipes.forEach((recipe, index) => {
     elements.push(
       <RecipeCard
         key={recipe.id}
@@ -91,15 +160,28 @@ const RecipesList: React.FC<RecipesListProps> = ({
   return (
     <div className={`${styles.recipesList} ${styles[viewMode]}`}>
       {elements}
-      {effectiveLoading && (
+      {effectiveLoading && onLoadMore && (
         <>
           {Array.from({ length: 6 }).map((_, index) => (
             <RecipeCardSkeleton key={`skeleton-${index}`} />
           ))}
         </>
       )}
+      {enablePagination && (
+        <div className={`${styles.fullWidth} ${styles.paginationContainer}`}>
+          <ListPaginationControls
+            summary={summaryText}
+            hasMore={effectiveHasMore}
+            loading={effectiveLoading && Boolean(onLoadMore)}
+            onLoadMore={loadMoreHandler}
+            buttonLabel={loadMoreLabel}
+            finishedLabel={finishedLabel}
+            note={footerNote}
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-export default RecipesList; 
+export default RecipesList;

@@ -1,0 +1,56 @@
+.wrapper {
+  width: 100%;
+  margin-top: var(--token-space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--token-space-3);
+}
+
+.summary {
+  font-size: var(--token-text-sm);
+  color: var(--token-muted);
+  text-align: center;
+  line-height: var(--token-leading-normal);
+}
+
+.note {
+  font-size: calc(var(--token-text-sm) - 1px);
+  color: var(--token-muted);
+  text-align: center;
+  line-height: var(--token-leading-normal);
+}
+
+.finishButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--token-space-2);
+  padding: 0 var(--token-space-4);
+  height: 44px;
+  min-width: 220px;
+  border-radius: var(--token-radius-full);
+  border: 1px dashed color-mix(in oklab, var(--token-accent) 50%, var(--token-border) 50%);
+  background: color-mix(in oklab, var(--token-accent-weak) 70%, var(--token-surface) 30%);
+  color: var(--token-accent-strong);
+  font-size: var(--token-text-base);
+  font-weight: 600;
+  box-shadow: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+.finishButton::before {
+  content: '✓';
+  font-size: var(--token-text-base);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .finishButton {
+    transition: background-color var(--token-duration-normal), border-color var(--token-duration-normal);
+  }
+  .finishButton:hover {
+    background: color-mix(in oklab, var(--token-accent-weak) 50%, var(--token-surface) 50%);
+    border-color: color-mix(in oklab, var(--token-accent) 60%, var(--token-border) 40%);
+  }
+}
