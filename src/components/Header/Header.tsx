@@ -308,6 +308,7 @@ const Header: React.FC = () => {
         <div className={styles.container}>
           {/* Logo */}
           <Link to="/" className={styles.logo} onClick={closeMobileMenu}>
+            <img src="/logo.png" alt="Refook" width={28} height={28} style={{ marginRight: 8, borderRadius: 6 }} />
             <span className={styles.logoText}>Refook</span>
           </Link>
 
