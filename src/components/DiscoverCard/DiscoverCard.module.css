@@ -351,6 +351,18 @@
   margin-bottom: 1rem;
 }
 
+.ingredientsStatus {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin-bottom: 0.75rem;
+}
+
+.ingredientsError {
+  font-size: 0.8rem;
+  color: #f87171;
+  margin-bottom: 0.75rem;
+}
+
 .ingredientItem {
   display: flex;
   align-items: center;

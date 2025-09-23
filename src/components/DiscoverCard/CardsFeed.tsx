@@ -252,6 +252,7 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
                 onSelect={() => onRecipeSelect(recipe)}
                 currentFilter={currentFilter}
                 onFilterChange={onFilterChange}
+                isActive={index === currentIndex}
               />
             </div>
           );

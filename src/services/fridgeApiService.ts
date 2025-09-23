@@ -25,11 +25,20 @@ class FridgeApiService {
     const url = `${API_BASE_URL}/fridges`;
     const headers = getAuthHeaders();
     apiLogger.logRequest(url, 'GET', headers);
-    const response = await authorizedFetch(url, { method: 'GET', headers });
-    if (!response.ok) {
-      throw new Error(`Не удалось загрузить холодильники: ${response.status}`);
+    try {
+      const response = await authorizedFetch(url, { method: 'GET', headers });
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.warn('API холодильника вернул 404 — используем пустой список');
+          return [];
+        }
+        throw new Error(`Не удалось загрузить холодильники: ${response.status}`);
+      }
+      return response.json();
+    } catch (error) {
+      console.error('getUserFridges fallback triggered:', error);
+      return [];
     }
-    return response.json();
   }
 
   /**
