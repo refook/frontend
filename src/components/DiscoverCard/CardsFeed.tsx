@@ -29,7 +29,28 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
   const [startTime, setStartTime] = useState(0);
   const [lastWheelTime, setLastWheelTime] = useState(0);
   const feedRef = useRef<HTMLDivElement>(null);
-  const cardHeight = window.innerHeight;
+  const [cardHeight, setCardHeight] = useState(() => window.innerHeight || 0);
+
+  const updateCardHeight = React.useCallback(() => {
+    const node = feedRef.current;
+    if (!node) return;
+    const measured = node.getBoundingClientRect().height;
+    if (!measured || Number.isNaN(measured)) return;
+    setCardHeight(measured);
+  }, []);
+
+  useEffect(() => {
+    updateCardHeight();
+    const handleResize = () => updateCardHeight();
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [updateCardHeight]);
+
+  useEffect(() => {
+    updateCardHeight();
+  }, [recipes.length, updateCardHeight]);
 
   // Обновляем позицию ленты при изменении индекса
   useEffect(() => {
@@ -42,7 +63,7 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
       return;
     }
     
-    setPosition(-currentIndex * cardHeight);
+    setPosition(-safeIndex * cardHeight);
   }, [currentIndex, cardHeight, recipes.length, onIndexChange]);
 
   const handleStart = (clientX: number, clientY: number) => {
@@ -87,11 +108,13 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
     if (isSwipe) {
       if (deltaY < 0) {
         // Свайп вверх - следующая карточка
-        const nextIndex = (currentIndex + 1) % recipes.length;
+        const nextIndex = Math.min(currentIndex + 1, recipes.length - 1);
+        setPosition(-nextIndex * cardHeight);
         onIndexChange(nextIndex);
       } else {
         // Свайп вниз - предыдущая карточка
-        const prevIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+        const prevIndex = Math.max(currentIndex - 1, 0);
+        setPosition(-prevIndex * cardHeight);
         onIndexChange(prevIndex);
       }
     } else {
@@ -150,11 +173,13 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
       
       if (delta > 0) {
         // Прокрутка вниз = следующая карточка
-        const nextIndex = (currentIndex + 1) % recipes.length;
+        const nextIndex = Math.min(currentIndex + 1, recipes.length - 1);
+        setPosition(-nextIndex * cardHeight);
         onIndexChange(nextIndex);
       } else {
         // Прокрутка вверх = предыдущая карточка
-        const prevIndex = (currentIndex - 1 + recipes.length) % recipes.length;
+        const prevIndex = Math.max(currentIndex - 1, 0);
+        setPosition(-prevIndex * cardHeight);
         onIndexChange(prevIndex);
       }
     }
@@ -252,6 +277,7 @@ const CardsFeed: React.FC<CardsFeedProps> = ({
                 onSelect={() => onRecipeSelect(recipe)}
                 currentFilter={currentFilter}
                 onFilterChange={onFilterChange}
+                isActive={index === currentIndex}
               />
             </div>
           );

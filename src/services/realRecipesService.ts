@@ -1,5 +1,5 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
-import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto, StepResponseDto } from '../types/recipe.types';
 import { apiLogger } from '../utils/apiLogger';
 import { getAuthHeaders, authorizedFetch } from './auth';
 
@@ -400,12 +400,13 @@ class RealRecipesService {
         difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
         cuisine: apiRecipe.kitchen,
         tags: tagsList,
-        ingredients: apiRecipe.ingredients || [],
-        steps: (apiRecipe.steps || []).map(step => ({
-          ...step,
-          photos: step.photos || [],
-          ingredients: step.ingredients || []
-        })) || [],
+        ingredients: ((apiRecipe as any)?.composition?.ingredients || apiRecipe.ingredients || []) as Recipe['ingredients'],
+        steps: ((((apiRecipe as any)?.composition?.steps || apiRecipe.steps || []) ?? []) as StepResponseDto[])
+          .map((step: StepResponseDto) => ({
+            ...step,
+            photos: step.photos || [],
+            ingredients: step.ingredients || []
+          })),
         macros: (apiRecipe as any)?.macros ? {
           calories: Number((apiRecipe as any).macros?.calories ?? 0),
           proteins: Number((apiRecipe as any).macros?.proteins ?? 0),
