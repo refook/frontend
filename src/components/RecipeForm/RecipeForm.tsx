@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../../services/api';
 import { BASE_UNITS_ARRAY, PRODUCT_UNITS, PRODUCT_UNITS_ARRAY, RECIPE_UNITS_ARRAY } from '../../constants/measures';
-import type { CreateRecipeDto, KitchenType, DifficultyLevel, ApiCreateRecipeDto, ApiUpdateStepDto } from '../../types/recipe.types';
+import type {
+  CreateRecipeDto,
+  KitchenType,
+  DifficultyLevel,
+  ApiCreateRecipeDto,
+  ApiUpdateStepDto,
+  ApiUpdateRecipeIngredientDto,
+} from '../../types/recipe.types';
 import type { ProductMeasureResponseDto } from '../../types/api.types';
 import { productsService } from '../../services';
 import IngredientPicker from '../IngredientPicker/IngredientPicker';
@@ -10,13 +17,15 @@ import TagsInput from '../TagsInput/TagsInput';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import styles from './RecipeForm.module.css';
 import { getAuthHeaders, authorizedFetch } from '../../services/auth';
+import KitchensService from '../../services/kitchensService';
 
 interface RecipeFormProps {
   initialData: CreateRecipeDto;
   onChange: (data: CreateRecipeDto) => void;
-  onSubmit: (data: CreateRecipeDto) => void;
+  onSubmit: (data: ApiCreateRecipeDto) => void;
   isSubmitting: boolean;
   isValid: boolean;
+  mode?: 'create' | 'edit';
 }
 
 const RecipeForm: React.FC<RecipeFormProps> = ({
@@ -24,13 +33,21 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
   onChange,
   onSubmit,
   isSubmitting,
-  isValid
+  isValid,
+  mode = 'create'
 }) => {
+  // Нормализация кухонь: всегда храним массив строк-id
+  const normalizeKitchenIds = (list: unknown): string[] => {
+    if (!Array.isArray(list)) return [];
+    return list
+      .map((item: any) => (typeof item === 'string' ? item : (item?.id ?? item?.uuid ?? item?.value)))
+      .filter(Boolean);
+  };
   const [formData, setFormData] = useState<CreateRecipeDto>({
     name: initialData.name || '',
     description: initialData.description || '',
     level: initialData.level || 'EASY',
-    kitchens: initialData.kitchens || [],
+    kitchens: normalizeKitchenIds((initialData as any).kitchens) || [],
     cookTime: initialData.cookTime || 0,
     allTime: initialData.allTime || 0,
     
@@ -54,7 +71,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       name: initialData.name || '',
       description: initialData.description || '',
       level: initialData.level || 'EASY',
-      kitchens: initialData.kitchens || [],
+      kitchens: normalizeKitchenIds((initialData as any).kitchens) || [],
       cookTime: initialData.cookTime || 0,
       allTime: initialData.allTime || 0,
       
@@ -117,7 +134,10 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       formData.ingredients.forEach((ing, index) => {
         if (!ing.id) newErrors[`ingredients.${index}.id`] = 'ID ингредиента обязателен';
         if (!ing.count || ing.count <= 0) newErrors[`ingredients.${index}.count`] = 'Количество должно быть больше 0';
-        if (!(ing as any).productUnit) newErrors[`ingredients.${index}.productUnit`] = 'Единица измерения обязательна';
+        // Разрешаем отсутствие productUnit, если есть productMeasureId (из режима редактирования)
+        const hasUnit = Boolean((ing as any).productUnit);
+        const hasMeasureId = Boolean((ing as any).productMeasureId);
+        if (!hasUnit && !hasMeasureId) newErrors[`ingredients.${index}.productUnit`] = 'Единица измерения обязательна';
       });
     }
     if (formData.steps.length === 0) {
@@ -154,9 +174,40 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     };
 
     // Маппинг ингредиентов формы -> UpdateRecipeIngredientDto (API)
-    const mapIngredients = async (ings: CreateRecipeDto['ingredients']) => {
-      const result: Array<{ id: string; count: number; isVariate: boolean; productMeasureId: string }> = [];
+    const mapIngredients = async (
+      ings: CreateRecipeDto['ingredients']
+    ): Promise<ApiUpdateRecipeIngredientDto[] | null> => {
+      const result: ApiUpdateRecipeIngredientDto[] = [];
       for (const ing of ings) {
+        // Если из режима редактирования пришел productMeasureId — используем его
+        const directMeasureId = (ing as any).productMeasureId as string | undefined;
+        if (directMeasureId) {
+          result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: directMeasureId });
+          continue;
+        }
+
+        // Попытка наследовать меру из базовых ингредиентов формы, если не указана в шаге
+        const baseIng = formData.ingredients.find(b => b.id === ing.id);
+        const inheritedMeasureId = (baseIng as any)?.productMeasureId as string | undefined;
+        if (inheritedMeasureId) {
+          result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: inheritedMeasureId });
+          continue;
+        }
+
+        const inheritedUnit = (ing as any).productUnit || (baseIng as any)?.productUnit;
+        if (inheritedUnit) {
+          const measures = await getMeasures(ing.id);
+          const wantedLabel = unitLabelByValue(String(inheritedUnit));
+          const found = measures.find(m => m.name === wantedLabel);
+          if (!found) {
+            setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
+            return null;
+          }
+          result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: found.id });
+          continue;
+        }
+
+        // Иначе подбираем по выбранной единице
         const measures = await getMeasures(ing.id);
         const wantedLabel = unitLabelByValue((ing as any).productUnit as string);
         const found = measures.find(m => m.name === wantedLabel);
@@ -164,7 +215,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
           setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
           return null;
         }
-        result.push({ id: ing.id, count: ing.count, isVariate: false, productMeasureId: found.id });
+        result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: found.id });
       }
       return result;
     };
@@ -176,12 +227,21 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     // Шаги (переносим ингредиенты шагов при наличии)
     const apiSteps: ApiUpdateStepDto[] = await (async () => {
       const steps: ApiUpdateStepDto[] = [];
-      for (const s of formData.steps) {
-        let stepIngredients: Array<{ id: string; count: number; isVariate: boolean; productMeasureId: string }> | undefined;
+      // Стабилизируем порядок: сортируем по index и гарантируем последовательные индексы
+      const sorted = [...formData.steps]
+        .slice()
+        .sort((a, b) => (Number(a.index || 0) - Number(b.index || 0)))
+        .map((s, i) => ({ ...s, index: Number.isFinite(Number(s.index)) && Number(s.index) > 0 ? Number(s.index) : i + 1 }));
+
+      for (const s of sorted) {
+        let stepIngredients: ApiUpdateRecipeIngredientDto[] | undefined;
         if ((s as any).ingredients?.length) {
           const mapped = await mapIngredients((s as any).ingredients as any);
-          if (!mapped) return [] as ApiUpdateStepDto[];
-          stepIngredients = mapped;
+          // Если не удалось сопоставить ингредиенты шага — не обнуляем весь список шагов
+          // Отправим шаг без ingredients, чтобы сохранить остальные данные шага
+          if (mapped) {
+            stepIngredients = mapped;
+          }
         }
         steps.push({
           id: (s as any).id,
@@ -189,7 +249,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
           name: s.name,
           description: s.description,
           photos: s.photos,
-          ingredients: stepIngredients as any,
+          ingredients: stepIngredients,
           time: (s as any).time,
         });
       }
@@ -201,7 +261,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       description: formData.description,
       level: formData.level,
       composition: {
-        ingredients: apiIngredients as any,
+        ingredients: apiIngredients,
         steps: apiSteps,
       },
       metaInfo: {
@@ -242,20 +302,45 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
   useEffect(() => {
     const loadKitchens = async () => {
       try {
-        const headers = getAuthHeaders();
-        const resp = await authorizedFetch(`${API_BASE_URL}/kitchens/all`, { headers });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-        const normalized = (Array.isArray(data) ? data : []).map((k: any) => ({
+        const list = await KitchensService.getAll();
+        const normalized = (Array.isArray(list) ? list : []).map((k: any) => ({
           id: k.id ?? k.uuid ?? k.value,
-          name: k.name ?? k.title ?? k.label ?? 'Без названия'
-        })).filter((k: any) => k.id);
+          name: k.name ?? k.title ?? k.label ?? 'Без названия',
+        })).filter((k: { id?: string }) => Boolean(k.id));
+
+        if (normalized.length === 0) {
+          // Попробуем альтернативные структуры ответа (data/content/items)
+          const headers = getAuthHeaders();
+          const resp = await authorizedFetch(`${API_BASE_URL}/kitchens/all`, { headers, method: 'GET' });
+          if (resp.ok) {
+            const payload = await resp.json();
+            const fallbackSource = Array.isArray(payload)
+              ? payload
+              : Array.isArray(payload?.data)
+                ? payload.data
+                : Array.isArray(payload?.content)
+                  ? payload.content
+                  : Array.isArray(payload?.items)
+                    ? payload.items
+                    : [];
+
+            const fallback = fallbackSource.map((k: any) => ({
+              id: k.id ?? k.uuid ?? k.value,
+              name: k.name ?? k.title ?? k.label ?? 'Без названия',
+            })).filter((k: { id?: string }) => Boolean(k.id));
+            setKitchens(fallback);
+            return;
+          }
+        }
+
         setKitchens(normalized);
-      } catch (e) {
+      } catch (error) {
+        console.error('Не удалось загрузить список кухонь', error);
         setKitchens([]);
       }
     };
-    loadKitchens();
+
+    void loadKitchens();
   }, []);
 
   const calculateMacrosFromProducts = async () => {
@@ -491,7 +576,9 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
             className={`${styles.submitButton} ${(!isValid || stepIngredientOveruses.length > 0) ? styles.disabled : ''}`}
             disabled={!isValid || isSubmitting || stepIngredientOveruses.length > 0}
           >
-            {isSubmitting ? 'Создаем рецепт...' : 'Создать рецепт'}
+            {isSubmitting
+              ? (mode === 'edit' ? 'Обновляем рецепт...' : 'Создаем рецепт...')
+              : (mode === 'edit' ? 'Обновить рецепт' : 'Создать рецепт')}
           </button>
         </div>
       </div>

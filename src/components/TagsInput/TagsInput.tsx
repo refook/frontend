@@ -83,19 +83,22 @@ const TagsInput: React.FC<TagsInputProps> = ({
   return (
     <div className={styles.tagsInput}>
       <div className={styles.tagsContainer}>
-        {tags.map((tag) => (
-          <span key={tag.id} className={styles.tag}>
-            {tag.name}
-            <button
-              type="button"
-              onClick={() => removeTagById(tag.id)}
-              className={styles.removeTag}
-              title={`Удалить тег "${tag.name}"`}
-            >
-              <XMarkIcon className={styles.removeIcon} />
-            </button>
-          </span>
-        ))}
+        {tags.map((tag, index) => {
+          const key = tag.id || `${tag.name}-${index}`;
+          return (
+            <span key={key} className={styles.tag}>
+              {tag.name}
+              <button
+                type="button"
+                onClick={() => removeTagById(tag.id)}
+                className={styles.removeTag}
+                title={`Удалить тег "${tag.name}"`}
+              >
+                <XMarkIcon className={styles.removeIcon} />
+              </button>
+            </span>
+          );
+        })}
         
         {canAddMore && (
           <div className={styles.inputContainer}>
@@ -124,9 +127,9 @@ const TagsInput: React.FC<TagsInputProps> = ({
             
             {showSuggestions && suggestions.length > 0 && (
               <div className={styles.suggestions}>
-                {suggestions.map(suggestion => (
+                {suggestions.map((suggestion, index) => (
                   <button
-                    key={suggestion.id}
+                    key={suggestion.id || `${suggestion.name}-${index}`}
                     type="button"
                     onClick={() => handleSuggestionClick(suggestion.name)}
                     className={styles.suggestion}

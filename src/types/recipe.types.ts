@@ -74,9 +74,16 @@ export interface ApiCreateRecipeDto {
   macros: MacrosDto;
 }
 
+export interface ApiUpdateRecipeIngredientDto {
+  id: string;
+  count: number;
+  isVariant: boolean;
+  productMeasureId: string;
+}
+
 export interface ApiRecipeCompositionDto {
   steps?: ApiUpdateStepDto[];
-  ingredients: CreateRecipeIngredientDto[];
+  ingredients: ApiUpdateRecipeIngredientDto[];
 }
 
 export interface ApiCreateMetaInfoDto {
@@ -84,6 +91,8 @@ export interface ApiCreateMetaInfoDto {
   tags?: string[] | null; // array of UUIDs
   photos?: string[];
 }
+
+export interface ApiUpdateMetaInfoDto extends ApiCreateMetaInfoDto {}
 
 export interface ApiCookingTimeDto {
   activeTime?: number; // секунды
@@ -109,18 +118,18 @@ export interface UpdateStepDto extends CreateStepDto {
   id?: string;
 }
 
-export interface UpdateRecipeDto {
+export interface ApiUpdateRecipeDto {
   name: string;
   description: string;
-  kitchens?: string[];
   level: DifficultyLevel;
-  cookTime: number;
-  allTime: number;
-  photos?: string[];
-  tags?: TagResponseDto[] | null;
-  ingredients: CreateRecipeIngredientDto[];
-  steps: UpdateStepDto[];
+  composition: ApiRecipeCompositionDto;
+  metaInfo?: ApiUpdateMetaInfoDto;
+  cookingTime?: ApiCookingTimeDto;
+  serving: ApiRecipeServingDto;
+  macros: MacrosDto;
 }
+
+export type UpdateRecipeDto = ApiUpdateRecipeDto;
 
 // DTO для создания ингредиента в рецепте
 export interface CreateRecipeIngredientDto {
@@ -139,8 +148,14 @@ export interface CreateStepDto {
   time?: number;
 }
 
-export interface ApiUpdateStepDto extends CreateStepDto {
+export interface ApiUpdateStepDto {
   id?: string;
+  index: number;
+  name?: string;
+  description: string;
+  photos?: string[];
+  ingredients?: ApiUpdateRecipeIngredientDto[];
+  time?: number;
 }
 
 // DTO для ответа от API
