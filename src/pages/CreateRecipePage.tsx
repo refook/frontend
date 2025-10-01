@@ -42,7 +42,7 @@ const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ fullWidth = false }
     setFormData(newFormData);
   };
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: ApiCreateRecipeDto) => {
     setIsSubmitting(true);
     
     try {
@@ -107,7 +107,7 @@ const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ fullWidth = false }
             <RecipePreview
               formData={formData}
               onEdit={() => setActiveTab('form')}
-              onSubmit={() => handleSubmit(formData)}
+              onSubmit={() => handleSubmit(formData as unknown as ApiCreateRecipeDto)}
               isSubmitting={isSubmitting}
             />
           )}

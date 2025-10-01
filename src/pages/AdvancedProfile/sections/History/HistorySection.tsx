@@ -21,10 +21,10 @@ import HistoryCard, { type HistoryItem } from '../../components/HistoryCard';
 const mockHistory: HistoryItem[] = [
   {
     id: 'h1',
-    recipeTitle: 'Mediterranean Quinoa Salad',
-    authorName: 'Chef Maria',
+    recipeTitle: 'Средиземноморский салат с киноа',
+    authorName: 'Шеф Мария',
     photo: undefined,
-    comment: 'Absolutely delicious! Added some extra feta cheese and it was perfect.',
+    comment: 'Абсолютно вкусно! Добавила немного дополнительной феты — получилось идеально.',
     rating: 5,
     durationMin: 25,
     status: 'COOKED',
@@ -32,10 +32,10 @@ const mockHistory: HistoryItem[] = [
   },
   {
     id: 'h2',
-    recipeTitle: 'Sourdough Bread Basics',
-    authorName: 'Baker John',
+    recipeTitle: 'Основы хлеба на закваске',
+    authorName: 'Пекарь Джон',
     photo: undefined,
-    comment: 'Second attempt, better rise this time!',
+    comment: 'Вторая попытка, подъём лучше!',
     rating: 3,
     durationMin: 180,
     status: 'ATTEMPTED',
@@ -43,10 +43,10 @@ const mockHistory: HistoryItem[] = [
   },
   {
     id: 'h3',
-    recipeTitle: 'Perfect Poached Eggs',
-    authorName: 'Anna K.',
+    recipeTitle: 'Идеальные яйца-пашот',
+    authorName: 'Анна К.',
     photo: undefined,
-    comment: 'Need to tweak the temperature – will try again.',
+    comment: 'Нужно подправить температуру — попробую ещё раз.',
     rating: 2,
     durationMin: 10,
     status: 'FAILED',
@@ -55,7 +55,7 @@ const mockHistory: HistoryItem[] = [
 ];
 
 /**
- * Секция «Cooking History» в расширенном профиле.
+ * Секция «История готовки» в расширенном профиле.
  * Отображает ленту событий приготовления рецептов с краткой статистикой.
  *
  * @param {{}} props Параметры компонента (входные свойства не требуются)
@@ -68,9 +68,9 @@ const HistorySection: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <SectionHeader
-        title="Cooking History"
-        description="Your culinary journey and experiences"
-        stats={[{ label: 'Activities', value: total, tone: 'accent', icon: <UserIcon /> }]}
+        title="История готовки"
+        description="Ваши кулинарные достижения и опыт"
+        stats={[{ label: 'События', value: total, tone: 'accent', icon: <UserIcon /> }]}
       />
 
       <div className={styles.list}>

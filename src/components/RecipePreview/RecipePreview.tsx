@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { ingredientsService } from '../../services/ingredientsService';
 import type { Recipe } from '../../types';
-import type { CreateRecipeDto, CreateRecipeIngredientDto, RecipeIngredientDto } from '../../types/recipe.types';
+import type {
+  CreateRecipeDto,
+  CreateRecipeIngredientDto,
+  RecipeIngredientDto,
+  CreateStepDto,
+  StepResponseDto,
+  ApiCreateRecipeDto,
+  ApiUpdateRecipeDto,
+  ApiUpdateRecipeIngredientDto,
+  ApiUpdateStepDto,
+} from '../../types/recipe.types';
 import type { ApiIngredient } from '../../types/ingredient.types';
 import { 
   ClockIcon, 
@@ -16,7 +26,6 @@ import IngredientsSection from '../IngredientsSection/IngredientsSection';
 import HeroCard from '../HeroCard/HeroCard';
 import ActionToggle from '../ActionToggle/ActionToggle';
 import RatingControl from '../RatingControl/RatingControl';
-import Chip from '../Chip/Chip';
 import StepsSection from '../StepsSection/StepsSection';
 import styles from './RecipePreview.module.css';
 import InfoCard from '../InfoCard/InfoCard';
@@ -28,8 +37,14 @@ import CommentCard, { type CommentItem } from '../../pages/AdvancedProfile/compo
 import type { ProductMeasureResponseDto } from '../../types/api.types';
 import { formatMeasureLabel } from '../../utils/measureLabel';
 
+type FormRecipeData = CreateRecipeDto | ApiCreateRecipeDto | ApiUpdateRecipeDto;
+
+const isApiFormRecipe = (dto?: FormRecipeData | null): dto is ApiCreateRecipeDto | ApiUpdateRecipeDto => {
+  return Boolean(dto && typeof dto === 'object' && 'composition' in dto);
+};
+
 interface RecipePreviewProps {
-  formData?: CreateRecipeDto;
+  formData?: FormRecipeData;
   recipe?: Recipe;
   onEdit?: () => void;
   onSubmit?: () => void;
@@ -65,28 +80,109 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     void loadIngredients();
   }, [isFormDataMode]);
 
-  const data = recipe || formData;
-  if (!data) return null;
-
   const isFormData = isFormDataMode;
-  const recipeData = !isFormData ? (data as Recipe) : undefined;
-  
-  const title = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
-  const description = isFormData ? (data as CreateRecipeDto).description : (data as Recipe).description;
-  const prepTime = isFormData ? (data as CreateRecipeDto).allTime : (data as Recipe).prepTime || 0;
-  const cookTime = isFormData ? (data as CreateRecipeDto).cookTime : (data as Recipe).cookTime || 0;
-  const servings = isFormData ? 1 : (data as Recipe).servings;
-  const difficulty = isFormData ? (data as CreateRecipeDto).level.toLowerCase() : (data as Recipe).difficulty;
-  const cuisine = isFormData ? undefined : (data as Recipe).cuisine;
-  const tags: string[] = isFormData
-    ? (((data as CreateRecipeDto).tags ?? []).map((t: any) => (typeof t === 'string' ? t : (t?.name ?? ''))).filter(Boolean))
-    : ((((data as any).tags ?? []).map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))).filter((s: any) => Boolean(s)) as string[]);
-  const ingredients = isFormData ? (data as CreateRecipeDto).ingredients : (data as Recipe).ingredients;
-  const steps = isFormData ? (data as CreateRecipeDto).steps : (data as Recipe).steps;
-  const photos = isFormData ? (data as CreateRecipeDto).photos : (data as Recipe).photos;
+  const formRecipeData = isFormData ? (formData as FormRecipeData | undefined) : undefined;
+  const apiFormData = isFormData && isApiFormRecipe(formRecipeData) ? formRecipeData : undefined;
+  const legacyFormData = isFormData && !apiFormData ? (formRecipeData as CreateRecipeDto | undefined) : undefined;
+  const recipeData = !isFormData ? (recipe as Recipe | undefined) : undefined;
+  const hasData = Boolean(formRecipeData || recipeData);
+
+  const title = isFormData
+    ? (formRecipeData?.name ?? 'Название рецепта')
+    : (recipeData?.title || 'Название рецепта');
+
+  const description = isFormData
+    ? (apiFormData?.description ?? legacyFormData?.description ?? '')
+    : (recipeData?.description || 'Описание рецепта');
+
+  const activeMinutes = (() => {
+    if (apiFormData) {
+      const activeSec = Number(apiFormData.cookingTime?.activeTime ?? 0);
+      return Math.max(0, Math.round(activeSec / 60));
+    }
+    if (legacyFormData) {
+      const activeSec = Number(legacyFormData.cookTime ?? 0);
+      return Math.max(0, Math.round(activeSec / 60));
+    }
+    return Math.max(0, recipeData?.cookTime ?? 0);
+  })();
+
+  const totalMinutes = (() => {
+    if (apiFormData) {
+      const activeSec = Number(apiFormData.cookingTime?.activeTime ?? 0);
+      const allSec = Number(apiFormData.cookingTime?.allTime ?? activeSec);
+      return Math.max(0, Math.round(allSec / 60));
+    }
+    if (legacyFormData) {
+      const activeSec = Number(legacyFormData.cookTime ?? 0);
+      const allSec = Number(legacyFormData.allTime ?? activeSec);
+      return Math.max(0, Math.round(allSec / 60));
+    }
+    const prep = Number(recipeData?.prepTime ?? 0);
+    const cook = Number(recipeData?.cookTime ?? 0);
+    return Math.max(0, Math.round(prep + cook));
+  })();
+
+  const servings = (() => {
+    if (apiFormData) {
+      return Number(apiFormData.serving?.unitCount ?? 1) || 1;
+    }
+    if (legacyFormData) {
+      return Number((legacyFormData as any).unitCount ?? 1) || 1;
+    }
+    return recipeData?.servings ?? 1;
+  })();
+
+  const difficulty = (() => {
+    if (apiFormData) {
+      return apiFormData.level?.toLowerCase?.() ?? 'easy';
+    }
+    if (legacyFormData) {
+      return legacyFormData.level?.toLowerCase?.() ?? 'easy';
+    }
+    return recipeData?.difficulty ?? 'easy';
+  })();
+
+  const tags: string[] = (() => {
+    if (apiFormData) {
+      const rawTags = apiFormData.metaInfo?.tags ?? [];
+      return (rawTags || []).map((t) => String(t)).filter(Boolean);
+    }
+    if (legacyFormData) {
+      return ((legacyFormData.tags ?? []) as any[])
+        .map((t) => (typeof t === 'string' ? t : (t?.name ?? '')))
+        .filter(Boolean);
+    }
+    return ((((recipeData as any)?.tags ?? []).map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))).filter((s: any) => Boolean(s)) as string[]);
+  })();
+
+  const ingredients: Array<CreateRecipeIngredientDto | ApiUpdateRecipeIngredientDto | RecipeIngredientDto> = (() => {
+    if (apiFormData) {
+      return apiFormData.composition?.ingredients ?? [];
+    }
+    if (legacyFormData) {
+      return legacyFormData.ingredients ?? [];
+    }
+    return recipeData?.ingredients ?? [];
+  })();
+
+  const stepsRaw: Array<ApiUpdateStepDto | CreateStepDto | StepResponseDto> = (() => {
+    if (apiFormData) {
+      return apiFormData.composition?.steps ?? [];
+    }
+    if (legacyFormData) {
+      return legacyFormData.steps ?? [];
+    }
+    return recipeData?.steps ?? [];
+  })();
+
+  const steps: Array<ApiUpdateStepDto | CreateStepDto | StepResponseDto> = React.useMemo(() => {
+    return [...stepsRaw].sort((a: any, b: any) => Number(a?.index || 0) - Number(b?.index || 0));
+  }, [stepsRaw]);
+
   const heroImageUrl = !isFormData
     ? (() => {
-        const raw = (((data as Recipe).photos?.[0]) || (data as Recipe).image);
+        const raw = ((recipeData?.photos?.[0]) || recipeData?.image);
         if (!raw) return undefined;
         const url = String(raw).trim();
         if (!url) return undefined;
@@ -98,8 +194,6 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     // Для отладки отображения изображения
     try { console.debug('RecipePreview heroImageUrl:', heroImageUrl); } catch {}
   }
-  
-  const totalTime = prepTime + cookTime;
   
   const difficultyMap: Record<string, string> = {
     easy: 'Легко',
@@ -113,6 +207,8 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     hard: 'var(--color-danger)'
   };
 
+  const normalizedDifficulty = difficultyMap[difficulty] ? difficulty : 'easy';
+
   // Эмодзи для шагов теперь берутся в дочернем компоненте через utils/emoji
 
   const recipeId = recipeData?.id;
@@ -125,17 +221,29 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const measuresCacheRef = useRef<Map<string, ProductMeasureResponseDto[]>>(new Map());
   const [measureLabels, setMeasureLabels] = useState<Record<string, string>>({});
 
+  const macros = !isFormData
+    ? recipeData?.macros
+    : (apiFormData?.macros ?? legacyFormData?.macros);
+
   useEffect(() => {
-    if (isFormData || !recipeData) return;
+    const aggregated: Array<ApiUpdateRecipeIngredientDto | RecipeIngredientDto> = [];
 
-    const stepIngredients = (recipeData.steps || []).flatMap((step) => step?.ingredients || []);
-    const allIngredients = [...(recipeData.ingredients || []), ...stepIngredients];
+    if (apiFormData?.composition) {
+      aggregated.push(...(apiFormData.composition.ingredients ?? []));
+      (apiFormData.composition.steps ?? []).forEach((step) => {
+        aggregated.push(...(step?.ingredients ?? []));
+      });
+    } else if (!isFormData && recipeData) {
+      const stepIngredients = (recipeData.steps || []).flatMap((step) => step?.ingredients || []);
+      aggregated.push(...(recipeData.ingredients || []), ...stepIngredients);
+    }
 
-    if (allIngredients.length === 0) return;
+    if (aggregated.length === 0) return;
 
-    const ingredientsToCheck = allIngredients.filter(
-      (ing) => ing?.productMeasureId && !measureLabels[ing.productMeasureId as string]
-    );
+    const ingredientsToCheck = aggregated.filter((ing) => {
+      const measureId = (ing as any)?.productMeasureId;
+      return measureId && !measureLabels[measureId as string];
+    });
     if (ingredientsToCheck.length === 0) return;
 
     let cancelled = false;
@@ -144,16 +252,20 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       const updates: Record<string, string> = {};
 
       for (const ing of ingredientsToCheck) {
-        const measureId = ing.productMeasureId;
+        const measureId = (ing as any).productMeasureId as string | undefined;
         if (!measureId) continue;
+        const ingredientId = String((ing as any).id ?? '');
+        if (!ingredientId) continue;
 
-        const cacheKey = `${ing.isVariant ? 'variant' : 'base'}:${ing.id}`;
+        const variantFlag = Boolean((ing as any).isVariant ?? (ing as any).isVariate);
+        const cacheKey = `${variantFlag ? 'variant' : 'base'}:${ingredientId}`;
+
         try {
           let measures = measuresCacheRef.current.get(cacheKey);
           if (!measures) {
-            measures = ing.isVariant
-              ? await productsService.getVariantMeasures(String(ing.id))
-              : await productsService.getBaseMeasures(String(ing.id));
+            measures = variantFlag
+              ? await productsService.getVariantMeasures(ingredientId)
+              : await productsService.getBaseMeasures(ingredientId);
             measuresCacheRef.current.set(cacheKey, measures);
           }
           const found = measures?.find((m) => m.id === measureId);
@@ -161,7 +273,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             updates[measureId] = found.name;
           }
         } catch (error) {
-          console.error('Не удалось загрузить меры продукта', { productId: ing.id, measureId }, error);
+          console.error('Не удалось загрузить меры продукта', { productId: ingredientId, measureId }, error);
         }
       }
 
@@ -175,35 +287,51 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [isFormData, recipeId, recipeData?.ingredients, recipeData?.steps, measureLabels]);
+  }, [apiFormData, isFormData, recipeData, measureLabels]);
 
   type NormalizedIngredient = { id: string; name: string; amount: string };
-  const normalizeIngredient = (ingredient: CreateRecipeIngredientDto | RecipeIngredientDto): NormalizedIngredient => {
-    if (isFormData) {
+  const normalizeIngredient = (
+    ingredient: CreateRecipeIngredientDto | ApiUpdateRecipeIngredientDto | RecipeIngredientDto
+  ): NormalizedIngredient => {
+    if (apiFormData) {
+      const ing = ingredient as ApiUpdateRecipeIngredientDto;
+      const sourceIngredient = availableIngredients.find((i) => i.id === ing.id);
+      const name = sourceIngredient?.name || 'Ингредиент';
+      const measureId = ing.productMeasureId;
+      const measureLabel = measureId ? measureLabels[measureId] : undefined;
+      const unitLabel = formatMeasureLabel(measureLabel ? String(measureLabel) : undefined);
+      const suffix = unitLabel ? ` ${unitLabel}` : '';
+      return {
+        id: `form-new:${ing.id}:${measureId ?? 'none'}:${ing.count}`,
+        name,
+        amount: `${ing.count}${suffix}`,
+      };
+    }
+
+    if (legacyFormData) {
       const ing = ingredient as CreateRecipeIngredientDto;
-      const ai = availableIngredients.find(i => i.id === ing.id);
+      const ai = availableIngredients.find((i) => i.id === ing.id);
       const name = ai?.name || 'Ингредиент';
       const unitRaw = (ing as any).productUnit || (ing as any).measure || '';
       const unit = formatMeasureLabel(unitRaw ? String(unitRaw) : undefined);
       const suffix = unit ? ` ${unit}` : '';
       return { id: `form:${ing.id}:${unitRaw}:${ing.count}`, name, amount: `${ing.count}${suffix}` };
-    } else {
-      const ing = ingredient as RecipeIngredientDto;
-      const name = ing.name || 'Ингредиент';
-      const measureId = ing.productMeasureId;
-      const measureLabel = measureId ? measureLabels[measureId] : undefined;
-      const fallbackUnit = (ing as any).productUnit || (ing as any).measure || '';
-      const unitLabelRaw = measureLabel || fallbackUnit;
-      const unitLabel = formatMeasureLabel(unitLabelRaw ? String(unitLabelRaw) : undefined);
-      const unitSuffix = unitLabel ? ` ${unitLabel}` : '';
-      return { id: `api:${ing.id}`, name, amount: `${ing.count}${unitSuffix}` };
     }
+
+    const ing = ingredient as RecipeIngredientDto;
+    const name = ing.name || 'Ингредиент';
+    const measureId = ing.productMeasureId;
+    const measureLabel = measureId ? measureLabels[measureId] : undefined;
+    const fallbackUnit = (ing as any).productUnit || (ing as any).measure || '';
+    const unitLabelRaw = measureLabel || fallbackUnit;
+    const unitLabel = formatMeasureLabel(unitLabelRaw ? String(unitLabelRaw) : undefined);
+    const unitSuffix = unitLabel ? ` ${unitLabel}` : '';
+    return { id: `api:${ing.id}`, name, amount: `${ing.count}${unitSuffix}` };
   };
 
   // Локальные состояния для старой реализации ингредиентов больше не используются
   // Оставлены только для совместимости normalizeIngredient → IngredientsSection
   const [showNutritionDetails, setShowNutritionDetails] = useState<boolean>(false);
-  const recipeTitle = isFormData ? (data as CreateRecipeDto).name : (data as Recipe).title;
 
   // Лайки
   const initialLikes = !isFormData ? (recipeLikes ?? 0) : 0;
@@ -303,6 +431,10 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     }
   };
 
+  if (!hasData) {
+    return null;
+  }
+
   return (
     <div className={styles.recipePreview}>
       <div className={styles.previewContainer}>
@@ -311,12 +443,12 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           description={description || 'Описание рецепта'}
           rating={
             !isFormData
-              ? ((data as any).stats?.avgRating ?? (data as Recipe).stats?.rating ?? 4.8)
+              ? (((recipeData as any)?.stats?.avgRating ?? recipeData?.stats?.rating ?? 4.8))
               : 4.8
           }
-          author={(isFormData ? 'Автор рецепта' : (data as Recipe).author?.name) || 'Автор'}
+          author={(isFormData ? 'Автор рецепта' : recipeData?.author?.name) || 'Автор'}
           imageUrl={heroImageUrl}
-          viewsCount={!isFormData ? (((data as any).stats?.viewsCount ?? (data as any).stats?.views) ?? undefined) : undefined}
+          viewsCount={!isFormData ? ((((recipeData as any)?.stats?.viewsCount ?? (recipeData as any)?.stats?.views) ?? undefined)) : undefined}
           actionsSlot={
             !isFormData && (
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
@@ -333,7 +465,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                   active={favorite}
                   loading={favoriteLoading}
                   disabled={!isAuthenticated}
-                  count={((data as any).stats?.favoritesCount ?? (data as any).stats?.saves) as number | undefined}
+                  count={((recipeData as any)?.stats?.favoritesCount ?? (recipeData as any)?.stats?.saves) as number | undefined}
                   onToggle={handleToggleFavorite}
                 />
               </div>
@@ -350,11 +482,11 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
               <span
                 className={styles.difficultyBadge}
                 style={{
-                  color: difficultyColor[difficulty],
-                  background: `color-mix(in oklab, ${difficultyColor[difficulty]} 18%, transparent)`
+                  color: difficultyColor[normalizedDifficulty],
+                  background: `color-mix(in oklab, ${difficultyColor[normalizedDifficulty]} 18%, transparent)`
                 }}
               >
-                {difficultyMap[difficulty]}
+                {difficultyMap[normalizedDifficulty]}
               </span>
             }
             tone="accent"
@@ -362,13 +494,13 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           <InfoCard
             icon={<ClockIcon className={styles.infoIcon} />}
             label="Общее время"
-            value={<span>{totalTime} мин</span>}
+            value={<span>{totalMinutes} мин</span>}
             tone="info"
           />
           <InfoCard
             icon={<ClockIcon className={styles.infoIcon} />}
             label="Активное время"
-            value={<span>{cookTime} мин</span>}
+            value={<span>{activeMinutes} мин</span>}
             tone="warning"
           />
           <InfoCard
@@ -392,10 +524,10 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           <NutritionInfo 
             expanded={showNutritionDetails} 
             onToggle={() => setShowNutritionDetails(v => !v)}
-            calories={!isFormData ? (data as Recipe).macros?.calories : (data as CreateRecipeDto).macros?.calories}
-            proteins={!isFormData ? (data as Recipe).macros?.proteins : (data as CreateRecipeDto).macros?.proteins}
-            fats={!isFormData ? (data as Recipe).macros?.fats : (data as CreateRecipeDto).macros?.fats}
-            carbs={!isFormData ? (data as Recipe).macros?.carbs : (data as CreateRecipeDto).macros?.carbs}
+            calories={macros?.calories}
+            proteins={macros?.proteins}
+            fats={macros?.fats}
+            carbs={macros?.carbs}
           />
 
           {/* Шаги приготовления */}
@@ -423,7 +555,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                 loading={ratingLoading}
                 disabled={!isAuthenticated}
                 onChange={handleSetRating}
-                countLabel={`${Number((data as any).stats?.ratingsCount ?? 0)} оценок`}
+                countLabel={`${Number((recipeData as any)?.stats?.ratingsCount ?? 0)} оценок`}
               />
             </div>
             <div className={styles.reviewField}>
@@ -451,9 +583,9 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                 {
                   id: 'c1',
                   recipeTitle: title || 'Рецепт',
-                  recipeAuthor: (data as Recipe).author?.name || 'Автор',
-                  recipeImage: (data as Recipe).image,
-                  rating: Math.max(0, Math.min(5, Math.round(((data as Recipe).stats?.rating ?? 4.8)))) || 4,
+                  recipeAuthor: recipeData?.author?.name || 'Автор',
+                  recipeImage: recipeData?.image,
+                  rating: Math.max(0, Math.min(5, Math.round((recipeData?.stats?.rating ?? 4.8)))) || 4,
                   verified: true,
                   text: 'Очень вкусно! Обязательно приготовлю ещё раз.',
                   likes: 3,
@@ -463,8 +595,8 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
                 {
                   id: 'c2',
                   recipeTitle: title || 'Рецепт',
-                  recipeAuthor: (data as Recipe).author?.name || 'Автор',
-                  recipeImage: (data as Recipe).image,
+                  recipeAuthor: recipeData?.author?.name || 'Автор',
+                  recipeImage: recipeData?.image,
                   rating: 5,
                   verified: false,
                   text: 'Спасибо за рецепт, получилось отлично!',

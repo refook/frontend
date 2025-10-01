@@ -27,6 +27,12 @@ export interface Recipe extends BaseEntity {
   servings: number;
   difficulty: 'easy' | 'medium' | 'hard';
   cuisine?: KitchenType;
+  kitchenIds?: string[];
+  // Доп. поля для режима редактирования (serving)
+  servingBaseUnit?: 'ML' | 'GR';
+  servingTotalWeight?: number;
+  servingRecipeUnit?: 'PORTION' | 'PLATE' | 'CUP' | 'PIECE' | 'SLICE' | 'ITEM' | 'GR' | 'ML';
+  servingUnitCount?: number;
   tags: string[];
   ingredients: RecipeIngredientDto[];
   steps: StepResponseDto[];

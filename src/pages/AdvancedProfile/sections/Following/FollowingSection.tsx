@@ -21,48 +21,48 @@ import FollowingCard, { type FollowingAuthor } from '../../components/FollowingC
 const mockAuthors: FollowingAuthor[] = [
   {
     id: 'a1',
-    name: 'Chef Maria Santos',
+    name: 'Шеф Мария Сантос',
     handle: 'mariasantos',
     avatarUrl: '',
-    bio: 'Mediterranean cuisine specialist with 15 years of experience',
-    location: 'Barcelona, Spain',
+    bio: 'Специалист по средиземноморской кухне с 15-летним стажем',
+    location: 'Барселона, Испания',
     stats: { followers: 12500, recipes: 89, rating: 4.8 },
-    tags: ['Mediterranean', 'Healthy', 'Seafood']
+    tags: ['Средиземноморская', 'Здоровое питание', 'Морепродукты']
   },
   {
     id: 'a2',
-    name: 'Luca Romano',
+    name: 'Лука Романо',
     handle: 'lucacooks',
     avatarUrl: '',
-    bio: 'Italian street food and artisan pasta enthusiast',
-    location: 'Rome, Italy',
+    bio: 'Ценитель итальянского стритфуда и ремесленной пасты',
+    location: 'Рим, Италия',
     stats: { followers: 8400, recipes: 56, rating: 4.6 },
-    tags: ['Italian', 'Pasta', 'StreetFood']
+    tags: ['Итальянская', 'Паста', 'Стритфуд']
   },
   {
     id: 'a3',
-    name: 'Aya Nakamura',
+    name: 'Ая Накамура',
     handle: 'ayanakamura',
     avatarUrl: '',
-    bio: 'Home baker sharing simple Asian-inspired desserts',
-    location: 'Kyoto, Japan',
+    bio: 'Домашний кондитер, делюсь простыми десертами с азиатскими мотивами',
+    location: 'Киото, Япония',
     stats: { followers: 15200, recipes: 41, rating: 4.9 },
-    tags: ['Desserts', 'Asian', 'HomeBaking']
+    tags: ['Десерты', 'Азиатская кухня', 'Домашняя выпечка']
   },
   {
     id: 'a4',
-    name: 'Carlos Mendes',
+    name: 'Карлос Мендес',
     handle: 'grillwithcarlos',
     avatarUrl: '',
-    bio: 'BBQ and open-fire cooking with a focus on fresh vegetables',
-    location: 'Porto, Portugal',
+    bio: 'Готовлю на гриле и открытом огне с акцентом на свежие овощи',
+    location: 'Порту, Португалия',
     stats: { followers: 6100, recipes: 33, rating: 4.5 },
-    tags: ['BBQ', 'Grill', 'Vegetables']
+    tags: ['BBQ', 'Гриль', 'Овощи']
   }
 ];
 
 /**
- * Секция «Following» в расширенном профиле.
+ * Секция «Подписки» в расширенном профиле.
  * Отображает карточки авторов, на которых подписан пользователь, и
  * краткую статистику с общим числом подписок.
  *
@@ -75,9 +75,9 @@ const FollowingSection: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <SectionHeader
-        title="Following"
-        description="Chefs and food creators you follow"
-        stats={[{ label: 'Following', value: authors.length, tone: 'accent', icon: <UserGroupIcon /> }]}
+        title="Подписки"
+        description="Авторы и кулинары, на которых вы подписаны"
+        stats={[{ label: 'Подписки', value: authors.length, tone: 'accent', icon: <UserGroupIcon /> }]}
       />
 
       <div className={styles.list}>

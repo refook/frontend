@@ -122,14 +122,14 @@ const RecipeDetailPage: React.FC = () => {
     <div className={styles.detailPage}>
       <div className="container">
         <div className={styles.topBar}>
-          <button onClick={() => navigate(-1)} className={styles.backBtn}>
+          <button onClick={() => navigate(-1)} className={`${styles.backBtn} ui-btn ui-btn--flat`}>
             ← Назад
           </button>
           <button 
-          //onClick={handleEdit} 
-          className={styles.editBtn}>
+          onClick={handleEdit} 
+          className={`${styles.editBtn} ui-btn ui-btn--primary`}>
             <PencilIcon className={styles.editIcon} />
-            Редактировать (в разработке)
+            Редактировать
           </button>
         </div>
         

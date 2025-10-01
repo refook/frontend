@@ -36,12 +36,12 @@ import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
  * @property {{id: string; label: string; color: ('gold'|'blue'|'purple')}[]} badges Значки/награды пользователя
  */
 const mockUser: AdvancedProfileUser = {
-    name: 'Sarah Johnson',
+    name: 'Сара Джонсон',
     username: 'sarahcooks',
     avatarUrl: '',
-    location: 'San Francisco, CA',
+    location: 'Сан-Франциско, США',
     joinedAt: '2022-03-01T00:00:00Z',
-    bio: 'Home chef passionate about Mediterranean cuisine and healthy cooking. Always experimenting with new flavors!',
+    bio: 'Домашний шеф, увлечённая средиземноморской кухней и здоровыми блюдами. Постоянно экспериментирую с новыми вкусами!',
     stats: {
         recipes: 24,
         followers: 1248,
@@ -49,19 +49,19 @@ const mockUser: AdvancedProfileUser = {
         likes: 3942
     },
     badges: [
-        {id: 'master', label: 'Master Chef', color: 'gold'},
-        {id: 'creator', label: 'Recipe Creator', color: 'blue'},
-        {id: 'hero', label: 'Community Hero', color: 'purple'}
+        {id: 'master', label: 'Мастер-шеф', color: 'gold'},
+        {id: 'creator', label: 'Создатель рецептов', color: 'blue'},
+        {id: 'hero', label: 'Герой сообщества', color: 'purple'}
     ]
 };
 
 const profileTabs = [
-    {id: 'favorites', label: 'Favorites', Icon: HeartIcon},
-    {id: 'history', label: 'History', Icon: ClockIcon},
-    {id: 'following', label: 'Following', Icon: UserGroupIcon},
-    {id: 'recipes', label: 'Recipes', Icon: BookOpenIcon},
-    {id: 'comments', label: 'Comments', Icon: ChatBubbleLeftRightIcon},
-    {id: 'activity', label: 'Activity', Icon: StarIcon},
+    {id: 'favorites', label: 'Избранное', Icon: HeartIcon},
+    {id: 'history', label: 'История', Icon: ClockIcon},
+    {id: 'following', label: 'Подписки', Icon: UserGroupIcon},
+    {id: 'recipes', label: 'Рецепты', Icon: BookOpenIcon},
+    {id: 'comments', label: 'Комментарии', Icon: ChatBubbleLeftRightIcon},
+    {id: 'activity', label: 'Активность', Icon: StarIcon},
 ];
 
 /**
@@ -135,7 +135,7 @@ const AdvancedProfilePage: React.FC = () => {
                 initial={activeTab}
                 onChange={setActiveTab}
                 tabs={profileTabs}
-                ariaLabel="Profile sections"
+                ariaLabel="Разделы профиля"
             />
             {activeTab === 'favorites' && <FavoritesSection/>}
             {activeTab === 'history' && <HistorySection/>}

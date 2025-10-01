@@ -2,7 +2,12 @@ import React from 'react';
 import styles from './StepsSection.module.css';
 import Chip from '../Chip/Chip';
 import { getEmojiByKey } from '../../utils/emoji';
-import type { CreateRecipeIngredientDto, RecipeIngredientDto, StepResponseDto } from '../../types';
+import type {
+  CreateRecipeIngredientDto,
+  RecipeIngredientDto,
+  StepResponseDto,
+  ApiUpdateRecipeIngredientDto,
+} from '../../types';
 import { formatMeasureLabel } from '../../utils/measureLabel';
 
 /**
@@ -48,14 +53,14 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName, m
                   <div>
                     <div className={styles.chips}>
                       {step.ingredients.map((ing: any, i: number) => {
-                        const name = isFormData
-                          ? (getIngredientName((ing as CreateRecipeIngredientDto).id) || 'Ингредиент')
-                          : ((ing as RecipeIngredientDto).name || 'Ингредиент');
-                        const unitRaw = isFormData
-                          ? ((ing as any).productUnit || (ing as any).measure || '')
-                          : ((ing as RecipeIngredientDto).productMeasureId && measureLabels[(ing as RecipeIngredientDto).productMeasureId as string])
-                            || ((ing as any).productUnit || (ing as any).measure || '');
-                        const unit = formatMeasureLabel(unitRaw ? String(unitRaw) : undefined);
+                        const ingredientId = (ing as CreateRecipeIngredientDto)?.id ?? (ing as ApiUpdateRecipeIngredientDto)?.id;
+                        const explicitName = (ing as RecipeIngredientDto)?.name;
+                        const name = explicitName || (isFormData && ingredientId ? getIngredientName(ingredientId) : undefined) || 'Ингредиент';
+                        const measureId = (ing as RecipeIngredientDto).productMeasureId
+                          ?? (ing as ApiUpdateRecipeIngredientDto).productMeasureId;
+                        const fallbackUnit = (ing as any).productUnit || (ing as any).measure || '';
+                        const unitSource = measureId && measureLabels[measureId] ? measureLabels[measureId] : fallbackUnit;
+                        const unit = formatMeasureLabel(unitSource ? String(unitSource) : undefined);
                         const suffix = unit ? ` ${unit}` : '';
                         const amount = `${(ing as any).count}${suffix}`;
                         return <Chip key={i} emoji={getEmojiByKey(name)} label={name} amount={amount} />;

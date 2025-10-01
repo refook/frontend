@@ -315,25 +315,17 @@ class RealRecipesService {
     try {
       console.log('Обновление рецепта:', id, formData.name);
 
-      const apiRecipeData = {
-        name: formData.name,
-        description: formData.description,
-        kitchens: formData.kitchens,
-        level: formData.level,
-        activeTime: formData.cookTime,
-        allTime: formData.allTime,
-        photos: formData.photos || [],
-        tags: formData.tags || null,
-        ingredients: formData.ingredients || [],
-        steps: (formData.steps || []).map(step => ({
-          id: (step as any).id, // если приходит id шага — передаем, чтобы бэкенд обновлял, а не дублировал
-          index: step.index,
-          name: step.name || undefined,
-          description: step.description,
-          photos: step.photos || [],
-          ingredients: step.ingredients || [],
-          time: step.time || 0
-        }))
+      const apiRecipeData: UpdateRecipeDto = {
+        ...formData,
+        description: formData.description ?? '',
+        composition: {
+          ingredients: formData.composition?.ingredients ?? [],
+          steps: formData.composition?.steps ?? [],
+        },
+        metaInfo: formData.metaInfo ?? undefined,
+        cookingTime: formData.cookingTime ?? undefined,
+        serving: formData.serving,
+        macros: formData.macros,
       };
 
       const headers = getAuthHeaders();
@@ -373,6 +365,19 @@ class RealRecipesService {
           const tagsList: string[] = (Array.isArray(rawTags) ? rawTags : [])
             .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
             .filter((s: any) => typeof s === 'string' && s.length > 0);
+          const tagObjects: Array<{ id: string; name: string }> | undefined = (() => {
+            if (!Array.isArray(rawTags)) return undefined;
+            // Объекты из metaInfo.tags
+            const fromObjects = rawTags
+              .map((t: any) => ({ id: t?.id ?? t?.uuid ?? t?.value, name: t?.name }))
+              .filter((t: any) => t.id && t.name);
+            if (fromObjects.length > 0) return fromObjects as Array<{ id: string; name: string }>;
+            // Только строки — подставим id=name
+            const fromStrings = rawTags
+              .map((t: any) => (typeof t === 'string' ? { id: t, name: t } : null))
+              .filter(Boolean);
+            return (fromStrings.length > 0 ? fromStrings as Array<{ id: string; name: string }> : undefined);
+          })();
 
           const apiState = (apiRecipe as any)?.state || {};
           const rawRate = (apiState as any)?.rate;
@@ -399,14 +404,47 @@ class RealRecipesService {
         servings: (apiRecipe as any)?.serving?.unitCount || 4,
         difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
         cuisine: apiRecipe.kitchen,
+        // Прокидываем ID кухонь из metaInfo для режима редактирования
+        kitchenIds: (() => {
+          // 1) metaInfo.kitchens: может быть string[] или объект[]
+          const rawMeta = (apiRecipe as any)?.metaInfo?.kitchens;
+          if (Array.isArray(rawMeta)) {
+            // string[] вариант
+            const idsFromStrings = rawMeta.filter((v: any) => typeof v === 'string' && v.length > 0);
+            if (idsFromStrings.length > 0) return idsFromStrings;
+            // объект[] вариант
+            const idsFromObjects = rawMeta
+              .map((k: any) => (k?.id ?? k?.uuid ?? k?.value))
+              .filter((v: any) => typeof v === 'string' && v.length > 0);
+            if (idsFromObjects.length > 0) return idsFromObjects;
+          }
+          // 2) kitchens: Array<{ id|uuid|value, name }>
+          const rawKitchens = (apiRecipe as any)?.kitchens;
+          if (Array.isArray(rawKitchens)) {
+            const ids = rawKitchens
+              .map((k: any) => (k?.id ?? k?.uuid ?? k?.value))
+              .filter((v: any) => typeof v === 'string' && v.length > 0);
+            if (ids.length > 0) return ids;
+          }
+          return undefined;
+        })(),
         tags: tagsList,
+        ...(tagObjects ? { tagObjects } : {}),
         ingredients: ((apiRecipe as any)?.composition?.ingredients || apiRecipe.ingredients || []) as Recipe['ingredients'],
         steps: ((((apiRecipe as any)?.composition?.steps || apiRecipe.steps || []) ?? []) as StepResponseDto[])
           .map((step: StepResponseDto) => ({
             ...step,
             photos: step.photos || [],
             ingredients: step.ingredients || []
-          })),
+          }))
+          .sort((a: StepResponseDto, b: StepResponseDto) => Number(a.index || 0) - Number(b.index || 0)),
+        // Дополнительно прокидываем поля сервинга для режима редактирования
+        ...({
+          servingBaseUnit: (apiRecipe as any)?.serving?.baseUnit,
+          servingTotalWeight: (apiRecipe as any)?.serving?.totalWeight,
+          servingRecipeUnit: (apiRecipe as any)?.serving?.recipeUnit,
+          servingUnitCount: (apiRecipe as any)?.serving?.unitCount,
+        } as any),
         macros: (apiRecipe as any)?.macros ? {
           calories: Number((apiRecipe as any).macros?.calories ?? 0),
           proteins: Number((apiRecipe as any).macros?.proteins ?? 0),

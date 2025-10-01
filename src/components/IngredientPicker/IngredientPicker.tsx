@@ -72,24 +72,34 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     try {
       const headers = getAuthHeaders();
       let measures: Array<{ name?: string }> = [];
+      let variantFallbackUsed = false;
+
       if (variant) {
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/measures/variant/${variant}/all?onlyUnique=true`, { headers });
-        measures = resp.ok ? await resp.json() : [];
+        const respVariant = await authorizedFetch(`${API_BASE_URL}/products/measures/variant/${variant}/all`, { headers });
+        const variantMeasures = respVariant.ok ? await respVariant.json() : [];
+        if (Array.isArray(variantMeasures) && variantMeasures.length > 0) {
+          measures = variantMeasures;
+        } else {
+          variantFallbackUsed = true;
+          const respBase = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
+          measures = respBase.ok ? await respBase.json() : [];
+        }
       } else {
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
-        measures = resp.ok ? await resp.json() : [];
+        const respBase = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
+        measures = respBase.ok ? await respBase.json() : [];
       }
 
       const allowedLabels = new Set((measures || []).map((m: any) => String(m?.name ?? '').trim()).filter(Boolean));
       const filtered = PRODUCT_UNITS_ARRAY.filter(u => allowedLabels.has(u.label));
 
-      if (variant && filtered.length === 0) {
-        return { units: [], warning: 'Для выбранного варианта нет доступных мер. Выберите другой вариант или продукт.' };
+      let warning: string | null = null;
+      if (variant && filtered.length === 0 && !variantFallbackUsed) {
+        warning = 'Для выбранного варианта нет доступных мер. Выберите другой вариант или продукт.';
       }
 
       return {
         units: filtered.length > 0 ? filtered : PRODUCT_UNITS_ARRAY,
-        warning: null,
+        warning,
       };
     } catch (error) {
       console.error('IngredientPicker: не удалось загрузить меры продукта', error);

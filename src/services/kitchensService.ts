@@ -17,8 +17,21 @@ export class KitchensService {
       apiLogger.logRequest(url, 'GET', headers);
       const res = await authorizedFetch(url, { method: 'GET' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      return Array.isArray(data) ? data : [];
+      const raw = await res.json();
+      const arr = Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw?.content)
+            ? raw.content
+            : Array.isArray(raw?.items)
+              ? raw.items
+              : [];
+
+      // Нормализуем к { id, name }
+      return arr
+        .map((k: any) => ({ id: k?.id ?? k?.uuid ?? k?.value, name: k?.name ?? k?.title ?? k?.label }))
+        .filter((k: KitchenResponseDto) => Boolean(k.id));
     } catch (e) {
       console.error('Не удалось получить список кухонь:', e);
       return [];

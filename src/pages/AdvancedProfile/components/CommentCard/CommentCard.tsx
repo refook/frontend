@@ -11,7 +11,7 @@ import { FOOD_PLACEHOLDER_EMOJIS, hashStringToIndex } from '../../../../utils/em
  * @property recipeAuthor Автор рецепта
  * @property recipeImage Обложка рецепта (опционально)
  * @property rating Оценка комментария (0..5)
- * @property verified Флаг "Verified Cook" (опционально)
+ * @property verified Флаг "Подтверждённый повар" (опционально)
  * @property text Текст комментария
  * @property likes Количество лайков
  * @property replies Количество ответов
@@ -35,7 +35,7 @@ export interface CommentItem {
  * @param value Значение рейтинга
  */
 const Stars: React.FC<{ value: number }> = ({ value }) => (
-  <span className={styles.stars} aria-label={`Rating ${value} of 5`}>
+  <span className={styles.stars} aria-label={`Оценка ${value} из 5`}>
     {Array.from({ length: 5 }).map((_, i) => (
       <StarSolidIcon key={i} className={styles.star} style={{ opacity: i < value ? 1 : 0.3 }} />
     ))}
@@ -55,34 +55,34 @@ const CommentCard: React.FC<{ item: CommentItem }> = ({ item }) => {
       <div className={styles.header}>
         <div className={styles.left}>
           <div className={styles.thumb}>
-            {item.recipeImage ? <img src={item.recipeImage} alt={item.recipeTitle} className={styles.thumb} /> : <span>{placeholder}</span>}
+            {item.recipeImage ? <img src={item.recipeImage} alt={item.recipeTitle} className={styles.thumb} /> : <span aria-label="заглушка">{placeholder}</span>}
           </div>
           <div className={styles.titleWrap}>
             <h3 className={styles.title}>{item.recipeTitle}</h3>
-            <span className={styles.author}>by {item.recipeAuthor}</span>
+            <span className={styles.author}>от {item.recipeAuthor}</span>
           </div>
         </div>
         <div className={styles.date}>
           <CalendarDaysIcon className={styles.dateIcon} />
-          <span>{new Date(item.dateISO).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <span>{new Date(item.dateISO).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
         </div>
       </div>
 
       <div className={styles.ratingRow}>
         <Stars value={item.rating} />
         <span>{item.rating}/5</span>
-        {item.verified && <span className={styles.verifyChip}>Verified Cook</span>}
+        {item.verified && <span className={styles.verifyChip}>Подтверждённый повар</span>}
       </div>
 
       <div className={styles.commentBox}>{item.text}</div>
 
       <div className={styles.footer}>
         <div className={styles.footerLeft}>
-          <span className={styles.footerItem}><HandThumbUpIcon className={styles.footerIcon} /> {item.likes} likes</span>
-          <span className={styles.footerItem}><ChatBubbleLeftRightIcon className={styles.footerIcon} /> {item.replies} replies</span>
+          <span className={styles.footerItem}><HandThumbUpIcon className={styles.footerIcon} /> {item.likes} лайков</span>
+          <span className={styles.footerItem}><ChatBubbleLeftRightIcon className={styles.footerIcon} /> {item.replies} ответов</span>
         </div>
         <div className={styles.footerRight}>
-          <span className={styles.footerItem}><ArrowUturnLeftIcon className={styles.footerIcon} /> Reply</span>
+          <span className={styles.footerItem}><ArrowUturnLeftIcon className={styles.footerIcon} /> Ответить</span>
         </div>
       </div>
     </article>

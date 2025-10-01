@@ -52,7 +52,7 @@ const ActivityRow: React.FC<{ item: ActivityItem }> = ({ item }) => {
       <div>
         <h4 className={styles.title}>{item.title}</h4>
         {item.subtitle && <p className={styles.subtitle}>{item.subtitle}</p>}
-        <div className={styles.timeRow}><ClockIcon className={styles.timeIcon} />{new Date(item.dateISO).toLocaleString(undefined, { hour: '2-digit', minute: '2-digit' })} ago</div>
+        <div className={styles.timeRow}><ClockIcon className={styles.timeIcon} />{new Date(item.dateISO).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' })} назад</div>
       </div>
       <RightIcon type={item.type} />
     </div>
