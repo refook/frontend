@@ -6,7 +6,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--spacing-3xl);
+  gap: 15px;
+  
+  padding: 12px 0;
+ 
+  
 }
 
 .backBtn {
@@ -72,7 +76,10 @@
   }
   
   .topBar {
+    flex-wrap: wrap;
+    row-gap: var(--spacing-sm);
     margin-bottom: var(--spacing-xl);
+    padding: 8px 0;
   }
   
   .editBtn {
