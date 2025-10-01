@@ -11,7 +11,7 @@ import { KeycloakContext } from '../../../../providers/KeycloakProvider';
 // Мета для карточек в профиле теперь не используется
 
 /**
- * Секция «My Recipes» в расширенном профиле.
+ * Секция «Мои рецепты» в расширенном профиле.
  * Отображает список собственных рецептов пользователя с базовой статистикой и
  * действиями (создание нового рецепта).
  *
@@ -56,10 +56,10 @@ const RecipesSection: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <SectionHeader
-        title="My Recipes"
-        description="Recipes you've created and shared"
-        stats={[{ label: 'Published', value: userRecipes.length, tone: 'success' }]}
-        actionLabel="NEW RECIPE"
+        title="Мои рецепты"
+        description="Рецепты, которыми вы поделились"
+        stats={[{ label: 'Опубликовано', value: userRecipes.length, tone: 'success' }]}
+        actionLabel="НОВЫЙ РЕЦЕПТ"
         onActionClick={() => {
           const next = new URLSearchParams(searchParams);
           next.set('tab', 'recipes');
@@ -77,7 +77,7 @@ const RecipesSection: React.FC = () => {
             <RecipeCard key={r.id} recipe={r} />
           ))}
           {isAuthenticated && userRecipes.length === 0 && (
-            <div>У вас пока нет рецептов. Нажмите «NEW RECIPE», чтобы создать.</div>
+            <div>У вас пока нет рецептов. Нажмите «НОВЫЙ РЕЦЕПТ», чтобы создать.</div>
           )}
           {!isAuthenticated && (
             <div>Войдите, чтобы увидеть свои рецепты.</div>

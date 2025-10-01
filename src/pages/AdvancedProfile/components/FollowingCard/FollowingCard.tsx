@@ -28,7 +28,7 @@ export type FollowingAuthor = {
   tags: string[];
 };
 
-const formatNumber = (n: number) => n.toLocaleString();
+const formatNumber = (n: number) => n.toLocaleString('ru-RU');
 
 /**
  * Карточка автора, на которого подписан пользователь.
@@ -66,18 +66,18 @@ const FollowingCard: React.FC<{ author: FollowingAuthor }> = ({ author }) => {
         <div className={styles.statsRow}>
           <div className={styles.stat}>
             <div className={styles.statValue}>{formatNumber(a.stats.followers)}</div>
-            <div className={styles.statLabel}>Followers</div>
+            <div className={styles.statLabel}>Подписчики</div>
           </div>
           <div className={styles.stat}>
             <div className={styles.statValue}>{a.stats.recipes}</div>
-            <div className={styles.statLabel}>Recipes</div>
+            <div className={styles.statLabel}>Рецепты</div>
           </div>
           <div className={styles.stat}>
             <div className={styles.statValueRow}>
               <StarSolidIcon className={styles.ratingIcon} />
               <span className={styles.statValue}>{a.stats.rating}</span>
             </div>
-            <div className={styles.statLabel}>Rating</div>
+            <div className={styles.statLabel}>Рейтинг</div>
           </div>
         </div>
 
@@ -92,7 +92,7 @@ const FollowingCard: React.FC<{ author: FollowingAuthor }> = ({ author }) => {
         <div className={styles.cta}>
           <button className={styles.ctaBtn}>
             <BookOpenIcon className={styles.ctaIcon} />
-            View Recipes
+            Смотреть рецепты
           </button>
         </div>
       </div>

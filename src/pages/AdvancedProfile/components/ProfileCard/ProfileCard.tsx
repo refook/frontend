@@ -33,8 +33,10 @@ export type AdvancedProfileUser = {
 
 function formatJoined(dateIso: string): string {
   const date = new Date(dateIso);
-  const formatter = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' });
-  return `Joined ${formatter.format(date)}`;
+  const formatter = new Intl.DateTimeFormat('ru-RU', { month: 'long', year: 'numeric' });
+  const formatted = formatter.format(date);
+  const capitalized = formatted[0]?.toUpperCase() + formatted.slice(1);
+  return `На сайте с ${capitalized}`;
 }
 
 /**
@@ -57,7 +59,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user }) => {
       <div className={styles.settingsTopRight}>
         <Link to="/profile" className={`ui-btn`} aria-label="Профиль">
           <Cog6ToothIcon className={styles.settingsIcon} />
-          <span className={styles.settingsLabel}>Settings</span>
+          <span className={styles.settingsLabel}>Настройки</span>
         </Link>
       </div>
       <div className={styles.layout}>
@@ -94,19 +96,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user }) => {
           <div className={styles.statsRow}>
             <div className={styles.statCard}>
               <div className={styles.statValue}>{user.stats.recipes}</div>
-              <div className={styles.statLabel}>Recipes</div>
+              <div className={styles.statLabel}>Рецепты</div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statValue}>{user.stats.followers}</div>
-              <div className={styles.statLabel}>Followers</div>
+              <div className={styles.statLabel}>Подписчики</div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statValue}>{user.stats.following}</div>
-              <div className={styles.statLabel}>Following</div>
+              <div className={styles.statLabel}>Подписки</div>
             </div>
             <div className={styles.statCard}>
               <div className={styles.statValue}>{user.stats.likes}</div>
-              <div className={styles.statLabel}>Likes</div>
+              <div className={styles.statLabel}>Лайки</div>
             </div>
           </div>
 

@@ -22,21 +22,21 @@ import CommentCard, { type CommentItem } from '../../components/CommentCard';
 const mockComments: CommentItem[] = [
   {
     id: 'c1',
-    recipeTitle: 'Mediterranean Quinoa Salad',
-    recipeAuthor: 'Chef Maria',
+    recipeTitle: 'Средиземноморский салат с киноа',
+    recipeAuthor: 'Шеф Мария',
     rating: 5,
     verified: true,
-    text: "Absolutely loved this recipe! Added some extra feta cheese and cherry tomatoes, and it turned out amazing.",
+    text: 'Это блюдо обожаю! Добавила чуть больше феты и черри — получилось изумительно.',
     likes: 12,
     replies: 3,
     dateISO: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
   },
   {
     id: 'c2',
-    recipeTitle: 'Sourdough Bread Basics',
-    recipeAuthor: 'Baker John',
+    recipeTitle: 'Основы хлеба на закваске',
+    recipeAuthor: 'Пекарь Джон',
     rating: 4,
-    text: 'Crust was great, my crumb needs work. Thanks for the tips!',
+    text: 'Корочка вышла отличной, но над мякишем ещё поработаю. Спасибо за советы!',
     likes: 5,
     replies: 1,
     dateISO: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString()
@@ -44,7 +44,7 @@ const mockComments: CommentItem[] = [
 ];
 
 /**
- * Секция «My Comments» в расширенном профиле.
+ * Секция «Мои комментарии» в расширенном профиле.
  * Отображает список комментариев пользователя к рецептам с короткой статистикой.
  *
  * @param {{}} props Параметры компонента (не принимает входных свойств)
@@ -56,9 +56,9 @@ const CommentsSection: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <SectionHeader
-        title="My Comments"
-        description="Your reviews and feedback on recipes"
-        stats={[{ label: 'Comments', value: items.length, tone: 'accent', icon: <ChatBubbleLeftRightIcon /> }]}
+        title="Мои комментарии"
+        description="Ваши отзывы и впечатления о рецептах"
+        stats={[{ label: 'Комментарии', value: items.length, tone: 'accent', icon: <ChatBubbleLeftRightIcon /> }]}
       />
       <div className={styles.list}>
         {items.map((it) => (

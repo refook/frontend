@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useContext } from 'react';
+import React, { useEffect, useMemo, useState, useContext, useRef } from 'react';
 import styles from './FavoritesSection.module.css';
 import SectionHeader from '../../components/SectionHeader';
 import RecipeCard from '../../../../components/RecipeCard/RecipeCard';
@@ -8,7 +8,7 @@ import { PlusIcon, PencilSquareIcon, TrashIcon, EllipsisHorizontalIcon } from '@
 import { KeycloakContext } from '../../../../providers/KeycloakProvider';
 
 /**
- * Секция «Favorite Recipes» с полным функционалом закладок (группы):
+ * Секция «Избранные рецепты» с полным функционалом закладок (группы):
  * - создание, переименование, удаление групп
  * - добавление рецептов в активную группу
  * - перенос рецептов между группами и удаление из группы
@@ -36,22 +36,46 @@ const FavoritesSection: React.FC = () => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        setGroups(JSON.parse(saved));
+        const parsed: FavoriteGroup[] = JSON.parse(saved);
+        setGroups(parsed.map(g => {
+          if (g.id === 'all') {
+            return { ...g, name: g.name === 'All' ? 'Все' : g.name || 'Все' };
+          }
+          if (g.id === 'desserts') {
+            return { ...g, name: g.name === 'Desserts' ? 'Десерты' : g.name || 'Десерты' };
+          }
+          return g;
+        }));
       } else {
         const starter: FavoriteGroup[] = [
-          { id: 'all', name: 'All', recipes: [] },
-          { id: 'desserts', name: 'Desserts', recipes: [] }
+          { id: 'all', name: 'Все', recipes: [] },
+          { id: 'desserts', name: 'Десерты', recipes: [] }
         ];
         setGroups(starter);
       }
     } catch {
-      setGroups([{ id: 'all', name: 'All', recipes: [] }]);
+      setGroups([{ id: 'all', name: 'Все', recipes: [] }]);
     }
   }, []);
 
   // Автосохранение
+  const storageDisabledRef = useRef(false);
+
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+    if (storageDisabledRef.current) {
+      return;
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(groups));
+    } catch (error) {
+      const quotaOverflow = error instanceof DOMException && (error.name === 'QuotaExceededError' || error.code === 22);
+      if (quotaOverflow) {
+        storageDisabledRef.current = true;
+        console.warn('Сохранение избранных групп в localStorage отключено: превышена квота');
+        return;
+      }
+      console.warn('Не удалось сохранить данные избранных групп в localStorage:', error);
+    }
   }, [groups]);
 
   const activeGroup = useMemo(() => groups.find(g => g.id === activeGroupId) || groups[0], [groups, activeGroupId]);
@@ -83,21 +107,21 @@ const FavoritesSection: React.FC = () => {
 
   const allKnownRecipes: Recipe[] = useMemo(() => availableRecipes, [availableRecipes]);
 
-  // После загрузки favorites — заполняем группу "All" для отображения карточек
+  // После загрузки избранного — заполняем группу "Все" для отображения карточек
   useEffect(() => {
     if (!availableRecipes) return;
     setGroups(prev => {
       if (!prev || prev.length === 0) {
         return [
-          { id: 'all', name: 'All', recipes: availableRecipes },
-          { id: 'desserts', name: 'Desserts', recipes: [] }
+          { id: 'all', name: 'Все', recipes: availableRecipes },
+          { id: 'desserts', name: 'Десерты', recipes: [] }
         ];
       }
       const hasAll = prev.some(g => g.id === 'all');
       if (!hasAll) {
-        return [{ id: 'all', name: 'All', recipes: availableRecipes }, ...prev];
+        return [{ id: 'all', name: 'Все', recipes: availableRecipes }, ...prev];
       }
-      return prev.map(g => g.id === 'all' ? { ...g, recipes: availableRecipes } : g);
+      return prev.map(g => g.id === 'all' ? { ...g, recipes: availableRecipes, name: g.name === 'All' ? 'Все' : g.name || 'Все' } : g);
     });
   }, [availableRecipes]);
 
@@ -146,7 +170,7 @@ const FavoritesSection: React.FC = () => {
   };
 
   const createGroup = () => {
-    const name = prompt('New group name:');
+    const name = prompt('Название новой группы:');
     if (!name) return;
     const id = `group-${Date.now()}`;
     setGroups(prev => [...prev, { id, name, recipes: [] }]);
@@ -156,14 +180,14 @@ const FavoritesSection: React.FC = () => {
   const renameGroup = (groupId: string) => {
     const group = groups.find(g => g.id === groupId);
     if (!group) return;
-    const name = prompt('Rename group:', group.name);
+    const name = prompt('Переименовать группу:', group.name);
     if (!name) return;
     setGroups(prev => prev.map(g => g.id === groupId ? { ...g, name } : g));
   };
 
   const deleteGroup = (groupId: string) => {
-    if (groupId === 'all') return alert('Cannot delete the "All" group');
-    if (!confirm('Delete this group (recipes remain in other groups)?')) return;
+    if (groupId === 'all') return alert('Невозможно удалить группу "Все"');
+    if (!confirm('Удалить эту группу? (Рецепты останутся в других группах)')) return;
     setGroups(prev => prev.filter(g => g.id !== groupId));
     setActiveGroupId('all');
   };
@@ -184,10 +208,10 @@ const FavoritesSection: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <SectionHeader
-        title="Favorite Recipes"
-        description="Manage your saved recipes with groups"
-        stats={[{ label: 'Likes', value: totalLikes, tone: 'accent' }]}
-        actionLabel="ADD RECIPES"
+        title="Избранные рецепты"
+        description="Управляйте сохранёнными рецептами с помощью групп"
+        stats={[{ label: 'Лайки', value: totalLikes, tone: 'accent' }]}
+        actionLabel="ДОБАВИТЬ РЕЦЕПТЫ"
         onActionClick={openAddModal}
         actionVariant="ghost"
       />
@@ -203,7 +227,7 @@ const FavoritesSection: React.FC = () => {
               <span
                 className={`${styles.groupName} ${styles.groupNameEditable}`}
                 onClick={(e) => { e.stopPropagation(); renameGroup(group.id); }}
-                title="Rename group"
+                title="Переименовать группу"
               >
                 {group.name}
               </span>
@@ -217,7 +241,7 @@ const FavoritesSection: React.FC = () => {
                   type="button"
                   className={styles.groupIconBtn}
                   onClick={(e) => { e.stopPropagation(); setIsSettingsOpen(v => !v); }}
-                  aria-label={`Settings ${group.name}`}
+                  aria-label={`Настройки ${group.name}`}
                 >
                   <EllipsisHorizontalIcon className={styles.groupIcon} />
                 </button>
@@ -228,14 +252,14 @@ const FavoritesSection: React.FC = () => {
                       className={styles.groupMenuItem}
                       onClick={(e) => { e.stopPropagation(); setIsSettingsOpen(false); renameGroup(group.id); }}
                     >
-                      Rename
+                      Переименовать
                     </button>
                     <button
                       type="button"
                       className={`${styles.groupMenuItem} ${styles.groupMenuItemDanger}`}
                       onClick={(e) => { e.stopPropagation(); setIsSettingsOpen(false); deleteGroup(group.id); }}
                     >
-                      Delete
+                      Удалить
                     </button>
                   </div>
                 )}
@@ -243,7 +267,7 @@ const FavoritesSection: React.FC = () => {
             )}
           </button>
         ))}
-        <button className={styles.groupPill} onClick={createGroup} aria-label="New group">
+        <button className={styles.groupPill} onClick={createGroup} aria-label="Новая группа">
 
 
             <span className={styles.groupIconBtn} aria-hidden>
@@ -263,12 +287,12 @@ const FavoritesSection: React.FC = () => {
                 value=""
                 onChange={(e) => { const to = e.target.value; if (to) moveToGroup(recipe.id, activeGroup.id, to); }}
               >
-                <option value="" disabled>Move to…</option>
+                <option value="" disabled>Переместить в…</option>
                 {groups.filter(g => g.id !== activeGroup.id).map(g => (
                   <option key={g.id} value={g.id}>{g.name}</option>
                 ))}
               </select>
-              <button className="ui-btn" onClick={() => removeFromGroup(recipe.id, activeGroup.id)}>Remove</button>
+              <button className="ui-btn" onClick={() => removeFromGroup(recipe.id, activeGroup.id)}>Удалить</button>
             </div>
           </div>
         ))}
@@ -278,11 +302,11 @@ const FavoritesSection: React.FC = () => {
         <div className={styles.modalBackdrop} role="dialog" aria-modal="true">
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Add recipes</h3>
+              <h3 className={styles.modalTitle}>Добавить рецепты</h3>
             </div>
             <div className={styles.modalBody}>
               {allKnownRecipes.length === 0 ? (
-                <p className={styles.muted}>No recipes available to add</p>
+                <p className={styles.muted}>Нет рецептов для добавления</p>
               ) : (
                 <div className={styles.recipesSelectable}>
                   {allKnownRecipes.map(r => (
@@ -299,8 +323,8 @@ const FavoritesSection: React.FC = () => {
               )}
             </div>
             <div className={styles.modalFooter}>
-              <button className="ui-btn" onClick={closeAddModal}>Cancel</button>
-              <button className="ui-btn ui-btn--primary" onClick={addSelectedRecipes}>Add</button>
+              <button className="ui-btn" onClick={closeAddModal}>Отмена</button>
+              <button className="ui-btn ui-btn--primary" onClick={addSelectedRecipes}>Добавить</button>
             </div>
           </div>
         </div>
@@ -310,5 +334,4 @@ const FavoritesSection: React.FC = () => {
 };
 
 export default FavoritesSection;
-
 

@@ -31,24 +31,25 @@ interface ProfileRecipeCardProps { recipe: Recipe; meta: ProfileRecipeMeta; }
 
 const formatDate = (iso: string): string => {
   const date = new Date(iso);
-  return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
+  return new Intl.RelativeTimeFormat('ru', { numeric: 'auto' }).format(
     Math.round((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
     'day'
   );
 };
 
 const formatTime = (minutes: number) => {
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60) return `${minutes} мин`;
+
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m ? `${h} h ${m} min` : `${h} h`;
+  return m ? `${h} ч ${m} мин` : `${h} ч`;
 };
 
 /**
  * Карточка рецепта в профиле с расширенной статистикой.
- * Показывает обложку, статус (Published/Draft),
+ * Показывает обложку, статус (Опубликован/Черновик),
  * рейтинг, длительность, просмотры, лайки, комментарии,
- * теги и кнопки View/Edit.
+ * теги и кнопки «Открыть»/«Редактировать».
  *
  * @param props Параметры компонента
  * @param props.recipe Объект рецепта
@@ -57,19 +58,26 @@ const formatTime = (minutes: number) => {
 const ProfileRecipeCard: React.FC<ProfileRecipeCardProps> = ({ recipe, meta }) => {
   const fallbackEmoji = FOOD_PLACEHOLDER_EMOJIS[hashStringToIndex(recipe.title ?? '', FOOD_PLACEHOLDER_EMOJIS.length)];
   const statusClass = meta.status === 'PUBLISHED' ? styles.chip_success : styles.chip_muted;
-
+  const difficultyValue = String(recipe.difficulty ?? '').toLowerCase();
+  const difficultyLabel = difficultyValue === 'easy'
+    ? 'Лёгко'
+    : difficultyValue === 'medium'
+      ? 'Средне'
+      : difficultyValue === 'hard'
+        ? 'Сложно'
+        : recipe.difficulty ? String(recipe.difficulty) : '';
   return (
     <article className={styles.card}>
       <div className={styles.imageWrap}>
         {recipe.image ? (
           <img src={recipe.image as string} alt={recipe.title} className={styles.image} />
         ) : (
-          <div className={styles.placeholder} aria-label="placeholder">{fallbackEmoji}</div>
+          <div className={styles.placeholder} aria-label="заглушка">{fallbackEmoji}</div>
         )}
         <div className={styles.statusChips}>
-          <span className={`${styles.chip} ${statusClass}`}>{meta.status === 'PUBLISHED' ? 'Published' : 'Draft'}</span>
-          {recipe.difficulty && (
-            <span className={`${styles.chip} ${styles.chip_muted}`}>{String(recipe.difficulty).toLowerCase() === 'easy' ? 'Easy' : String(recipe.difficulty)}</span>
+          <span className={`${styles.chip} ${statusClass}`}>{meta.status === 'PUBLISHED' ? 'Опубликовано' : 'Черновик'}</span>
+          {difficultyLabel && (
+            <span className={`${styles.chip} ${styles.chip_muted}`}>{difficultyLabel}</span>
           )}
         </div>
       </div>
@@ -95,8 +103,8 @@ const ProfileRecipeCard: React.FC<ProfileRecipeCardProps> = ({ recipe, meta }) =
         <div className={styles.footer}>
           <span className={styles.date}>{formatDate(meta.publishedAt)}</span>
           <div className={styles.btns}>
-            <Link to={`/recipe/${recipe.id}`} className={styles.btn}>View</Link>
-            <Link to={`/recipe/${recipe.id}/edit`} className={styles.btn}>Edit</Link>
+            <Link to={`/recipe/${recipe.id}`} className={styles.btn}>Открыть</Link>
+            <Link to={`/recipe/${recipe.id}/edit`} className={styles.btn}>Редактировать</Link>
           </div>
         </div>
       </div>

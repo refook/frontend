@@ -39,7 +39,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       {hasRight && (
         <div className={styles.right}>
           {stats && stats.length > 0 && (
-            <div className={styles.stats} aria-label="Section statistics">
+            <div className={styles.stats} aria-label="Статистика раздела">
               {stats.map((s, idx) => (
                 <div key={idx} className={`${styles.stat} ${s.tone ? styles[`stat_${s.tone}`] : ''}`}>
                   {s.icon && <span className={styles.statIcon}>{s.icon}</span>}

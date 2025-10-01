@@ -35,24 +35,25 @@ export interface HistoryItem {
 
 const formatDate = (iso: string): string => {
   const date = new Date(iso);
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  return date.toLocaleDateString('ru-RU', { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
 const formatTime = (minutes: number): string => {
-  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 60) return `${minutes} мин`;
+
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  return mins > 0 ? `${hours} h ${mins} min` : `${hours} h`;
+  return mins > 0 ? `${hours} ч ${mins} мин` : `${hours} ч`;
 };
 
 const statusMeta: Record<HistoryStatus, { label: string; className: string; Icon: React.ComponentType<any> }> = {
-  COOKED: { label: 'Cooked', className: styles.status_cooked, Icon: CheckCircleIcon },
-  ATTEMPTED: { label: 'Attempted', className: styles.status_attempted, Icon: BeakerIcon },
-  FAILED: { label: 'Failed', className: styles.status_failed, Icon: XCircleIcon }
+  COOKED: { label: 'Приготовлено', className: styles.status_cooked, Icon: CheckCircleIcon },
+  ATTEMPTED: { label: 'Попытка', className: styles.status_attempted, Icon: BeakerIcon },
+  FAILED: { label: 'Неудача', className: styles.status_failed, Icon: XCircleIcon }
 };
 
 const Stars: React.FC<{ value: number }> = ({ value }) => (
-  <span className={styles.stars} aria-label={`Rating ${value} of 5`}>
+  <span className={styles.stars} aria-label={`Оценка ${value} из 5`}>
     {Array.from({ length: 5 }).map((_, i) =>
       i < value ? (
         <StarSolidIcon key={i} className={styles.star} />
@@ -83,14 +84,14 @@ const HistoryCard: React.FC<{ item: HistoryItem }> = ({ item }) => {
         {item.photo ? (
           <img src={item.photo} alt={item.recipeTitle} className={styles.thumb} />
         ) : (
-          <span aria-label="placeholder">{placeholder}</span>
+          <span aria-label="заглушка">{placeholder}</span>
         )}
       </div>
 
       <div>
         <div className={styles.header}>
           <h3 className={styles.title}>{item.recipeTitle}</h3>
-          <span className={styles.author}>by {item.authorName}</span>
+          <span className={styles.author}>от {item.authorName}</span>
         </div>
 
         <div className={styles.meta}>
@@ -109,7 +110,7 @@ const HistoryCard: React.FC<{ item: HistoryItem }> = ({ item }) => {
           </div>
         </div>
 
-        {item.comment && <div className={styles.comment}>&quot;{item.comment}&quot;</div>}
+        {item.comment && <div className={styles.comment}>«{item.comment}»</div>}
 
         <div className={styles.date}>
           <CalendarDaysIcon className={styles.dateIcon} />

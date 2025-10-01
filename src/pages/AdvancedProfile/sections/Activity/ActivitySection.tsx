@@ -15,16 +15,16 @@ import ActivityRow, { type ActivityItem } from '../../components/ActivityRow';
  * @property {string} dateISO Дата и время события в формате ISO 8601
  */
 const mock: ActivityItem[] = [
-  { id: 'ac1', type: 'create', title: 'Created a new recipe', subtitle: 'Asian Fusion Salad Bowl', imageTitle: 'Asian Fusion Salad Bowl', dateISO: new Date(Date.now() - 2 * 3600 * 1000).toISOString() },
-  { id: 'ac2', type: 'like', title: 'Your comment received 5 likes', subtitle: 'On Mediterranean Quinoa Salad by Chef Maria', imageTitle: 'Mediterranean Quinoa Salad', dateISO: new Date(Date.now() - 4 * 3600 * 1000).toISOString() },
-  { id: 'ac3', type: 'cook', title: 'Cooked a recipe', subtitle: 'Thai Green Curry by Chef Siriporn – Rated 4 stars', imageTitle: 'Thai Green Curry', dateISO: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
-  { id: 'ac4', type: 'follow', title: 'New follower', subtitle: 'Michael Thompson started following you', imageTitle: 'Michael Thompson', dateISO: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
-  { id: 'ac5', type: 'review', title: 'Left a review', subtitle: 'Classic Chocolate Chip Cookies — 5 stars', imageTitle: 'Classic Chocolate Chip Cookies', dateISO: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
-  { id: 'ac6', type: 'badge', title: 'Earned a badge', subtitle: 'Recipe Creator — For publishing your 5th recipe', imageTitle: 'Badge', dateISO: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() }
+  { id: 'ac1', type: 'create', title: 'Создан новый рецепт', subtitle: 'Салат в азиатском стиле', imageTitle: 'Салат в азиатском стиле', dateISO: new Date(Date.now() - 2 * 3600 * 1000).toISOString() },
+  { id: 'ac2', type: 'like', title: 'Ваш комментарий получил 5 лайков', subtitle: 'К рецепту «Средиземноморский салат с киноа» от Шеф Марии', imageTitle: 'Средиземноморский салат с киноа', dateISO: new Date(Date.now() - 4 * 3600 * 1000).toISOString() },
+  { id: 'ac3', type: 'cook', title: 'Приготовлено блюдо', subtitle: 'Тайский зелёный карри от шефа Сирипорн — оценка 4 звезды', imageTitle: 'Тайский зелёный карри', dateISO: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
+  { id: 'ac4', type: 'follow', title: 'Новый подписчик', subtitle: 'Майкл Томпсон подписался на вас', imageTitle: 'Майкл Томпсон', dateISO: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
+  { id: 'ac5', type: 'review', title: 'Оставлен отзыв', subtitle: 'Классическое печенье с шоколадной крошкой — 5 звёзд', imageTitle: 'Классическое печенье с шоколадной крошкой', dateISO: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
+  { id: 'ac6', type: 'badge', title: 'Получена награда', subtitle: '«Создатель рецептов» — за публикацию пятого рецепта', imageTitle: 'Награда', dateISO: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() }
 ];
 
 /**
- * Секция «Recent Activity» в расширенном профиле пользователя.
+ * Секция «Последняя активность» в расширенном профиле пользователя.
  * Показывает список последних действий пользователя (создание рецептов, лайки, подписки и т. д.).
  *
  * @param {{}} props Параметры компонента (не принимает входных свойств)
@@ -35,9 +35,9 @@ const ActivitySection: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       <SectionHeader
-        title="Recent Activity"
-        description="Your latest cooking adventures and interactions"
-        stats={[{ label: 'activities', value: items.length, tone: 'accent' }]}
+        title="Последняя активность"
+        description="Ваши последние кулинарные действия и взаимодействия"
+        stats={[{ label: 'Активности', value: items.length, tone: 'accent' }]}
       />
 
       <div className={styles.card}>

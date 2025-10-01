@@ -12,6 +12,7 @@ interface ApiLogData {
 
 class ApiLogger {
   private logs: ApiLogData[] = [];
+  private storageDisabled = false;
 
   /**
    * Логирует данные запроса к API
@@ -71,10 +72,36 @@ class ApiLogger {
    * Сохранить логи в localStorage
    */
   private saveToStorage() {
+    if (this.storageDisabled) {
+      return;
+    }
+
     try {
       localStorage.setItem('api_logs', JSON.stringify(this.logs));
     } catch (error) {
+      if (this.handleQuotaOverflow(error)) {
+        return;
+      }
       console.warn('Не удалось сохранить логи в localStorage:', error);
+    }
+  }
+
+  private handleQuotaOverflow(error: unknown): boolean {
+    const isQuotaError = error instanceof DOMException && (error.name === 'QuotaExceededError' || error.code === 22);
+    if (!isQuotaError) {
+      return false;
+    }
+
+    console.warn('Локальное хранилище для логов переполнено, обрезаем данные');
+    // Оставляем только последние 50 записей, чтобы попытаться освободить место
+    this.logs = this.logs.slice(-50);
+    try {
+      localStorage.setItem('api_logs', JSON.stringify(this.logs));
+      return true;
+    } catch (retryError) {
+      console.warn('Не удалось повторно сохранить логи — отключаем сохранение', retryError);
+      this.storageDisabled = true;
+      return true;
     }
   }
 
