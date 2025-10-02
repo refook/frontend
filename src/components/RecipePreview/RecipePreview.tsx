@@ -320,10 +320,12 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
 
     const ing = ingredient as RecipeIngredientDto;
     const name = ing.name || 'Ингредиент';
-    const measureId = ing.productMeasureId;
-    const measureLabel = measureId ? measureLabels[measureId] : undefined;
+    // Новый API: конкретная мера доступна в ing.measure.name
+    const measureNameFromApi = (ing as any)?.measure?.name as string | undefined;
+    const measureId = (ing as any)?.productMeasureId as string | undefined;
+    const measureLabelFromCache = measureId ? measureLabels[measureId] : undefined;
     const fallbackUnit = (ing as any).productUnit || (ing as any).measure || '';
-    const unitLabelRaw = measureLabel || fallbackUnit;
+    const unitLabelRaw = measureNameFromApi || measureLabelFromCache || fallbackUnit;
     const unitLabel = formatMeasureLabel(unitLabelRaw ? String(unitLabelRaw) : undefined);
     const unitSuffix = unitLabel ? ` ${unitLabel}` : '';
     return { id: `api:${ing.id}`, name, amount: `${ing.count}${unitSuffix}` };

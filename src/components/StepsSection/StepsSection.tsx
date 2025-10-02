@@ -56,10 +56,12 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName, m
                         const ingredientId = (ing as CreateRecipeIngredientDto)?.id ?? (ing as ApiUpdateRecipeIngredientDto)?.id;
                         const explicitName = (ing as RecipeIngredientDto)?.name;
                         const name = explicitName || (isFormData && ingredientId ? getIngredientName(ingredientId) : undefined) || 'Ингредиент';
+                        // Новый API: меру берём из ing.measure.name если есть
                         const measureId = (ing as RecipeIngredientDto).productMeasureId
                           ?? (ing as ApiUpdateRecipeIngredientDto).productMeasureId;
+                        const measureNameFromApi = (ing as any)?.measure?.name as string | undefined;
                         const fallbackUnit = (ing as any).productUnit || (ing as any).measure || '';
-                        const unitSource = measureId && measureLabels[measureId] ? measureLabels[measureId] : fallbackUnit;
+                        const unitSource = measureNameFromApi || (measureId && measureLabels[measureId] ? measureLabels[measureId] : fallbackUnit);
                         const unit = formatMeasureLabel(unitSource ? String(unitSource) : undefined);
                         const suffix = unit ? ` ${unit}` : '';
                         const amount = `${(ing as any).count}${suffix}`;
