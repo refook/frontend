@@ -466,7 +466,13 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
                               onAdd={(base) => {
                                 const next = [...(step.ingredients || [])];
                                 const payload: any = { id: base.id, count: Number((base as any).count) || 0, productUnit: (base as any).productUnit };
-                                if ((base as any).variantId) payload.variantId = (base as any).variantId;
+                                if ((base as any).variantId) {
+                                  payload.variantId = (base as any).variantId;
+                                  if ((base as any).variantName) payload.variantName = (base as any).variantName;
+                                }
+                                if ((base as any).name) {
+                                  payload.name = (base as any).name;
+                                }
                                 next.push(payload);
                                 updateStep(index, { ingredients: next as any });
                               }}
@@ -579,6 +585,18 @@ const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds,
   const [selectedId, setSelectedId] = useState<string>('');
   const [count, setCount] = useState<number>(0);
   const candidates = useMemo(() => baseIngredients.filter(b => !usedIds.includes(b.id)), [baseIngredients, usedIds]);
+
+  const getIngredientDisplayName = (ingredient: CreateRecipeIngredientDto): string => {
+    const raw: any = ingredient;
+    const variantLabel = typeof raw?.variantName === 'string' ? raw.variantName.trim() : '';
+    if (variantLabel) return variantLabel;
+    const variantId = raw?.variantId || (raw?.isVariant ? raw?.id : undefined);
+    if (variantId && idToName[variantId]) return idToName[variantId];
+    if (typeof raw?.name === 'string' && raw.name.trim()) return raw.name.trim();
+    const baseLabel = idToName[ingredient.id];
+    if (baseLabel) return baseLabel;
+    return ingredient.id;
+  };
   const current = candidates.find(c => c.id === selectedId);
   useEffect(() => {
     if (!current) return;
@@ -595,7 +613,7 @@ const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds,
       <select className="ui-select" value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
         <option value="">Выберите ингредиент</option>
         {candidates.map(c => (
-          <option key={c.id} value={c.id}>{idToName[c.id] || c.id}</option>
+          <option key={c.id} value={c.id}>{getIngredientDisplayName(c)}</option>
         ))}
       </select>
       <input
