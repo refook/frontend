@@ -54,8 +54,11 @@ const StepsSection: React.FC<Props> = ({ steps, isFormData, getIngredientName, m
                     <div className={styles.chips}>
                       {step.ingredients.map((ing: any, i: number) => {
                         const ingredientId = (ing as CreateRecipeIngredientDto)?.id ?? (ing as ApiUpdateRecipeIngredientDto)?.id;
-                        const explicitName = (ing as RecipeIngredientDto)?.name;
-                        const name = explicitName || (isFormData && ingredientId ? getIngredientName(ingredientId) : undefined) || 'Ингредиент';
+                        const explicitName = (ing as RecipeIngredientDto)?.name as string | undefined;
+                        const variantName = (ing as any)?.variantName as string | undefined;
+                        const variantId = (ing as any)?.variantId as string | undefined;
+                        const formName = isFormData ? getIngredientName(variantId || ingredientId) : undefined;
+                        const name = variantName || explicitName || (formName && formName !== ingredientId ? formName : undefined) || 'Ингредиент';
                         // Новый API: меру берём из ing.measure.name если есть
                         const measureId = (ing as RecipeIngredientDto).productMeasureId
                           ?? (ing as ApiUpdateRecipeIngredientDto).productMeasureId;

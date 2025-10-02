@@ -13,6 +13,7 @@ import type { CreateStepDto, CreateRecipeIngredientDto } from "../../types";
 import { API_BASE_URL } from '../../services/api';
 import { authorizedFetch, getAuthHeaders } from '../../services/auth';
 import { PRODUCT_UNITS_ARRAY } from '../../constants/measures';
+import { productsService } from '../../services/productsService';
 
 export type StepIngredientOveruse = {
   key: string;
@@ -50,6 +51,7 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [idToName, setIdToName] = useState<Record<string, string>>({});
+  const [variantNames, setVariantNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // Подгрузим справочник продуктов для отображения названий
@@ -68,6 +70,34 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
     };
     load();
   }, []);
+
+  // Подгрузка названий вариантов по variantId (или по id, если isVariant=true и variantId нет)
+  useEffect(() => {
+    const ids = new Set<string>();
+    const collect = (arr: any[] | undefined) => {
+      (arr || []).forEach((i: any) => {
+        const vid = i?.variantId || (i?.isVariant ? i?.id : undefined);
+        if (typeof vid === 'string' && vid && !variantNames[vid]) ids.add(vid);
+      });
+    };
+    collect(baseIngredients as any);
+    (steps || []).forEach((s) => collect((s as any)?.ingredients));
+    if (ids.size === 0) return;
+    let cancelled = false;
+    (async () => {
+      const updates: Record<string, string> = {};
+      for (const vid of ids) {
+        try {
+          const v = await productsService.getProductVariantById(vid);
+          if (v?.name) updates[vid] = v.name;
+        } catch { /* ignore */ }
+      }
+      if (!cancelled && Object.keys(updates).length > 0) {
+        setVariantNames((prev) => ({ ...prev, ...updates }));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [baseIngredients, steps, variantNames]);
 
   const selectableBaseIngredients = useMemo(() => baseIngredients || [], [baseIngredients]);
 
@@ -377,7 +407,15 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
                             return (
                               <div key={`${ing.id}-${si}`} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 100px auto', gap: 8, alignItems: 'center' }}>
                                 <div style={{ color: 'var(--token-text)' }}>
-                                  {idToName[ing.id] || ing.id}
+                                  {(() => {
+                                    const explicitVariantName = (ing as any)?.variantName as string | undefined;
+                                    const explicitName = (ing as any)?.name as string | undefined;
+                                    const vid = (ing as any)?.variantId || ((ing as any)?.isVariant ? (ing as any).id : undefined);
+                                    if (explicitVariantName) return explicitVariantName;
+                                    if (explicitName && explicitName !== ing.id) return explicitName;
+                                    if (vid && variantNames[vid]) return variantNames[vid];
+                                    return idToName[ing.id] || vid || ing.id;
+                                  })()}
                                   <span style={{ marginLeft: 6, color: 'var(--token-muted)', fontSize: 12 }}>
                                     {PRODUCT_UNITS_ARRAY.find(u => u.value === (ing as any).productUnit)?.label}
                                   </span>

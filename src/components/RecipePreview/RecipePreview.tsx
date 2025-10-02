@@ -220,6 +220,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
 
   const measuresCacheRef = useRef<Map<string, ProductMeasureResponseDto[]>>(new Map());
   const [measureLabels, setMeasureLabels] = useState<Record<string, string>>({});
+  const [variantNames, setVariantNames] = useState<Record<string, string>>({});
 
   const macros = !isFormData
     ? recipeData?.macros
@@ -288,6 +289,39 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       cancelled = true;
     };
   }, [apiFormData, isFormData, recipeData, measureLabels]);
+
+  // Подгружаем названия вариантов по variantId для отображения
+  useEffect(() => {
+    const ids = new Set<string>();
+    const collect = (arr: any[] | undefined) => {
+      (arr || []).forEach((i: any) => {
+        const vid = i?.variantId;
+        if (typeof vid === 'string' && vid && !variantNames[vid]) ids.add(vid);
+      });
+    };
+    if (apiFormData) {
+      collect(apiFormData.composition?.ingredients as any);
+      (apiFormData.composition?.steps || []).forEach((s) => collect((s as any)?.ingredients));
+    } else if (!isFormData && recipeData) {
+      collect(recipeData.ingredients as any);
+      (recipeData.steps || []).forEach((s) => collect((s as any)?.ingredients));
+    }
+    if (ids.size === 0) return;
+    let cancelled = false;
+    (async () => {
+      const updates: Record<string, string> = {};
+      for (const vid of ids) {
+        try {
+          const v = await productsService.getProductVariantById(vid);
+          if (v?.name) updates[vid] = v.name;
+        } catch {}
+      }
+      if (!cancelled && Object.keys(updates).length > 0) {
+        setVariantNames((prev) => ({ ...prev, ...updates }));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [apiFormData, isFormData, recipeData, variantNames]);
 
   type NormalizedIngredient = { id: string; name: string; amount: string };
   const normalizeIngredient = (
@@ -536,7 +570,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           <StepsSection
             steps={steps}
             isFormData={isFormData}
-            getIngredientName={(id: string) => availableIngredients.find(ai => ai.id === id)?.name}
+            getIngredientName={(id: string) => variantNames[id] || availableIngredients.find(ai => ai.id === id)?.name}
             measureLabels={measureLabels}
           />
 

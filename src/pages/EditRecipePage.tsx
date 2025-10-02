@@ -58,12 +58,15 @@ const EditRecipePage: React.FC = () => {
       tags: ((currentRecipe as any)?.tagObjects && Array.isArray((currentRecipe as any).tagObjects))
         ? (currentRecipe as any).tagObjects
         : ((currentRecipe.tags || []) as any[]).map((t: any) => (typeof t === 'string' ? { id: t, name: t } : t)),
-      ingredients: (currentRecipe.ingredients || []).map((ing) => ({
+      ingredients: (currentRecipe.ingredients || []).map((ing: any) => ({
         id: ing.id,
         count: ing.count,
-        productUnit: (ing as any).productUnit || (ing as any).measure,
-        // Прокидываем productMeasureId из API, чтобы можно было обновлять без пере-выбора единицы
-        productMeasureId: (ing as any).productMeasureId,
+        productUnit: ing.productUnit || ing.measure,
+        productMeasureId: ing.productMeasureId,
+        // Для отображения: имя ингредиента/варианта из детального рецепта
+        name: ing.name,
+        // Флаг варианта из API (вариант может не иметь отдельного variantId в ответе)
+        isVariant: Boolean(ing.isVariant),
       })),
       steps: (currentRecipe.steps || []).map((s) => ({
         id: s.id,

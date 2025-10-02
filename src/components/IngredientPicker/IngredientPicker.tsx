@@ -7,6 +7,7 @@ import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
 import type {ApiIngredient, CreateRecipeIngredientDto} from "../../types";
 import { getAuthHeaders, authorizedFetch } from '../../services/auth';
+import { productsService } from '../../services';
 
 interface IngredientPickerProps {
   ingredients: CreateRecipeIngredientDto[];
@@ -63,6 +64,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [ingredientUnitsMap, setIngredientUnitsMap] = useState<Record<string, UnitsInfo>>({});
   const ingredientUnitsMapRef = useRef<Record<string, UnitsInfo>>({});
+  const [variantNameMap, setVariantNameMap] = useState<Record<string, string>>({});
 
   useEffect(() => {
     ingredientUnitsMapRef.current = ingredientUnitsMap;
@@ -159,6 +161,30 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     void loadUnitsForExisting();
   }, [ingredients]);
 
+  // Подтягиваем названия вариантов для уже существующих ингредиентов (редактирование)
+  useEffect(() => {
+    let cancelled = false;
+    const loadVariantNames = async () => {
+      const toFetch = Array.from(new Set(
+        ingredients
+          .map((ing: any) => String(ing?.variantId || ''))
+          .filter((id) => id && !variantNameMap[id])
+      ));
+      for (const vId of toFetch) {
+        try {
+          const variant = await productsService.getProductVariantById(vId);
+          if (!cancelled && variant?.name) {
+            setVariantNameMap((prev) => ({ ...prev, [vId]: variant.name }));
+          }
+        } catch {
+          // ignore
+        }
+      }
+    };
+    void loadVariantNames();
+    return () => { cancelled = true; };
+  }, [ingredients, variantNameMap]);
+
   const addIngredient = () => {
     if (selectedIngredient && amount.trim() && unit) {
       const newIngredient: CreateRecipeIngredientDto = {
@@ -168,7 +194,11 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       };
       
       const payload: any = { ...newIngredient };
-      if (variantId) payload.variantId = variantId;
+      if (variantId) {
+        payload.variantId = variantId;
+        const v = variants.find(v => v.id === variantId);
+        if (v?.name) payload.variantName = v.name;
+      }
 
       onChange([...ingredients, payload]);
 
@@ -279,7 +309,11 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
           <div key={ingredient.id} className={styles.ingredientItem}>
             <div className={styles.ingredientInfo}>
               <span className={styles.ingredientName}>
-                {availableIngredients.find(i => i.id === ingredient.id)?.name || 'Неизвестный ингредиент'}
+                {((ingredient as any).variantName)
+                  || (ingredient as any).name
+                  || ((ingredient as any).variantId && variantNameMap[(ingredient as any).variantId])
+                  || availableIngredients.find(i => i.id === ingredient.id)?.name
+                  || 'Неизвестный ингредиент'}
               </span>
               {(() => {
                 const variant = (ingredient as any)?.variantId ?? null;

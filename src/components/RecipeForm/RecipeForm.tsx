@@ -161,10 +161,13 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
 
     // Кеш базовых мер по продукту
     const measuresCache = new Map<string, ProductMeasureResponseDto[]>();
-    const getMeasures = async (productId: string) => {
-      if (measuresCache.has(productId)) return measuresCache.get(productId)!;
-      const list = await productsService.getBaseMeasures(productId);
-      measuresCache.set(productId, list);
+    const getMeasures = async (productOrVariantId: string, isVariant: boolean) => {
+      const cacheKey = `${isVariant ? 'variant' : 'base'}:${productOrVariantId}`;
+      if (measuresCache.has(cacheKey)) return measuresCache.get(cacheKey)!;
+      const list = isVariant
+        ? await productsService.getVariantMeasures(productOrVariantId)
+        : await productsService.getBaseMeasures(productOrVariantId);
+      measuresCache.set(cacheKey, list);
       return list;
     };
 
@@ -179,10 +182,13 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     ): Promise<ApiUpdateRecipeIngredientDto[] | null> => {
       const result: ApiUpdateRecipeIngredientDto[] = [];
       for (const ing of ings) {
+        const variantId = (ing as any)?.variantId as string | undefined;
+        const isVariant = Boolean(variantId);
+        const selectedId = variantId || ing.id;
         // Если из режима редактирования пришел productMeasureId — используем его
         const directMeasureId = (ing as any).productMeasureId as string | undefined;
         if (directMeasureId) {
-          result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: directMeasureId });
+          result.push({ id: selectedId, count: ing.count, isVariant, productMeasureId: directMeasureId });
           continue;
         }
 
@@ -190,32 +196,34 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         const baseIng = formData.ingredients.find(b => b.id === ing.id);
         const inheritedMeasureId = (baseIng as any)?.productMeasureId as string | undefined;
         if (inheritedMeasureId) {
-          result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: inheritedMeasureId });
+          const inheritedVariantId = (baseIng as any)?.variantId as string | undefined;
+          const inheritedIsVariant = Boolean(inheritedVariantId);
+          result.push({ id: (inheritedVariantId || ing.id), count: ing.count, isVariant: inheritedIsVariant, productMeasureId: inheritedMeasureId });
           continue;
         }
 
         const inheritedUnit = (ing as any).productUnit || (baseIng as any)?.productUnit;
         if (inheritedUnit) {
-          const measures = await getMeasures(ing.id);
+          const measures = await getMeasures(selectedId, isVariant);
           const wantedLabel = unitLabelByValue(String(inheritedUnit));
           const found = measures.find(m => m.name === wantedLabel);
           if (!found) {
             setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
             return null;
           }
-          result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: found.id });
+          result.push({ id: selectedId, count: ing.count, isVariant, productMeasureId: found.id });
           continue;
         }
 
         // Иначе подбираем по выбранной единице
-        const measures = await getMeasures(ing.id);
+        const measures = await getMeasures(selectedId, isVariant);
         const wantedLabel = unitLabelByValue((ing as any).productUnit as string);
         const found = measures.find(m => m.name === wantedLabel);
         if (!found) {
           setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
           return null;
         }
-        result.push({ id: ing.id, count: ing.count, isVariant: false, productMeasureId: found.id });
+        result.push({ id: selectedId, count: ing.count, isVariant, productMeasureId: found.id });
       }
       return result;
     };
