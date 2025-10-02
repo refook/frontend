@@ -177,14 +177,60 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
     };
 
     // Маппинг ингредиентов формы -> UpdateRecipeIngredientDto (API)
+    const resolveIngredientIds = (ingredient: any): {
+      baseProductId?: string;
+      variantId?: string;
+      isVariant: boolean;
+    } => {
+      const pickId = (...candidates: any[]): string | undefined => {
+        for (const candidate of candidates) {
+          if (typeof candidate === 'string') {
+            const trimmed = candidate.trim();
+            if (trimmed.length > 0) return trimmed;
+          }
+          if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+            return String(candidate);
+          }
+        }
+        return undefined;
+      };
+
+      const variantId = pickId(
+        ingredient?.variantId,
+        ingredient?.variant?.id,
+        ingredient?.productVariantId,
+        ingredient?.isVariant ? ingredient?.id : undefined
+      );
+
+      const baseProductId = pickId(
+        ingredient?.baseProductId,
+        ingredient?.productId,
+        ingredient?.ingredientId,
+        ingredient?.originalProductId,
+        ingredient?.id
+      );
+
+      return {
+        baseProductId: baseProductId || undefined,
+        variantId: variantId || undefined,
+        isVariant: Boolean(variantId || ingredient?.isVariant),
+      };
+    };
+
     const mapIngredients = async (
       ings: CreateRecipeDto['ingredients']
     ): Promise<ApiUpdateRecipeIngredientDto[] | null> => {
       const result: ApiUpdateRecipeIngredientDto[] = [];
       for (const ing of ings) {
-        const variantId = (ing as any)?.variantId as string | undefined;
-        const isVariant = Boolean(variantId);
-        const selectedId = variantId || ing.id;
+        const meta = resolveIngredientIds(ing as any);
+        const variantId = meta.variantId;
+        const isVariant = meta.isVariant;
+        const selectedId = variantId || meta.baseProductId || ing.id;
+        const errorSuffixId = meta.baseProductId || variantId || ing.id;
+        if (!selectedId) {
+          setErrors(prev => ({ ...prev, [`ingredients.measure.${errorSuffixId}`]: 'Не удалось определить идентификатор продукта' }));
+          return null;
+        }
         // Если из режима редактирования пришел productMeasureId — используем его
         const directMeasureId = (ing as any).productMeasureId as string | undefined;
         if (directMeasureId) {
@@ -193,7 +239,11 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         }
 
         // Попытка наследовать меру из базовых ингредиентов формы, если не указана в шаге
-        const baseIng = formData.ingredients.find(b => b.id === ing.id);
+        const baseIng = formData.ingredients.find((b) => {
+          const baseMeta = resolveIngredientIds(b as any);
+          return (baseMeta.baseProductId || b.id) === (meta.baseProductId || ing.id)
+            && (baseMeta.variantId || '') === (variantId || '');
+        });
         const inheritedMeasureId = (baseIng as any)?.productMeasureId as string | undefined;
         if (inheritedMeasureId) {
           const inheritedVariantId = (baseIng as any)?.variantId as string | undefined;
@@ -208,7 +258,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
           const wantedLabel = unitLabelByValue(String(inheritedUnit));
           const found = measures.find(m => m.name === wantedLabel);
           if (!found) {
-            setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
+            setErrors(prev => ({ ...prev, [`ingredients.measure.${errorSuffixId}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
             return null;
           }
           result.push({ id: selectedId, count: ing.count, isVariant, productMeasureId: found.id });
@@ -220,7 +270,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         const wantedLabel = unitLabelByValue((ing as any).productUnit as string);
         const found = measures.find(m => m.name === wantedLabel);
         if (!found) {
-          setErrors(prev => ({ ...prev, [`ingredients.measure.${ing.id}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
+          setErrors(prev => ({ ...prev, [`ingredients.measure.${errorSuffixId}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
           return null;
         }
         result.push({ id: selectedId, count: ing.count, isVariant, productMeasureId: found.id });

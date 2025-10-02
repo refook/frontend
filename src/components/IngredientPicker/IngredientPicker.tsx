@@ -42,7 +42,50 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   errors = {},
   compact = false
 }) => {
-  const getIngredientKey = (productId: string, variant?: string | null) => (variant ? `${productId}::${variant}` : productId);
+  const getIngredientKey = (productId: string, variant?: string | null, isVariant?: boolean) => {
+    if (variant) return `variant:${variant}`;
+    if (isVariant && productId) return `variant:${productId}`;
+    if (productId) return `base:${productId}`;
+    return '';
+  };
+
+  const resolveMeasureContext = (ingredient: any): {
+    baseProductId?: string;
+    variantId?: string;
+    isVariant: boolean;
+  } => {
+    if (!ingredient) {
+      return { baseProductId: undefined, variantId: undefined, isVariant: false };
+    }
+
+    const pickId = (...candidates: any[]): string | undefined => {
+      for (const candidate of candidates) {
+        if (typeof candidate === 'string') {
+          const trimmed = candidate.trim();
+          if (trimmed.length > 0) return trimmed;
+        }
+        if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+          return String(candidate);
+        }
+      }
+      return undefined;
+    };
+
+    const variantId = pickId(ingredient?.variantId, ingredient?.variant?.id, ingredient?.isVariant ? ingredient?.id : undefined);
+    const baseProductId = pickId(
+      ingredient?.productId,
+      ingredient?.baseProductId,
+      ingredient?.ingredientId,
+      ingredient?.originalProductId,
+      ingredient?.id
+    );
+
+    return {
+      baseProductId,
+      variantId,
+      isVariant: Boolean(variantId || ingredient?.isVariant),
+    };
+  };
 
   type UnitsInfo = {
     units: typeof PRODUCT_UNITS_ARRAY;
@@ -70,42 +113,45 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     ingredientUnitsMapRef.current = ingredientUnitsMap;
   }, [ingredientUnitsMap]);
 
-  const fetchUnitsInfo = async (productId: string, variant?: string | null): Promise<UnitsInfo> => {
+  const fetchUnitsInfo = async (
+    params: { baseProductId?: string; variantId?: string | null; isVariant?: boolean }
+  ): Promise<UnitsInfo> => {
     try {
-      const headers = getAuthHeaders();
-      let measures: Array<{ name?: string }> = [];
-      let variantFallbackUsed = false;
+      const baseId = typeof params.baseProductId === 'string' && params.baseProductId.trim().length > 0
+        ? params.baseProductId.trim()
+        : undefined;
+      const variantId = typeof params.variantId === 'string' && params.variantId.trim().length > 0
+        ? params.variantId.trim()
+        : undefined;
+      const isVariant = Boolean(variantId || params.isVariant);
 
-      if (variant) {
-        const respVariant = await authorizedFetch(`${API_BASE_URL}/products/measures/variant/${variant}/all`, { headers });
-        const variantMeasures = respVariant.ok ? await respVariant.json() : [];
-        if (Array.isArray(variantMeasures) && variantMeasures.length > 0) {
-          measures = variantMeasures;
-        } else {
-          variantFallbackUsed = true;
-          const respBase = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
-          measures = respBase.ok ? await respBase.json() : [];
-        }
-      } else {
-        const respBase = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
-        measures = respBase.ok ? await respBase.json() : [];
+      let measures: Array<{ name?: string }> = [];
+
+      if (isVariant && variantId) {
+        measures = await productsService.getVariantMeasures(variantId);
+      } else if (baseId) {
+        measures = await productsService.getBaseMeasures(baseId);
       }
 
       const allowedLabels = new Set((measures || []).map((m: any) => String(m?.name ?? '').trim()).filter(Boolean));
-      const filtered = PRODUCT_UNITS_ARRAY.filter(u => allowedLabels.has(u.label));
+      const filtered = allowedLabels.size > 0
+        ? PRODUCT_UNITS_ARRAY.filter(u => allowedLabels.has(u.label))
+        : [];
 
       let warning: string | null = null;
-      if (variant && filtered.length === 0 && !variantFallbackUsed) {
+      if (isVariant && filtered.length === 0) {
         warning = 'Для выбранного варианта нет доступных мер. Выберите другой вариант или продукт.';
+      } else if (!isVariant && filtered.length === 0 && measures.length === 0) {
+        warning = 'Для продукта нет доступных мер. Добавьте их в админке.';
       }
 
       return {
-        units: filtered.length > 0 ? filtered : PRODUCT_UNITS_ARRAY,
+        units: filtered,
         warning,
       };
     } catch (error) {
       console.error('IngredientPicker: не удалось загрузить меры продукта', error);
-      return { units: PRODUCT_UNITS_ARRAY, warning: null };
+      return { units: [], warning: 'Не удалось загрузить меры продукта.' };
     }
   };
 
@@ -145,10 +191,16 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   useEffect(() => {
     const loadUnitsForExisting = async () => {
       for (const ingredient of ingredients) {
-        const variant = (ingredient as any)?.variantId ?? null;
-        const key = getIngredientKey(ingredient.id, variant);
+        const context = resolveMeasureContext(ingredient as any);
+        const cacheKeySeed = context.baseProductId || context.variantId;
+        if (!cacheKeySeed) continue;
+        const key = getIngredientKey(cacheKeySeed, context.variantId, context.isVariant);
         if (!key || ingredientUnitsMapRef.current[key]) continue;
-        const info = await fetchUnitsInfo(ingredient.id, variant);
+        const info = await fetchUnitsInfo({
+          baseProductId: context.baseProductId,
+          variantId: context.variantId,
+          isVariant: context.isVariant,
+        });
         setIngredientUnitsMap(prev => {
           if (prev[key]) return prev;
           const next = { ...prev, [key]: info };
@@ -167,7 +219,10 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     const loadVariantNames = async () => {
       const toFetch = Array.from(new Set(
         ingredients
-          .map((ing: any) => String(ing?.variantId || ''))
+          .map((ing: any) => {
+            const vid = ing?.variantId || (ing?.isVariant ? ing?.id : undefined);
+            return String(vid || '');
+          })
           .filter((id) => id && !variantNameMap[id])
       ));
       for (const vId of toFetch) {
@@ -202,10 +257,11 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
 
       onChange([...ingredients, payload]);
 
-      const key = getIngredientKey(selectedIngredient.id, variantId || null);
-      const info: UnitsInfo = unitWarning
-        ? { units: [], warning: unitWarning }
-        : { units: allowedUnits.length > 0 ? allowedUnits : PRODUCT_UNITS_ARRAY, warning: null };
+      const key = getIngredientKey(selectedIngredient.id, variantId || null, Boolean(variantId));
+      const info: UnitsInfo = {
+        units: allowedUnits,
+        warning: unitWarning ?? null,
+      };
       setIngredientUnitsMap(prev => {
         const next = { ...prev, [key]: info };
         ingredientUnitsMapRef.current = next;
@@ -261,21 +317,22 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       setVariants((variantList || []).map((v: any) => ({ id: v.id ?? v.uuid ?? v.value, name: v.name ?? v.title ?? 'Вариант' })).filter(v => v.id));
 
       const variantKey = nextVariantId || null;
-      const unitsInfo = await fetchUnitsInfo(productId, variantKey);
-      if (variantKey) {
-        setUnitWarning(unitsInfo.warning);
-      } else {
-        setUnitWarning(null);
-      }
+      const unitsInfo = await fetchUnitsInfo({
+        baseProductId: productId,
+        variantId: variantKey,
+        isVariant: Boolean(variantKey),
+      });
+
+      setUnitWarning(unitsInfo.warning ?? null);
       setAllowedUnits(unitsInfo.units);
       if (unitsInfo.units.length > 0) {
-        const defaultUnit = unitsInfo.units.find(u => u.value === unit) || unitsInfo.units[0] || PRODUCT_UNITS.GRAM;
-        setUnit((defaultUnit as any)?.value || 'GR');
+        const defaultUnit = unitsInfo.units.find(u => u.value === unit) || unitsInfo.units[0];
+        setUnit((defaultUnit as any)?.value || '');
       } else {
         setUnit('');
       }
 
-      const key = getIngredientKey(productId, variantKey);
+      const key = getIngredientKey(productId, variantKey, Boolean(variantKey));
       setIngredientUnitsMap(prev => {
         const next = { ...prev, [key]: unitsInfo };
         ingredientUnitsMapRef.current = next;
@@ -311,29 +368,33 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
               <span className={styles.ingredientName}>
                 {((ingredient as any).variantName)
                   || (ingredient as any).name
-                  || ((ingredient as any).variantId && variantNameMap[(ingredient as any).variantId])
+                  || (() => {
+                    const resolvedVariantId = (ingredient as any).variantId || ((ingredient as any).isVariant ? (ingredient as any).id : undefined);
+                    return resolvedVariantId ? variantNameMap[resolvedVariantId] : undefined;
+                  })()
                   || availableIngredients.find(i => i.id === ingredient.id)?.name
                   || 'Неизвестный ингредиент'}
               </span>
               {(() => {
-                const variant = (ingredient as any)?.variantId ?? null;
-                const key = getIngredientKey(ingredient.id, variant);
-                const info = ingredientUnitsMap[key];
+                const context = resolveMeasureContext(ingredient as any);
+                const cacheSeed = context.baseProductId || context.variantId || ingredient.id;
+                const key = cacheSeed ? getIngredientKey(cacheSeed, context.variantId, context.isVariant) : '';
+                const info = key ? ingredientUnitsMap[key] : undefined;
                 const hasInfo = Boolean(info);
                 const warningMessage = info?.warning ?? null;
-                let unitsList = hasInfo ? (info?.units ?? PRODUCT_UNITS_ARRAY) : PRODUCT_UNITS_ARRAY.filter(u => u.value === (ingredient as any).productUnit);
+                const currentUnitValue = (ingredient as any).productUnit;
+                let unitsList = hasInfo ? (info?.units ?? []) : [];
 
-                if (unitsList.length > 0 && !(unitsList.some(u => u.value === (ingredient as any).productUnit))) {
-                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === (ingredient as any).productUnit);
+                if (!hasInfo) {
+                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue);
+                  if (currentUnit) unitsList = [currentUnit];
+                } else if (unitsList.length === 0) {
+                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue);
+                  if (currentUnit) unitsList = [currentUnit];
+                } else if (currentUnitValue && !unitsList.some(u => u.value === currentUnitValue)) {
+                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue);
                   if (currentUnit) {
                     unitsList = [...unitsList, currentUnit];
-                  }
-                }
-
-                if (unitsList.length === 0) {
-                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === (ingredient as any).productUnit);
-                  if (currentUnit) {
-                    unitsList = [currentUnit];
                   }
                 }
 
@@ -365,7 +426,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                         className={styles.controlSelect}
                         value={(ingredient as any).productUnit || ''}
                         onChange={(e) => updateIngredient(index, { productUnit: e.target.value as ProductUnitType })}
-                        disabled={!hasInfo || (Boolean(warningMessage) && (info?.units?.length ?? 0) === 0)}
+                        disabled={!hasInfo || uniqueUnits.length === 0}
                       >
                         {uniqueUnits.map(unitOption => (
                           <option key={unitOption.value} value={unitOption.value}>{unitOption.label}</option>

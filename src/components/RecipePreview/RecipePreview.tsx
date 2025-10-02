@@ -222,6 +222,53 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   const [measureLabels, setMeasureLabels] = useState<Record<string, string>>({});
   const [variantNames, setVariantNames] = useState<Record<string, string>>({});
 
+  const resolveIngredientMeta = (item: any): {
+    baseProductId?: string;
+    variantId?: string;
+    isVariant: boolean;
+    fetchId?: string;
+  } => {
+    const pickId = (...candidates: any[]): string | undefined => {
+      for (const candidate of candidates) {
+        if (typeof candidate === 'string') {
+          const trimmed = candidate.trim();
+          if (trimmed.length > 0) return trimmed;
+        }
+        if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+          return String(candidate);
+        }
+      }
+      return undefined;
+    };
+
+    const variantId = pickId(
+      item?.variantId,
+      item?.variant?.id,
+      item?.productVariantId,
+      item?.isVariant ? item?.id : undefined,
+      item?.isVariate ? item?.id : undefined
+    );
+
+    const baseProductId = pickId(
+      item?.baseProductId,
+      item?.productId,
+      item?.ingredientId,
+      item?.ingredient?.id,
+      item?.originalProductId,
+      item?.id
+    );
+
+    const isVariant = Boolean(variantId || item?.isVariant || item?.isVariate);
+    const fetchId = variantId || baseProductId;
+
+    return {
+      baseProductId,
+      variantId,
+      isVariant,
+      fetchId,
+    };
+  };
+
   const macros = !isFormData
     ? recipeData?.macros
     : (apiFormData?.macros ?? legacyFormData?.macros);
@@ -255,18 +302,18 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       for (const ing of ingredientsToCheck) {
         const measureId = (ing as any).productMeasureId as string | undefined;
         if (!measureId) continue;
-        const ingredientId = String((ing as any).id ?? '');
-        if (!ingredientId) continue;
+        const meta = resolveIngredientMeta(ing);
+        const fetchId = meta.fetchId;
+        if (!fetchId) continue;
 
-        const variantFlag = Boolean((ing as any).isVariant ?? (ing as any).isVariate);
-        const cacheKey = `${variantFlag ? 'variant' : 'base'}:${ingredientId}`;
+        const cacheKey = `${meta.isVariant ? 'variant' : 'base'}:${fetchId}`;
 
         try {
           let measures = measuresCacheRef.current.get(cacheKey);
           if (!measures) {
-            measures = variantFlag
-              ? await productsService.getVariantMeasures(ingredientId)
-              : await productsService.getBaseMeasures(ingredientId);
+            measures = meta.isVariant
+              ? await productsService.getVariantMeasures(fetchId)
+              : await productsService.getBaseMeasures(fetchId);
             measuresCacheRef.current.set(cacheKey, measures);
           }
           const found = measures?.find((m) => m.id === measureId);
@@ -274,7 +321,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             updates[measureId] = found.name;
           }
         } catch (error) {
-          console.error('Не удалось загрузить меры продукта', { productId: ingredientId, measureId }, error);
+          console.error('Не удалось загрузить меры продукта', { productId: fetchId, isVariant: meta.isVariant, measureId }, error);
         }
       }
 
@@ -295,7 +342,8 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     const ids = new Set<string>();
     const collect = (arr: any[] | undefined) => {
       (arr || []).forEach((i: any) => {
-        const vid = i?.variantId;
+        const meta = resolveIngredientMeta(i);
+        const vid = meta.variantId;
         if (typeof vid === 'string' && vid && !variantNames[vid]) ids.add(vid);
       });
     };
@@ -329,14 +377,16 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   ): NormalizedIngredient => {
     if (apiFormData) {
       const ing = ingredient as ApiUpdateRecipeIngredientDto;
-      const sourceIngredient = availableIngredients.find((i) => i.id === ing.id);
-      const name = sourceIngredient?.name || 'Ингредиент';
+      const meta = resolveIngredientMeta(ing);
+      const sourceIngredient = availableIngredients.find((i) => i.id === (meta.baseProductId || ing.id));
+      const resolvedVariantName = meta.variantId ? variantNames[meta.variantId] : undefined;
+      const name = resolvedVariantName || sourceIngredient?.name || 'Ингредиент';
       const measureId = ing.productMeasureId;
       const measureLabel = measureId ? measureLabels[measureId] : undefined;
       const unitLabel = formatMeasureLabel(measureLabel ? String(measureLabel) : undefined);
       const suffix = unitLabel ? ` ${unitLabel}` : '';
       return {
-        id: `form-new:${ing.id}:${measureId ?? 'none'}:${ing.count}`,
+        id: `form-new:${meta.variantId || meta.baseProductId || ing.id}:${measureId ?? 'none'}:${ing.count}`,
         name,
         amount: `${ing.count}${suffix}`,
       };
@@ -344,16 +394,20 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
 
     if (legacyFormData) {
       const ing = ingredient as CreateRecipeIngredientDto;
-      const ai = availableIngredients.find((i) => i.id === ing.id);
-      const name = ai?.name || 'Ингредиент';
+      const meta = resolveIngredientMeta(ing);
+      const ai = availableIngredients.find((i) => i.id === (meta.baseProductId || ing.id));
+      const resolvedVariantName = meta.variantId ? variantNames[meta.variantId] : undefined;
+      const name = resolvedVariantName || ai?.name || 'Ингредиент';
       const unitRaw = (ing as any).productUnit || (ing as any).measure || '';
       const unit = formatMeasureLabel(unitRaw ? String(unitRaw) : undefined);
       const suffix = unit ? ` ${unit}` : '';
-      return { id: `form:${ing.id}:${unitRaw}:${ing.count}`, name, amount: `${ing.count}${suffix}` };
+      return { id: `form:${meta.variantId || meta.baseProductId || ing.id}:${unitRaw}:${ing.count}`, name, amount: `${ing.count}${suffix}` };
     }
 
     const ing = ingredient as RecipeIngredientDto;
-    const name = ing.name || 'Ингредиент';
+    const meta = resolveIngredientMeta(ing);
+    const resolvedVariantName = meta.variantId ? variantNames[meta.variantId] : undefined;
+    const name = resolvedVariantName || ing.name || 'Ингредиент';
     // Новый API: конкретная мера доступна в ing.measure.name
     const measureNameFromApi = (ing as any)?.measure?.name as string | undefined;
     const measureId = (ing as any)?.productMeasureId as string | undefined;
@@ -362,7 +416,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     const unitLabelRaw = measureNameFromApi || measureLabelFromCache || fallbackUnit;
     const unitLabel = formatMeasureLabel(unitLabelRaw ? String(unitLabelRaw) : undefined);
     const unitSuffix = unitLabel ? ` ${unitLabel}` : '';
-    return { id: `api:${ing.id}`, name, amount: `${ing.count}${unitSuffix}` };
+    return { id: `api:${meta.variantId || meta.baseProductId || ing.id}`, name, amount: `${ing.count}${unitSuffix}` };
   };
 
   // Локальные состояния для старой реализации ингредиентов больше не используются

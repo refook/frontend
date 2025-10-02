@@ -15,6 +15,60 @@ const EditRecipePage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(true);
 
+  const normalizeApiIngredient = (source: any): any => {
+    const pickId = (...candidates: any[]): string | undefined => {
+      for (const candidate of candidates) {
+        if (typeof candidate === 'string') {
+          const trimmed = candidate.trim();
+          if (trimmed.length > 0) return trimmed;
+        }
+        if (typeof candidate === 'number' && Number.isFinite(candidate)) {
+          return String(candidate);
+        }
+      }
+      return undefined;
+    };
+
+    const variantId = pickId(
+      source?.variantId,
+      source?.variant?.id,
+      source?.productVariantId,
+      source?.isVariant ? source?.id : undefined
+    );
+
+    const baseProductId = pickId(
+      source?.productId,
+      source?.ingredientId,
+      source?.ingredient?.id,
+      source?.baseProductId,
+      source?.originalProductId,
+      source?.id
+    );
+
+    const normalized: any = {
+      ...source,
+      id: baseProductId || source?.id,
+      baseProductId: baseProductId || source?.baseProductId,
+      count: Number(source?.count) || 0,
+      productUnit: source?.productUnit || source?.measure,
+      productMeasureId: source?.productMeasureId,
+    };
+
+    if (variantId) {
+      normalized.variantId = variantId;
+    } else {
+      delete normalized.variantId;
+    }
+
+    normalized.isVariant = Boolean(variantId || source?.isVariant);
+
+    if (!normalized.productUnit && source?.measure) {
+      normalized.productUnit = source.measure;
+    }
+
+    return normalized;
+  };
+
   useEffect(() => {
     if (id) {
       dispatch(fetchRecipe(id));
@@ -58,23 +112,14 @@ const EditRecipePage: React.FC = () => {
       tags: ((currentRecipe as any)?.tagObjects && Array.isArray((currentRecipe as any).tagObjects))
         ? (currentRecipe as any).tagObjects
         : ((currentRecipe.tags || []) as any[]).map((t: any) => (typeof t === 'string' ? { id: t, name: t } : t)),
-      ingredients: (currentRecipe.ingredients || []).map((ing: any) => ({
-        id: ing.id,
-        count: ing.count,
-        productUnit: ing.productUnit || ing.measure,
-        productMeasureId: ing.productMeasureId,
-        // Для отображения: имя ингредиента/варианта из детального рецепта
-        name: ing.name,
-        // Флаг варианта из API (вариант может не иметь отдельного variantId в ответе)
-        isVariant: Boolean(ing.isVariant),
-      })),
+      ingredients: (currentRecipe.ingredients || []).map((ing: any) => normalizeApiIngredient(ing)),
       steps: (currentRecipe.steps || []).map((s) => ({
         id: s.id,
         index: s.index,
         name: s.name,
         description: s.description,
         photos: s.photos || [],
-        ingredients: s.ingredients || [],
+        ingredients: (s.ingredients || []).map((ing: any) => normalizeApiIngredient(ing)),
         time: s.time || 0,
       })),
     } as any;
