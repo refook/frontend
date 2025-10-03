@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import type { ProductMeasureResponseDto } from '../types/api.types';
 import { productsService } from '../services/productsService';
 
@@ -11,9 +11,15 @@ const buildCacheKey = (params: {
   return undefined;
 };
 
-export const useProductMeasureCache = () => {
-  const cacheRef = useRef<Map<string, ProductMeasureResponseDto[]>>(new Map());
+const sharedCache = new Map<string, ProductMeasureResponseDto[]>();
+const sharedInflight = new Map<string, Promise<ProductMeasureResponseDto[]>>();
 
+const mapMeasures = (payload: unknown): ProductMeasureResponseDto[] => {
+  if (!Array.isArray(payload)) return [];
+  return payload.filter((entry): entry is ProductMeasureResponseDto => typeof entry === 'object' && entry !== null);
+};
+
+export const useProductMeasureCache = () => {
   const getMeasures = useCallback(
     async ({
       baseProductId,
@@ -25,19 +31,35 @@ export const useProductMeasureCache = () => {
       const cacheKey = buildCacheKey({ baseProductId, variantId });
       if (!cacheKey) return [];
 
-      if (cacheRef.current.has(cacheKey)) {
-        return cacheRef.current.get(cacheKey) ?? [];
+      if (sharedCache.has(cacheKey)) {
+        return sharedCache.get(cacheKey) ?? [];
+      }
+
+      if (!sharedInflight.has(cacheKey)) {
+        const request = (async () => {
+          try {
+            const raw = variantId
+              ? await productsService.getVariantMeasures(variantId)
+              : await productsService.getBaseMeasures(baseProductId as string);
+            const normalized = mapMeasures(raw ?? []);
+            sharedCache.set(cacheKey, normalized);
+            return normalized;
+          } catch (error) {
+            console.error('Не удалось загрузить меры продукта', { baseProductId, variantId, error });
+            sharedCache.set(cacheKey, []);
+            return [];
+          } finally {
+            sharedInflight.delete(cacheKey);
+          }
+        })();
+        sharedInflight.set(cacheKey, request);
       }
 
       try {
-        const measures = variantId
-          ? await productsService.getVariantMeasures(variantId)
-          : await productsService.getBaseMeasures(baseProductId as string);
-        cacheRef.current.set(cacheKey, measures);
-        return measures ?? [];
+        return await (sharedInflight.get(cacheKey) as Promise<ProductMeasureResponseDto[]>);
       } catch (error) {
         console.error('Не удалось загрузить меры продукта', { baseProductId, variantId, error });
-        cacheRef.current.set(cacheKey, []);
+        sharedCache.set(cacheKey, []);
         return [];
       }
     },
@@ -45,7 +67,8 @@ export const useProductMeasureCache = () => {
   );
 
   const invalidate = useCallback((key: string) => {
-    cacheRef.current.delete(key);
+    sharedCache.delete(key);
+    sharedInflight.delete(key);
   }, []);
 
   return {

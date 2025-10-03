@@ -92,19 +92,35 @@ export const normalizeIngredientFromApi = (source: unknown): NormalizedFormIngre
     ?? normalized.id;
   (normalized as AnyRecord).baseProductId = baseCandidate;
 
-  const rawProductUnit = record.productUnit ?? record.measure;
+  const rawProductUnit =
+    record.productUnit ??
+    record.measure ??
+    (typeof record.measureName === 'string' ? record.measureName : undefined) ??
+    (typeof record.unit === 'string' ? record.unit : undefined);
   if (typeof rawProductUnit === 'string' && rawProductUnit.trim()) {
     normalized.productUnit = rawProductUnit.trim() as ProductUnitType;
+  }
+
+  const measureRecord = toRecord(record.measure);
+  const measureId = measureRecord?.id;
+  if (!normalized.productMeasureId && typeof measureId === 'string' && measureId.trim().length > 0) {
+    normalized.productMeasureId = measureId.trim();
   }
 
   if (meta.variantId) {
     (normalized as AnyRecord).variantId = meta.variantId;
     if (!(normalized as AnyRecord).variantName) {
       const variantRecord = toRecord(record.variant);
-      (normalized as AnyRecord).variantName =
+      const resolvedName =
         (record.variantName as string | undefined)
         ?? (variantRecord?.name as string | undefined)
-        ?? meta.variantId;
+        ?? (variantRecord?.title as string | undefined)
+        ?? (variantRecord?.label as string | undefined)
+        ?? (variantRecord?.product as AnyRecord | undefined)?.name;
+
+      if (typeof resolvedName === 'string' && resolvedName.trim().length > 0) {
+        (normalized as AnyRecord).variantName = resolvedName.trim();
+      }
     }
   } else {
     delete (normalized as AnyRecord).variantId;

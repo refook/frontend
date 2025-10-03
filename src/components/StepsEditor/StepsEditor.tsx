@@ -73,6 +73,60 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
 
   const variantNames = useVariantNames(variantNameSources as unknown[]);
 
+  const baseUnitsRef = useRef<Map<string, { unit?: string; measureId?: string }>>(new Map());
+
+  useEffect(() => {
+    const nextMap = new Map<string, { unit?: string; measureId?: string }>();
+    (baseIngredients || []).forEach((ingredient) => {
+      const key = getIngredientKey(ingredient as any);
+      if (!key) return;
+      nextMap.set(key, {
+        unit: (ingredient as any)?.productUnit,
+        measureId: (ingredient as any)?.productMeasureId,
+      });
+    });
+
+    const prevMap = baseUnitsRef.current;
+    let stepsUpdated = false;
+
+    const updatedSteps = steps.map((step) => {
+      const stepIngredients = step.ingredients || [];
+      let stepChanged = false;
+
+      const nextIngredients = stepIngredients.map((ingredient) => {
+        const key = getIngredientKey(ingredient as any);
+        if (!key) return ingredient;
+        const baseMeta = nextMap.get(key);
+        if (!baseMeta) return ingredient;
+
+        const { unit, measureId } = baseMeta;
+        const prevMeta = prevMap.get(key);
+        const unitChanged = unit !== prevMeta?.unit;
+        const measureChanged = measureId !== prevMeta?.measureId;
+
+        if (!unitChanged && !measureChanged) {
+          return ingredient;
+        }
+
+        stepChanged = true;
+        stepsUpdated = true;
+        return {
+          ...ingredient,
+          ...(unit ? { productUnit: unit } : {}),
+          ...(measureId ? { productMeasureId: measureId } : {}),
+        } as CreateRecipeIngredientDto;
+      });
+
+      return stepChanged ? { ...step, ingredients: nextIngredients } : step;
+    });
+
+    if (stepsUpdated) {
+      onChange(updatedSteps);
+    }
+
+    baseUnitsRef.current = nextMap;
+  }, [baseIngredients, onChange, steps]);
+
   const baseTotals = useMemo(() => {
     const map = new Map<string, number>();
     (baseIngredients || []).forEach((ingredient) => {

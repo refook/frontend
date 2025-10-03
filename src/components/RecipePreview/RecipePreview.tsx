@@ -62,6 +62,7 @@ type RecipeSocialState = {
   likeLoading: boolean;
   favorite: boolean;
   favoriteLoading: boolean;
+  favoritesCount: number;
   rating: number;
   ratingLoading: boolean;
   isAuthenticated: boolean;
@@ -69,6 +70,64 @@ type RecipeSocialState = {
   onToggleFavorite: () => void;
   onSetRating: (value: number) => void;
   recipeId?: string;
+};
+
+type RecipeStatsSnapshot = {
+  views: number;
+  likes: number;
+  favorites: number;
+  rating: number;
+  ratingsCount: number;
+};
+
+const pickNumber = (...values: unknown[]): number => {
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 0;
+};
+
+const getRecipeStatsSnapshot = (recipe?: Recipe): RecipeStatsSnapshot => {
+  const source = (recipe as any)?.stats ?? (recipe as any)?.statistic ?? (recipe as any)?.statistics ?? {};
+  const stats = typeof source === 'object' && source !== null ? source : {};
+
+  return {
+    views: pickNumber(
+      (stats as any).views,
+      (stats as any).viewsCount,
+      (stats as any).viewCount,
+      (stats as any).totalViews,
+    ),
+    likes: pickNumber(
+      (stats as any).likes,
+      (stats as any).likesCount,
+      (stats as any).likeCount,
+      (stats as any).totalLikes,
+    ),
+    favorites: pickNumber(
+      (stats as any).favorites,
+      (stats as any).favoritesCount,
+      (stats as any).saves,
+      (stats as any).savesCount,
+      (stats as any).bookmarks,
+      (stats as any).bookmarkCount,
+    ),
+    rating: pickNumber(
+      (stats as any).avgRating,
+      (stats as any).averageRating,
+      (stats as any).averageRate,
+      (stats as any).rating,
+    ),
+    ratingsCount: pickNumber(
+      (stats as any).ratingsCount,
+      (stats as any).ratingCount,
+      (stats as any).reviewsCount,
+      (stats as any).commentsCount,
+      (stats as any).votesCount,
+    ),
+  };
 };
 
 const difficultyMap: Record<string, string> = {
@@ -114,22 +173,25 @@ const useRecipePreviewSources = (
 const useRecipeSocialState = ({
   recipeData,
   isFormData,
+  stats,
 }: {
   recipeData?: Recipe;
   isFormData: boolean;
+  stats: RecipeStatsSnapshot;
 }): RecipeSocialState => {
   const keycloakCtx = useContext(KeycloakContext);
   const isAuthenticated = !!keycloakCtx?.authenticated;
   const recipeId = recipeData?.id;
 
-  const initialLikes = !isFormData ? recipeData?.stats?.likes ?? 0 : 0;
+  const initialLikes = !isFormData ? stats.likes : 0;
+  const initialFavorites = !isFormData ? stats.favorites : 0;
   const initialLiked = !isFormData ? Boolean(recipeData?.state?.liked) : false;
   const initialFavorite = !isFormData ? Boolean(recipeData?.state?.favorite) : false;
   const initialRating = !isFormData
     ? (() => {
         const stateRate = recipeData?.state?.rate;
         if (stateRate !== null && stateRate !== undefined) return stateRate;
-        return Math.round(recipeData?.stats?.rating ?? 0) || 0;
+        return stats.rating;
       })()
     : 0;
 
@@ -138,28 +200,31 @@ const useRecipeSocialState = ({
   const [likeLoading, setLikeLoading] = useState(false);
   const [favorite, setFavorite] = useState(initialFavorite);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [favoritesCount, setFavoritesCount] = useState(initialFavorites);
   const [rating, setRating] = useState(initialRating);
   const [ratingLoading, setRatingLoading] = useState(false);
 
   useEffect(() => {
     if (isFormData || !recipeId) return;
-    setLikesCount(recipeData?.stats?.likes ?? 0);
+    setLikesCount(stats.likes);
     setLiked(Boolean(recipeData?.state?.liked));
     setFavorite(Boolean(recipeData?.state?.favorite));
+    setFavoritesCount(stats.favorites);
     const stateRate = recipeData?.state?.rate;
     if (stateRate !== null && stateRate !== undefined) {
       setRating(stateRate);
     } else {
-      setRating(Math.round(recipeData?.stats?.rating ?? 0) || 0);
+      setRating(stats.rating);
     }
   }, [
     isFormData,
     recipeId,
-    recipeData?.stats?.likes,
+    stats.likes,
+    stats.favorites,
+    stats.rating,
     recipeData?.state?.liked,
     recipeData?.state?.favorite,
     recipeData?.state?.rate,
-    recipeData?.stats?.rating,
   ]);
 
   const handleToggleLike = async () => {
@@ -183,12 +248,14 @@ const useRecipeSocialState = ({
     if (isFormData || !recipeId || !isAuthenticated || favoriteLoading) return;
     const next = !favorite;
     setFavorite(next);
+    setFavoritesCount((prev) => Math.max(0, prev + (next ? 1 : -1)));
     setFavoriteLoading(true);
     try {
       await RecipesService.toggleFavorite(recipeId, next);
     } catch (error) {
       console.error('Не удалось выполнить действие FAVORITE:', error);
       setFavorite(!next);
+      setFavoritesCount((prev) => Math.max(0, prev + (next ? -1 : 1)));
     } finally {
       setFavoriteLoading(false);
     }
@@ -215,6 +282,7 @@ const useRecipeSocialState = ({
     likeLoading,
     favorite,
     favoriteLoading,
+    favoritesCount,
     rating,
     ratingLoading,
     isAuthenticated,
@@ -305,7 +373,9 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     );
   }, [stepsSource]);
 
-  const socialState = useRecipeSocialState({ recipeData, isFormData });
+  const recipeStats = useMemo(() => getRecipeStatsSnapshot(recipeData), [recipeData]);
+
+  const socialState = useRecipeSocialState({ recipeData, isFormData, stats: recipeStats });
 
   const macros = useMemo(() => {
     if (!isFormData) return recipeData?.macros;
@@ -481,16 +551,10 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       isAuthenticated={socialState.isAuthenticated}
       onToggleLike={socialState.onToggleLike}
       onToggleFavorite={socialState.onToggleFavorite}
-      favoritesCount={
-        (recipeData as any)?.stats?.favoritesCount ?? (recipeData as any)?.stats?.saves
-      }
+      favoritesCount={socialState.favoritesCount}
     />
   ) : undefined;
-
-  const ratingsCount = Number((recipeData as any)?.stats?.ratingsCount ?? 0);
-  const heroRating = !isFormData
-    ? (recipeData as any)?.stats?.avgRating ?? recipeData?.stats?.rating ?? 4.8
-    : 4.8;
+  const heroRating = !isFormData ? recipeStats.rating : 4.8;
 
   return (
     <div className={styles.recipePreview}>
@@ -501,11 +565,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           imageUrl={heroImageUrl}
           author={(!isFormData ? recipeData?.author?.name : 'Автор рецепта') || 'Автор'}
           rating={heroRating}
-          views={
-            !isFormData
-              ? (recipeData as any)?.stats?.viewsCount ?? recipeData?.stats?.views
-              : undefined
-          }
+          views={!isFormData ? recipeStats.views : undefined}
           actionsSlot={heroActions}
         />
 
@@ -537,7 +597,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
             ratingLoading={socialState.ratingLoading}
             isAuthenticated={socialState.isAuthenticated}
             onSetRating={socialState.onSetRating}
-            ratingsCount={ratingsCount}
+            ratingsCount={recipeStats.ratingsCount}
           />
         )}
 
@@ -803,7 +863,7 @@ const RecipeSocialActions: React.FC<{
   isAuthenticated: boolean;
   onToggleLike: () => void;
   onToggleFavorite: () => void;
-  favoritesCount?: number;
+  favoritesCount: number;
 }> = ({
   liked,
   likesCount,
@@ -829,7 +889,7 @@ const RecipeSocialActions: React.FC<{
       active={favorite}
       loading={favoriteLoading}
       disabled={!isAuthenticated}
-      count={favoritesCount as number | undefined}
+      count={favoritesCount}
       onToggle={onToggleFavorite}
     />
   </div>

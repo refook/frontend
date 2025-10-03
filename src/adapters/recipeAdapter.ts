@@ -213,6 +213,8 @@ export const mapRecipeResponseToRecipe = (
         avatar: undefined,
       };
 
+  const apiStats = ((apiRecipe as any)?.stats ?? (apiRecipe as any)?.statistic ?? {}) as Record<string, unknown>;
+
   return {
     id: apiRecipe.id,
     title: apiRecipe.name,
@@ -248,11 +250,17 @@ export const mapRecipeResponseToRecipe = (
     },
     author,
     stats: {
-      views: Number((apiRecipe as any)?.stats?.views ?? 0),
-      likes: Number((apiRecipe as any)?.stats?.likes ?? 0),
-      saves: Number((apiRecipe as any)?.stats?.favoritesCount ?? (apiRecipe as any)?.stats?.saves ?? 0),
-      rating: Number((apiRecipe as any)?.stats?.rating ?? 0),
-      reviewsCount: Number((apiRecipe as any)?.stats?.reviewsCount ?? 0),
+      views: Number(apiStats.viewsCount ?? apiStats.views ?? apiStats.viewCount ?? 0),
+      likes: Number(apiStats.likesCount ?? apiStats.likes ?? apiStats.likeCount ?? 0),
+      saves: Number(
+        apiStats.favoritesCount ?? apiStats.saves ?? apiStats.savesCount ?? apiStats.bookmarks ?? 0,
+      ),
+      rating: Number(
+        apiStats.avgRating ?? apiStats.averageRating ?? apiStats.averageRate ?? apiStats.rating ?? 0,
+      ),
+      reviewsCount: Number(
+        apiStats.ratingsCount ?? apiStats.reviewsCount ?? apiStats.commentsCount ?? apiStats.votesCount ?? 0,
+      ),
     },
     createdAt: apiRecipe.createdAt,
     updatedAt: apiRecipe.updatedAt,

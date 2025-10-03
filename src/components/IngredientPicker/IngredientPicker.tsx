@@ -1,17 +1,15 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import type { ProductUnitType } from '../../types/measures.types';
-import { API_BASE_URL } from '../../services/api';
-import keycloak from '../../services/keycloak.ts';
 import { PRODUCT_UNITS, PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
 import type { CreateRecipeIngredientDto } from '../../types';
 import type { ProductMeasureResponseDto } from '../../types/api.types';
-import { getAuthHeaders, authorizedFetch } from '../../services/auth';
 import { useVariantNames } from '../../hooks/useVariantNames';
 import { useProductMeasureCache } from '../../hooks/useProductMeasureCache';
 import { resolveIngredientIdentifiers } from '../../utils/recipeIngredient';
 import { useAvailableIngredients, type AvailableIngredient } from '../../hooks/useAvailableIngredients';
+import { productsService } from '../../services/productsService';
 
 interface IngredientPickerProps {
   ingredients: CreateRecipeIngredientDto[];
@@ -241,6 +239,32 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
         const currentUnitValue = (ingredient as any)?.productUnit as string | undefined;
         const measures = info.measures ?? [];
 
+        if (context.variantId) {
+          const currentVariantName = (ingredient as any)?.variantName || (ingredient as any)?.variant?.name;
+          if (!currentVariantName) {
+            const cachedVariantName = variantNameMap[context.variantId];
+            if (cachedVariantName) {
+              scheduleUpdate(index, { variantName: cachedVariantName });
+            } else {
+              try {
+                const variant = await productsService.getProductVariantById(context.variantId);
+                const resolvedName =
+                  (variant as any)?.name ??
+                  (variant as any)?.variantName ??
+                  (variant as any)?.title ??
+                  (variant as any)?.label ??
+                  (variant as any)?.product?.name ??
+                  (variant as any)?.productName;
+                if (typeof resolvedName === 'string' && resolvedName.trim().length > 0) {
+                  scheduleUpdate(index, { variantName: resolvedName.trim() });
+                }
+              } catch (error) {
+                console.warn('Не удалось получить название варианта продукта', error);
+              }
+            }
+          }
+        }
+
         if (measures.length === 0) continue;
 
         if (measureId) {
@@ -285,7 +309,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     };
 
     void loadUnitsForExisting();
-  }, [ingredients, onChange]);
+  }, [ingredients, onChange, variantNameMap]);
 
   const addIngredient = () => {
     if (selectedIngredient && amount.trim() && unit) {
@@ -367,11 +391,28 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
 
   const loadVariantsAndMeasures = async (productId: string, nextVariantId: string) => {
     try {
-      // загрузим варианты продукта
-      const headers = getAuthHeaders();
-      const respVar = await authorizedFetch(`${API_BASE_URL}/products/variants/${productId}/all`, { headers });
-      const variantList: Array<{ id: string; name: string }> = respVar.ok ? await respVar.json() : [];
-      setVariants((variantList || []).map((v: any) => ({ id: v.id ?? v.uuid ?? v.value, name: v.name ?? v.title ?? 'Вариант' })).filter(v => v.id));
+      const variantList = await productsService.getProductVariantsByProduct(productId);
+      setVariants(
+        (variantList || [])
+          .map((variant) => {
+            const record = variant as any;
+            const rawName =
+              record?.name ??
+              record?.variantName ??
+              record?.title ??
+              record?.label ??
+              record?.product?.name ??
+              record?.productName;
+
+            const fallbackName = typeof rawName === 'string' && rawName.trim().length > 0 ? rawName.trim() : 'Вариант';
+
+            return {
+              id: variant.id,
+              name: fallbackName,
+            };
+          })
+          .filter((variant) => Boolean(variant.id)),
+      );
 
       const variantKey = nextVariantId || null;
       const unitsInfo = await fetchUnitsInfo({
