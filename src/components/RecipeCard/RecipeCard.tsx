@@ -4,14 +4,14 @@ import type { Recipe } from '../../types';
 import type { CreateRecipeDto } from '../../types/recipe.types';
 import {
   ClockIcon,
-  UserIcon,
-  StarIcon,
+  StarIcon as StarIconOutline,
   HeartIcon,
   BookmarkIcon,
 } from '@heroicons/react/24/outline';
 import {
   HeartIcon as HeartIconSolid,
   BookmarkIcon as BookmarkIconSolid,
+  StarIcon as StarIconSolid,
 } from '@heroicons/react/24/solid';
 import styles from './RecipeCard.module.css';
 import { FOOD_PLACEHOLDER_EMOJIS, hashStringToIndex } from '../../utils/emoji';
@@ -69,12 +69,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   // Получаем значения в зависимости от типа данных
   const prepTime = isFormData ? (recipe as CreateRecipeDto).allTime : ((recipe as Recipe).prepTime || 0);
   const cookTime = isFormData ? (recipe as CreateRecipeDto).cookTime : ((recipe as Recipe).cookTime || 0);
-  const servingsCount = isFormData ? 1 : ((recipe as Recipe).servings || 4);
+  //console.log('Calculated values:', { prepTime, cookTime });
 
-  //console.log('Calculated values:', { prepTime, cookTime, servingsCount });
-  
   const totalTime = formatTime(prepTime + cookTime);
-  const ratingValue = !isFormData ? Number((recipe as Recipe)?.stats?.rating ?? 0) : 0;
+  const ratingValue = !isFormData
+    ? Number(
+        (recipe as Recipe)?.stats?.rating ??
+          (recipe as any)?.stats?.avgRating ??
+          (recipe as any)?.stats?.rating ??
+          (recipe as any)?.stats?.avgRating ??
+          0,
+      )
+    : undefined;
+  const hasRating = ratingValue !== undefined && !Number.isNaN(ratingValue);
 
   const recipeState = !isFormData ? (recipe as Recipe).state : undefined;
   const recipeId = !isFormData ? (recipe as Recipe).id : undefined;
@@ -220,18 +227,18 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <p className={styles.description}>{isFormData ? (recipe as CreateRecipeDto).description : (recipe as Recipe).description}</p>
           
           <div className={styles.meta}>
+            {!isFormData && hasRating && (
+              <div className={`${styles.metaItem} ${styles.metaRating}`}>
+                <StarIconSolid className={`${styles.metaIcon} ${styles.ratingIcon}`} />
+                <span>{(ratingValue ?? 0).toFixed(1)}</span>
+              </div>
+            )}
             <div className={styles.metaItem}>
               <ClockIcon className={styles.metaIcon} />
               <span>{totalTime}</span>
             </div>
-            {!isFormData && ratingValue > 0 && (
-              <div className={`${styles.metaItem} ${styles.metaRating}`}>
-                <StarIcon className={`${styles.metaIcon} ${styles.ratingIcon}`} />
-                <span>{ratingValue.toFixed(1)}</span>
-              </div>
-            )}
             <div className={styles.metaItem}>
-              <StarIcon
+              <StarIconOutline
                 className={styles.metaIcon}
                 style={{ color: getDifficultyColor(isFormData ? (recipe as CreateRecipeDto).level : (recipe as Recipe).difficulty) }}
               />
