@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './EditRecipePage.module.css';
 import RecipeForm from '../components/RecipeForm/RecipeForm';
@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../store';
 import { fetchRecipe } from '../store/thunks/recipesThunks';
 import { updateRecipeThunk } from '../store/thunks/recipesThunks';
 import type { CreateRecipeDto, UpdateRecipeDto, ApiCreateRecipeDto } from '../types/recipe.types';
+import { useEditRecipeInitialData } from './editRecipeInitialData';
 
 const EditRecipePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,61 +22,7 @@ const EditRecipePage: React.FC = () => {
     }
   }, [dispatch, id]);
 
-  const initialData: CreateRecipeDto = useMemo(() => {
-    if (!currentRecipe) {
-      return {
-        name: '',
-        description: '',
-        level: 'EASY',
-        kitchens: [],
-        cookTime: 0,
-        allTime: 0,
-        photos: [],
-        tags: [],
-        ingredients: [],
-        steps: [],
-      } as any;
-    }
-    return {
-      name: currentRecipe.title,
-      description: currentRecipe.description,
-      level: currentRecipe.difficulty.toUpperCase() as any,
-      // Для редактирования нужны именно ID кухонь
-      kitchens: (Array.isArray((currentRecipe as any)?.kitchenIds) && (currentRecipe as any).kitchenIds?.length)
-        ? (currentRecipe as any).kitchenIds
-        : (Array.isArray((currentRecipe as any)?.metaInfo?.kitchens) && (currentRecipe as any).metaInfo.kitchens?.length)
-          ? (currentRecipe as any).metaInfo.kitchens
-          : (currentRecipe.cuisine ? [currentRecipe.cuisine as any] : []),
-      cookTime: currentRecipe.cookTime * 60,
-      allTime: (currentRecipe.prepTime + currentRecipe.cookTime) * 60,
-      // Единицы рецепта (serving)
-      baseUnit: (currentRecipe as any)?.servingBaseUnit || 'GR',
-      avgWeight: Number((currentRecipe as any)?.servingTotalWeight ?? 0),
-      recipeUnit: (currentRecipe as any)?.servingRecipeUnit || 'PORTION',
-      unitCount: Number((currentRecipe as any)?.servingUnitCount ?? 1),
-      photos: currentRecipe.photos || [],
-      // Теги для формы ожидаются как объекты {id,name}
-      tags: ((currentRecipe as any)?.tagObjects && Array.isArray((currentRecipe as any).tagObjects))
-        ? (currentRecipe as any).tagObjects
-        : ((currentRecipe.tags || []) as any[]).map((t: any) => (typeof t === 'string' ? { id: t, name: t } : t)),
-      ingredients: (currentRecipe.ingredients || []).map((ing) => ({
-        id: ing.id,
-        count: ing.count,
-        productUnit: (ing as any).productUnit || (ing as any).measure,
-        // Прокидываем productMeasureId из API, чтобы можно было обновлять без пере-выбора единицы
-        productMeasureId: (ing as any).productMeasureId,
-      })),
-      steps: (currentRecipe.steps || []).map((s) => ({
-        id: s.id,
-        index: s.index,
-        name: s.name,
-        description: s.description,
-        photos: s.photos || [],
-        ingredients: s.ingredients || [],
-        time: s.time || 0,
-      })),
-    } as any;
-  }, [currentRecipe]);
+  const initialData: CreateRecipeDto = useEditRecipeInitialData(currentRecipe);
 
   const onChange = (data: CreateRecipeDto) => {
     // Минимальная валидация для кнопки

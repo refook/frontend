@@ -1,17 +1,33 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import {VitePWA} from "vite-plugin-pwa";
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
-  return {
-    plugins: [react(),
+  const isProd = mode === 'production';
+  const plugins = [react()];
+
+  if (isProd) {
+    plugins.push(
       VitePWA({
         registerType: 'autoUpdate',
-      })],
+      }),
+    );
+  }
+
+  return {
+    plugins,
     base: '',
     build: {
-      outDir: mode == 'production' ? 'prod/dist' : 'dist',
+      outDir: mode === 'production' ? 'prod/dist' : 'dist',
       emptyOutDir: true,
+      chunkSizeWarningLimit: 1024,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom', 'react-router-dom'],
+          },
+        },
+      },
     },
     server: {
     proxy: {

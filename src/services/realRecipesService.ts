@@ -1,5 +1,6 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
-import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto, StepResponseDto } from '../types/recipe.types';
+import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
+import { mapRecipeResponseToRecipe, mapShortRecipeResponseToRecipe } from '../adapters/recipeAdapter';
 import { apiLogger } from '../utils/apiLogger';
 import { getAuthHeaders, authorizedFetch } from './auth';
 
@@ -44,7 +45,13 @@ class RealRecipesService {
       console.log(`Получен список из ${recipesList.length} рецептов (краткие данные)`);
 
       // Возвращаем короткие карточки без дополнительного запроса деталей
-      return recipesList.map((shortRecipe: any) => this.transformShortApiRecipeToLocal(shortRecipe));
+      return recipesList.map((shortRecipe: any) =>
+        mapShortRecipeResponseToRecipe(shortRecipe, {
+          id: DEFAULT_USER.id,
+          name: DEFAULT_USER.name,
+          avatar: DEFAULT_USER.photo,
+        })
+      );
     } catch (error) {
       console.error('Ошибка при загрузке рецептов из API:', error);
       // Возвращаем пустой массив вместо ошибки
@@ -75,23 +82,7 @@ class RealRecipesService {
       
       const recipe: RecipeResponseDto = await response.json();
       console.log(`Успешно загружен рецепт: ${recipe.name}`);
-
-      // Добавляем заглушки для отсутствующих данных
-      const processedRecipe = {
-        ...recipe,
-        ownerUser: recipe.ownerUser || DEFAULT_USER,
-        tags: recipe.tags || null,
-        photos: recipe.photos || [],
-        ingredients: recipe.ingredients || [],
-        steps: (recipe.steps || []).map(step => ({
-          ...step,
-          photos: step.photos || [],
-          ingredients: step.ingredients || [],
-          time: step.time || 0
-        }))
-      };
-
-      return this.transformApiRecipeToLocal(processedRecipe);
+      return mapRecipeResponseToRecipe(recipe, DEFAULT_USER);
     } catch (error) {
       console.error('Ошибка при загрузке рецепта по ID:', error);
       return null;
@@ -113,7 +104,13 @@ class RealRecipesService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const list: any[] = await response.json();
-      return (list || []).map((it) => this.transformShortApiRecipeToLocal(it));
+      return (list || []).map((it) =>
+        mapShortRecipeResponseToRecipe(it, {
+          id: DEFAULT_USER.id,
+          name: DEFAULT_USER.name,
+          avatar: DEFAULT_USER.photo,
+        })
+      );
     } catch (error) {
       console.error('Ошибка при загрузке рецептов пользователя:', error);
       return [];
@@ -162,7 +159,13 @@ class RealRecipesService {
         if ((data as any).filter) apiFilter = (data as any).filter;
       }
 
-      const mapped: Recipe[] = (recipesRaw || []).map((it: any) => this.transformShortApiRecipeToLocal(it));
+      const mapped: Recipe[] = (recipesRaw || []).map((it: any) =>
+        mapShortRecipeResponseToRecipe(it, {
+          id: DEFAULT_USER.id,
+          name: DEFAULT_USER.name,
+          avatar: DEFAULT_USER.photo,
+        })
+      );
       return { filter: apiFilter, recipes: mapped };
     } catch (error) {
       console.error('Ошибка при ИИ-поиске рецептов:', error);
@@ -185,7 +188,13 @@ class RealRecipesService {
         throw new Error(`HTTP error! status: ${res.status}${text ? ` - ${text}` : ''}`);
       }
       const data: any[] = await res.json();
-      return (Array.isArray(data) ? data : []).map((it: any) => this.transformShortApiRecipeToLocal(it));
+      return (Array.isArray(data) ? data : []).map((it: any) =>
+        mapShortRecipeResponseToRecipe(it, {
+          id: DEFAULT_USER.id,
+          name: DEFAULT_USER.name,
+          avatar: DEFAULT_USER.photo,
+        })
+      );
     } catch (error) {
       console.error('Ошибка при загрузке избранных рецептов пользователя:', error);
       return [];
@@ -301,7 +310,7 @@ class RealRecipesService {
       const newRecipe: RecipeResponseDto = await response.json();
       console.log('Рецепт успешно создан:', newRecipe.name);
       
-      return this.transformApiRecipeToLocal(newRecipe);
+      return mapRecipeResponseToRecipe(newRecipe, DEFAULT_USER);
     } catch (error) {
       console.error('Ошибка при создании рецепта:', error);
       throw new Error(`Не удалось создать рецепт: ${error instanceof Error ? error.message : String(error)}`);
@@ -343,7 +352,7 @@ class RealRecipesService {
       }
 
       const updated: RecipeResponseDto = await response.json();
-      return this.transformApiRecipeToLocal(updated);
+      return mapRecipeResponseToRecipe(updated, DEFAULT_USER);
     } catch (error) {
       console.error('Ошибка при обновлении рецепта:', error);
       throw new Error(`Не удалось обновить рецепт: ${error instanceof Error ? error.message : String(error)}`);
@@ -351,173 +360,8 @@ class RealRecipesService {
   }
 
   /**
-   * Преобразовать API рецепт в локальный формат
-   */
-  transformApiRecipeToLocal(apiRecipe: RecipeResponseDto): Recipe {
-    // Время из API: cookingTime { activeTime, allTime } — в секундах
-    const activeSeconds = Number(((apiRecipe as any)?.cookingTime?.activeTime) ?? 0);
-    const allSeconds = Number(((apiRecipe as any)?.cookingTime?.allTime) ?? activeSeconds);
-    const cookTimeMinutes = Math.max(0, Math.round(activeSeconds / 60));
-    const prepTimeMinutes = Math.max(0, Math.round((allSeconds - activeSeconds) / 60));
-    
-          const photoList: string[] = (apiRecipe as any)?.metaInfo?.photos || apiRecipe.photos || [];
-          const rawTags: any[] = (apiRecipe as any)?.metaInfo?.tags || (apiRecipe as any)?.tags || [];
-          const tagsList: string[] = (Array.isArray(rawTags) ? rawTags : [])
-            .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
-            .filter((s: any) => typeof s === 'string' && s.length > 0);
-          const tagObjects: Array<{ id: string; name: string }> | undefined = (() => {
-            if (!Array.isArray(rawTags)) return undefined;
-            // Объекты из metaInfo.tags
-            const fromObjects = rawTags
-              .map((t: any) => ({ id: t?.id ?? t?.uuid ?? t?.value, name: t?.name }))
-              .filter((t: any) => t.id && t.name);
-            if (fromObjects.length > 0) return fromObjects as Array<{ id: string; name: string }>;
-            // Только строки — подставим id=name
-            const fromStrings = rawTags
-              .map((t: any) => (typeof t === 'string' ? { id: t, name: t } : null))
-              .filter(Boolean);
-            return (fromStrings.length > 0 ? fromStrings as Array<{ id: string; name: string }> : undefined);
-          })();
-
-          const apiState = (apiRecipe as any)?.state || {};
-          const rawRate = (apiState as any)?.rate;
-          let userRate: number | null = null;
-          if (typeof rawRate === 'number') {
-            userRate = rawRate;
-          } else if (typeof rawRate === 'string' && rawRate.trim() !== '') {
-            const parsed = Number(rawRate);
-            userRate = Number.isFinite(parsed) ? parsed : null;
-          }
-
-          return {
-        id: apiRecipe.id,
-        title: apiRecipe.name,
-        description: apiRecipe.description,
-        photos: photoList,
-        image: (() => {
-          const firstPhoto = photoList?.[0];
-          if (!firstPhoto) return undefined;
-          return /^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`;
-        })(),
-        prepTime: prepTimeMinutes, // время подготовки в минутах
-        cookTime: cookTimeMinutes, // время готовки в минутах  
-        servings: (apiRecipe as any)?.serving?.unitCount || 4,
-        difficulty: apiRecipe.level.toLowerCase() as Recipe['difficulty'],
-        cuisine: apiRecipe.kitchen,
-        // Прокидываем ID кухонь из metaInfo для режима редактирования
-        kitchenIds: (() => {
-          // 1) metaInfo.kitchens: может быть string[] или объект[]
-          const rawMeta = (apiRecipe as any)?.metaInfo?.kitchens;
-          if (Array.isArray(rawMeta)) {
-            // string[] вариант
-            const idsFromStrings = rawMeta.filter((v: any) => typeof v === 'string' && v.length > 0);
-            if (idsFromStrings.length > 0) return idsFromStrings;
-            // объект[] вариант
-            const idsFromObjects = rawMeta
-              .map((k: any) => (k?.id ?? k?.uuid ?? k?.value))
-              .filter((v: any) => typeof v === 'string' && v.length > 0);
-            if (idsFromObjects.length > 0) return idsFromObjects;
-          }
-          // 2) kitchens: Array<{ id|uuid|value, name }>
-          const rawKitchens = (apiRecipe as any)?.kitchens;
-          if (Array.isArray(rawKitchens)) {
-            const ids = rawKitchens
-              .map((k: any) => (k?.id ?? k?.uuid ?? k?.value))
-              .filter((v: any) => typeof v === 'string' && v.length > 0);
-            if (ids.length > 0) return ids;
-          }
-          return undefined;
-        })(),
-        tags: tagsList,
-        ...(tagObjects ? { tagObjects } : {}),
-        ingredients: ((apiRecipe as any)?.composition?.ingredients || apiRecipe.ingredients || []) as Recipe['ingredients'],
-        steps: ((((apiRecipe as any)?.composition?.steps || apiRecipe.steps || []) ?? []) as StepResponseDto[])
-          .map((step: StepResponseDto) => ({
-            ...step,
-            photos: step.photos || [],
-            ingredients: step.ingredients || []
-          }))
-          .sort((a: StepResponseDto, b: StepResponseDto) => Number(a.index || 0) - Number(b.index || 0)),
-        // Дополнительно прокидываем поля сервинга для режима редактирования
-        ...({
-          servingBaseUnit: (apiRecipe as any)?.serving?.baseUnit,
-          servingTotalWeight: (apiRecipe as any)?.serving?.totalWeight,
-          servingRecipeUnit: (apiRecipe as any)?.serving?.recipeUnit,
-          servingUnitCount: (apiRecipe as any)?.serving?.unitCount,
-        } as any),
-        macros: (apiRecipe as any)?.macros ? {
-          calories: Number((apiRecipe as any).macros?.calories ?? 0),
-          proteins: Number((apiRecipe as any).macros?.proteins ?? 0),
-          fats: Number((apiRecipe as any).macros?.fats ?? 0),
-          carbs: Number((apiRecipe as any).macros?.carbs ?? 0),
-        } : undefined,
-        state: {
-          liked: Boolean((apiState as any)?.liked),
-          favorite: Boolean((apiState as any)?.favorite),
-          rate: userRate,
-        },
-        author: {
-          id: apiRecipe.ownerUser.id.toString(),
-          name: apiRecipe.ownerUser.name,
-          avatar: apiRecipe.ownerUser.photo || undefined
-        },
-        stats: {
-          views: (apiRecipe as any)?.statistic?.viewsCount ?? 0,
-          likes: (apiRecipe as any)?.statistic?.likesCount ?? 0,
-          saves: (apiRecipe as any)?.statistic?.favoritesCount ?? 0,
-          rating: (apiRecipe as any)?.statistic?.avgRating ?? 0,
-          reviewsCount: (apiRecipe as any)?.statistic?.commentsCount ?? 0
-        },
-        createdAt: apiRecipe.createdAt,
-        updatedAt: apiRecipe.updatedAt
-    };
-  }
-
-  /**
    * Трансформировать короткий рецепт (RecipeShortResponseDto) в локальный формат Recipe
    */
-  private transformShortApiRecipeToLocal(short: any): Recipe {
-    const activeSeconds = Number(short?.cookingTime?.activeTime ?? 0);
-    const allSeconds = Number(short?.cookingTime?.allTime ?? activeSeconds);
-    const cookTimeMinutes = Math.max(0, Math.round(activeSeconds / 60));
-    const prepTimeMinutes = Math.max(0, Math.round((allSeconds - activeSeconds) / 60));
-    const photoList: string[] = short?.photos || short?.metaInfo?.photos || [];
-    const firstPhoto: string | undefined = photoList?.[0];
-    const tagsList: string[] = (Array.isArray(short?.tags) ? short.tags : [])
-      .map((t: any) => (typeof t === 'string' ? t : (t?.name ?? '')))
-      .filter((s: any) => typeof s === 'string' && s.length > 0);
-
-    return {
-      id: short.id,
-      title: short.name,
-      description: short.description ?? '',
-      photos: photoList,
-      image: firstPhoto ? (/^https?:\/\//i.test(firstPhoto) ? firstPhoto : `${API_BASE_URL}/photo/${firstPhoto}`) : undefined,
-      prepTime: prepTimeMinutes,
-      cookTime: cookTimeMinutes,
-      servings: 4,
-      difficulty: String(short.level || 'EASY').toLowerCase() as any,
-      cuisine: (short.kitchens && short.kitchens[0]?.name) || undefined,
-      tags: tagsList,
-      ingredients: [],
-      steps: [],
-      author: short.ownerUser ? {
-        id: String(short.ownerUser.id),
-        name: short.ownerUser.name || short.ownerUser.username,
-        avatar: short.ownerUser.photo || undefined
-      } : undefined,
-      stats: {
-        views: short?.statistic?.viewsCount ?? 0,
-        likes: short?.statistic?.likesCount ?? 0,
-        saves: short?.statistic?.favoritesCount ?? 0,
-        rating: short?.statistic?.avgRating ?? 0,
-        reviewsCount: short?.statistic?.commentsCount ?? 0
-      },
-      createdAt: short.updatedAt,
-      updatedAt: short.updatedAt
-    } as Recipe;
-  }
-
   /**
    * Преобразовать и отфильтровать рецепты
    */

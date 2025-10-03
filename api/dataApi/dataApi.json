@@ -17,6 +17,10 @@
   ],
   "tags": [
     {
+      "name": "Категории",
+      "description": "Информация по категориям"
+    },
+    {
       "name": "Кухни",
       "description": "Информация по кухням"
     },
@@ -904,6 +908,98 @@
         }
       }
     },
+    "/v1/categories/{id}": {
+      "get": {
+        "tags": [
+          "Категории"
+        ],
+        "summary": "Получение категории по id",
+        "operationId": "getCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Категории"
+        ],
+        "summary": "Обновление категории",
+        "operationId": "updateCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/tags": {
       "post": {
         "tags": [
@@ -1316,6 +1412,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/FridgeProductResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/categories": {
+      "post": {
+        "tags": [
+          "Категории"
+        ],
+        "summary": "Сохранение категории",
+        "operationId": "createCategory",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryResponseDto"
                 }
               }
             }
@@ -2402,6 +2539,86 @@
         }
       }
     },
+    "/v1/categories/search": {
+      "get": {
+        "tags": [
+          "Категории"
+        ],
+        "summary": "Получение категорий по совпадению",
+        "operationId": "getAllCategoriesByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2147483647,
+              "minLength": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/categories/all": {
+      "get": {
+        "tags": [
+          "Категории"
+        ],
+        "summary": "Получение всего списка категорий",
+        "operationId": "getAllCategories",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/fridge/{fridgeId}/products/{productId}": {
       "delete": {
         "tags": [
@@ -2549,6 +2766,25 @@
           "name"
         ]
       },
+      "CategoryResponseDto": {
+        "type": "object",
+        "description": "Ответ по 1 кухне",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "CookingTimeDto": {
         "type": "object",
         "description": "Время готовки",
@@ -2631,6 +2867,43 @@
           "proteins"
         ]
       },
+      "ProductMeasureResponseDto": {
+        "type": "object",
+        "description": "Ответ по мере продукта",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id меры"
+          },
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Штука"
+          },
+          "weight": {
+            "type": "number",
+            "description": "Вес (в граммах)",
+            "example": 80.0
+          },
+          "isDefault": {
+            "type": "boolean",
+            "description": "Является основной мерой",
+            "example": false
+          },
+          "density": {
+            "type": "number",
+            "description": "Плотность",
+            "example": 1.0
+          }
+        },
+        "required": [
+          "id",
+          "isDefault",
+          "name",
+          "weight"
+        ]
+      },
       "RecipeCompositionResponseDto": {
         "type": "object",
         "description": "Состав рецепта",
@@ -2686,10 +2959,9 @@
             "type": "number",
             "description": "Количество ингредиента"
           },
-          "productMeasureId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id меры продукта"
+          "measure": {
+            "$ref": "#/components/schemas/ProductMeasureResponseDto",
+            "description": "Конкретная мера"
           },
           "macros": {
             "$ref": "#/components/schemas/MacrosDto",
@@ -2701,8 +2973,8 @@
           "id",
           "isVariant",
           "macros",
-          "name",
-          "productMeasureId"
+          "measure",
+          "name"
         ]
       },
       "RecipeMetaInfoResponseDto": {
@@ -2728,6 +3000,13 @@
             "description": "Список тэгов рецепта",
             "items": {
               "$ref": "#/components/schemas/TagResponseDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Список категорий рецепта",
+            "items": {
+              "$ref": "#/components/schemas/CategoryResponseDto"
             }
           }
         }
@@ -2957,52 +3236,6 @@
           "rate"
         ]
       },
-      "StepIngredientDto": {
-        "type": "object",
-        "description": "Ингредиент шага рецепта",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id ингредиента",
-            "minLength": 1
-          },
-          "name": {
-            "type": "string",
-            "description": "Название ингредиента",
-            "maxLength": 255,
-            "minLength": 0
-          },
-          "description": {
-            "type": "string",
-            "description": "Описание ингредиента"
-          },
-          "photo": {
-            "type": "string",
-            "description": "Фото ингредиента"
-          },
-          "isVariant": {
-            "type": "boolean",
-            "description": "Является ли вариантом продукта"
-          },
-          "count": {
-            "type": "number",
-            "description": "Количество ингредиента"
-          },
-          "productMeasureId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id меры продукта"
-          }
-        },
-        "required": [
-          "count",
-          "id",
-          "isVariant",
-          "name",
-          "productMeasureId"
-        ]
-      },
       "StepResponseDto": {
         "type": "object",
         "description": "Шаг рецепта",
@@ -3042,7 +3275,7 @@
             "type": "array",
             "description": "Список ингредиентов для шага",
             "items": {
-              "$ref": "#/components/schemas/StepIngredientDto"
+              "$ref": "#/components/schemas/RecipeIngredientDto"
             }
           },
           "time": {
@@ -3143,6 +3376,14 @@
             ],
             "items": {
               "type": "string"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Список категорий рецепта",
+            "items": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         }
@@ -3300,43 +3541,6 @@
           "index"
         ]
       },
-      "ProductMeasureResponseDto": {
-        "type": "object",
-        "description": "Ответ по мере продукта",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id меры"
-          },
-          "name": {
-            "type": "string",
-            "description": "Название",
-            "example": "Штука"
-          },
-          "weight": {
-            "type": "number",
-            "description": "Вес (в граммах)",
-            "example": 80.0
-          },
-          "isDefault": {
-            "type": "boolean",
-            "description": "Является основной мерой",
-            "example": false
-          },
-          "density": {
-            "type": "number",
-            "description": "Плотность",
-            "example": 1.0
-          }
-        },
-        "required": [
-          "id",
-          "isDefault",
-          "name",
-          "weight"
-        ]
-      },
       "ProductResponseDto": {
         "type": "object",
         "description": "Ответ по 1 продукта",
@@ -3353,6 +3557,13 @@
           "description": {
             "type": "string",
             "description": "Описание"
+          },
+          "categories": {
+            "type": "array",
+            "description": "Категории",
+            "items": {
+              "$ref": "#/components/schemas/CategoryResponseDto"
+            }
           },
           "photo": {
             "type": "string",
@@ -3405,10 +3616,13 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "categoryId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id Категории"
+          "categories": {
+            "type": "array",
+            "description": "Список категорий",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "photo": {
             "type": "string",
@@ -3447,10 +3661,13 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "categoryId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id Категории"
+          "categories": {
+            "type": "array",
+            "description": "id Категории",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "photo": {
             "type": "string",
@@ -3721,6 +3938,19 @@
           "productId"
         ]
       },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Русская"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
       "CreateTagDto": {
         "type": "object",
         "description": "Создание тэга",
@@ -3769,6 +3999,14 @@
             ],
             "items": {
               "type": "string"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Список категорий рецепта",
+            "items": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         }
@@ -3917,10 +4155,13 @@
             "maxLength": 1000,
             "minLength": 0
           },
-          "categoryId": {
-            "type": "string",
-            "format": "uuid",
-            "description": "id Категории"
+          "categories": {
+            "type": "array",
+            "description": "Список категорий",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           },
           "photo": {
             "type": "string",
@@ -4053,6 +4294,20 @@
           "productId"
         ]
       },
+      "CreateCategoryDto": {
+        "type": "object",
+        "description": "Категория продуктов или рецептов",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Название",
+            "example": "Сладкое"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
       "RecipeShortResponseDto": {
         "type": "object",
         "description": "Короткий рецепт (для карточек)",
@@ -4108,6 +4363,13 @@
             "description": "Список тэгов рецепта",
             "items": {
               "$ref": "#/components/schemas/TagResponseDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Список категорий рецепта",
+            "items": {
+              "$ref": "#/components/schemas/CategoryResponseDto"
             }
           },
           "cookingTime": {

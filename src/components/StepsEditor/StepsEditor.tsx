@@ -13,6 +13,8 @@ import type { CreateStepDto, CreateRecipeIngredientDto } from "../../types";
 import { API_BASE_URL } from '../../services/api';
 import { authorizedFetch, getAuthHeaders } from '../../services/auth';
 import { PRODUCT_UNITS_ARRAY } from '../../constants/measures';
+import { useVariantNames } from '../../hooks/useVariantNames';
+import { useAvailableIngredients } from '../../hooks/useAvailableIngredients';
 
 export type StepIngredientOveruse = {
   key: string;
@@ -49,27 +51,81 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
   const [editingName, setEditingName] = useState('');
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [idToName, setIdToName] = useState<Record<string, string>>({});
+  const { ingredients: availableIngredients } = useAvailableIngredients(true);
 
-  useEffect(() => {
-    // Подгрузим справочник продуктов для отображения названий
-    const load = async () => {
-      try {
-        const headers = getAuthHeaders();
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/all`, { headers });
-        if (!resp.ok) return;
-        const list = await resp.json();
-        const map: Record<string, string> = {};
-        (list || []).forEach((p: any) => { if (p?.id) map[p.id] = p.name ?? 'Продукт'; });
-        setIdToName(map);
-      } catch {
-        setIdToName({});
-      }
-    };
-    load();
-  }, []);
+  const idToName = useMemo(() => {
+    const map: Record<string, string> = {};
+    (availableIngredients || []).forEach((product) => {
+      if (product?.id) map[product.id] = product.name ?? 'Продукт';
+    });
+    return map;
+  }, [availableIngredients]);
 
   const selectableBaseIngredients = useMemo(() => baseIngredients || [], [baseIngredients]);
+
+  const variantNameSources = useMemo(
+    () => [
+      ...(baseIngredients || []),
+      ...((steps || []).flatMap((step) => step.ingredients || [])),
+    ],
+    [baseIngredients, steps],
+  );
+
+  const variantNames = useVariantNames(variantNameSources as unknown[]);
+
+  const baseUnitsRef = useRef<Map<string, { unit?: string; measureId?: string }>>(new Map());
+
+  useEffect(() => {
+    const nextMap = new Map<string, { unit?: string; measureId?: string }>();
+    (baseIngredients || []).forEach((ingredient) => {
+      const key = getIngredientKey(ingredient as any);
+      if (!key) return;
+      nextMap.set(key, {
+        unit: (ingredient as any)?.productUnit,
+        measureId: (ingredient as any)?.productMeasureId,
+      });
+    });
+
+    const prevMap = baseUnitsRef.current;
+    let stepsUpdated = false;
+
+    const updatedSteps = steps.map((step) => {
+      const stepIngredients = step.ingredients || [];
+      let stepChanged = false;
+
+      const nextIngredients = stepIngredients.map((ingredient) => {
+        const key = getIngredientKey(ingredient as any);
+        if (!key) return ingredient;
+        const baseMeta = nextMap.get(key);
+        if (!baseMeta) return ingredient;
+
+        const { unit, measureId } = baseMeta;
+        const prevMeta = prevMap.get(key);
+        const unitChanged = unit !== prevMeta?.unit;
+        const measureChanged = measureId !== prevMeta?.measureId;
+
+        if (!unitChanged && !measureChanged) {
+          return ingredient;
+        }
+
+        stepChanged = true;
+        stepsUpdated = true;
+        return {
+          ...ingredient,
+          ...(unit ? { productUnit: unit } : {}),
+          ...(measureId ? { productMeasureId: measureId } : {}),
+        } as CreateRecipeIngredientDto;
+      });
+
+      return stepChanged ? { ...step, ingredients: nextIngredients } : step;
+    });
+
+    if (stepsUpdated) {
+      onChange(updatedSteps);
+    }
+
+    baseUnitsRef.current = nextMap;
+  }, [baseIngredients, onChange, steps]);
 
   const baseTotals = useMemo(() => {
     const map = new Map<string, number>();
@@ -377,7 +433,15 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
                             return (
                               <div key={`${ing.id}-${si}`} style={{ display: 'grid', gridTemplateColumns: '1fr 120px 100px auto', gap: 8, alignItems: 'center' }}>
                                 <div style={{ color: 'var(--token-text)' }}>
-                                  {idToName[ing.id] || ing.id}
+                                  {(() => {
+                                    const explicitVariantName = (ing as any)?.variantName as string | undefined;
+                                    const explicitName = (ing as any)?.name as string | undefined;
+                                    const vid = (ing as any)?.variantId || ((ing as any)?.isVariant ? (ing as any).id : undefined);
+                                    if (explicitVariantName) return explicitVariantName;
+                                    if (explicitName && explicitName !== ing.id) return explicitName;
+                                    if (vid && variantNames[vid]) return variantNames[vid];
+                                    return idToName[ing.id] || vid || ing.id;
+                                  })()}
                                   <span style={{ marginLeft: 6, color: 'var(--token-muted)', fontSize: 12 }}>
                                     {PRODUCT_UNITS_ARRAY.find(u => u.value === (ing as any).productUnit)?.label}
                                   </span>
@@ -428,7 +492,13 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
                               onAdd={(base) => {
                                 const next = [...(step.ingredients || [])];
                                 const payload: any = { id: base.id, count: Number((base as any).count) || 0, productUnit: (base as any).productUnit };
-                                if ((base as any).variantId) payload.variantId = (base as any).variantId;
+                                if ((base as any).variantId) {
+                                  payload.variantId = (base as any).variantId;
+                                  if ((base as any).variantName) payload.variantName = (base as any).variantName;
+                                }
+                                if ((base as any).name) {
+                                  payload.name = (base as any).name;
+                                }
                                 next.push(payload);
                                 updateStep(index, { ingredients: next as any });
                               }}
@@ -541,6 +611,18 @@ const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds,
   const [selectedId, setSelectedId] = useState<string>('');
   const [count, setCount] = useState<number>(0);
   const candidates = useMemo(() => baseIngredients.filter(b => !usedIds.includes(b.id)), [baseIngredients, usedIds]);
+
+  const getIngredientDisplayName = (ingredient: CreateRecipeIngredientDto): string => {
+    const raw: any = ingredient;
+    const variantLabel = typeof raw?.variantName === 'string' ? raw.variantName.trim() : '';
+    if (variantLabel) return variantLabel;
+    const variantId = raw?.variantId || (raw?.isVariant ? raw?.id : undefined);
+    if (variantId && idToName[variantId]) return idToName[variantId];
+    if (typeof raw?.name === 'string' && raw.name.trim()) return raw.name.trim();
+    const baseLabel = idToName[ingredient.id];
+    if (baseLabel) return baseLabel;
+    return ingredient.id;
+  };
   const current = candidates.find(c => c.id === selectedId);
   useEffect(() => {
     if (!current) return;
@@ -557,7 +639,7 @@ const AddStepIngredientRow: React.FC<AddRowProps> = ({ baseIngredients, usedIds,
       <select className="ui-select" value={selectedId} onChange={(e) => setSelectedId(e.target.value)}>
         <option value="">Выберите ингредиент</option>
         {candidates.map(c => (
-          <option key={c.id} value={c.id}>{idToName[c.id] || c.id}</option>
+          <option key={c.id} value={c.id}>{getIngredientDisplayName(c)}</option>
         ))}
       </select>
       <input

@@ -1,7 +1,33 @@
 import { API_BASE_URL } from './api';
 import { authorizedFetch, getAuthHeaders } from './auth';
 import { apiLogger } from '../utils/apiLogger';
-import type { CreateProductDto, UpdateProductDto, ProductResponseDto, ProductMeasureResponseDto, UpdateBaseProductMeasureDto, AddBaseProductMeasureDto, ChangeProductVariantDto, AddProductVariantMeasureDto } from '../types/api.types';
+import type {
+  CreateProductDto,
+  UpdateProductDto,
+  ProductResponseDto,
+  ProductMeasureResponseDto,
+  UpdateBaseProductMeasureDto,
+  AddBaseProductMeasureDto,
+  ChangeProductVariantDto,
+  AddProductVariantMeasureDto,
+} from '../types/api.types';
+
+const variantCache = new Map<string, ProductResponseDto>();
+const variantInflight = new Map<string, Promise<ProductResponseDto>>();
+
+const productVariantsCache = new Map<string, ProductResponseDto[]>();
+const productVariantsInflight = new Map<string, Promise<ProductResponseDto[]>>();
+
+const allVariantsCache = { data: null as ProductResponseDto[] | null, inflight: null as Promise<ProductResponseDto[]> | null };
+
+const normalizeVariantList = (payload: unknown): ProductResponseDto[] => {
+  if (!Array.isArray(payload)) return [];
+  return payload.filter((item): item is ProductResponseDto => typeof item === 'object' && item !== null);
+};
+
+const normalizeVariant = (payload: unknown): ProductResponseDto => {
+  return (payload ?? {}) as ProductResponseDto;
+};
 
 class ProductsService {
   async getAllProducts(): Promise<Array<{ id: string; name: string; description?: string }>> {
@@ -146,29 +172,58 @@ class ProductsService {
   }
 
   async getAllProductVariants(): Promise<ProductResponseDto[]> {
-    const url = `${API_BASE_URL}/products/variants/all`;
-    const headers = getAuthHeaders();
-    apiLogger.logRequest(url, 'GET', headers);
-
-    const response = await authorizedFetch(url, { method: 'GET', headers });
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`HTTP ${response.status}: ${text}`);
+    if (allVariantsCache.data) {
+      return allVariantsCache.data;
     }
-    return response.json();
+    if (!allVariantsCache.inflight) {
+      const url = `${API_BASE_URL}/products/variants/all`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'GET', headers);
+      allVariantsCache.inflight = authorizedFetch(url, { method: 'GET', headers })
+        .then(async (response) => {
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`HTTP ${response.status}: ${text}`);
+          }
+          const data = normalizeVariantList(await response.json());
+          allVariantsCache.data = data;
+          return data;
+        })
+        .finally(() => {
+          allVariantsCache.inflight = null;
+        });
+    }
+    return allVariantsCache.inflight ?? [];
   }
 
   async getProductVariantsByProduct(productId: string): Promise<ProductResponseDto[]> {
-    const url = `${API_BASE_URL}/products/variants/${productId}/all`;
-    const headers = getAuthHeaders();
-    apiLogger.logRequest(url, 'GET', headers);
-
-    const response = await authorizedFetch(url, { method: 'GET', headers });
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`HTTP ${response.status}: ${text}`);
+    if (productVariantsCache.has(productId)) {
+      return productVariantsCache.get(productId) ?? [];
     }
-    return response.json();
+
+    if (!productVariantsInflight.has(productId)) {
+      const url = `${API_BASE_URL}/products/variants/${productId}/all`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'GET', headers);
+
+      const request = authorizedFetch(url, { method: 'GET', headers })
+        .then(async (response) => {
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`HTTP ${response.status}: ${text}`);
+          }
+          const data = normalizeVariantList(await response.json());
+          productVariantsCache.set(productId, data);
+          return data;
+        })
+        .finally(() => {
+          productVariantsInflight.delete(productId);
+        });
+
+      productVariantsInflight.set(productId, request);
+    }
+
+    return productVariantsInflight.get(productId) ?? [];
   }
 
   async updateProductVariant(variantId: string, dto: ChangeProductVariantDto): Promise<{ id: string }> {
@@ -185,20 +240,40 @@ class ProductsService {
       const text = await response.text();
       throw new Error(`HTTP ${response.status}: ${text}`);
     }
+    variantCache.delete(variantId);
+    productVariantsCache.clear();
+    allVariantsCache.data = null;
     return response.json();
   }
 
   async getProductVariantById(variantId: string): Promise<ProductResponseDto> {
-    const url = `${API_BASE_URL}/products/variants/${variantId}`;
-    const headers = getAuthHeaders();
-    apiLogger.logRequest(url, 'GET', headers);
-
-    const response = await authorizedFetch(url, { method: 'GET', headers });
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`HTTP ${response.status}: ${text}`);
+    if (variantCache.has(variantId)) {
+      return variantCache.get(variantId) as ProductResponseDto;
     }
-    return response.json();
+
+    if (!variantInflight.has(variantId)) {
+      const url = `${API_BASE_URL}/products/variants/${variantId}`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'GET', headers);
+
+      const request = authorizedFetch(url, { method: 'GET', headers })
+        .then(async (response) => {
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(`HTTP ${response.status}: ${text}`);
+          }
+          const data = normalizeVariant(await response.json());
+          variantCache.set(variantId, data);
+          return data;
+        })
+        .finally(() => {
+          variantInflight.delete(variantId);
+        });
+
+      variantInflight.set(variantId, request);
+    }
+
+    return variantInflight.get(variantId) as Promise<ProductResponseDto>;
   }
 
   async getVariantMeasures(productVariantId: string, onlyUnique?: boolean): Promise<ProductMeasureResponseDto[]> {
@@ -234,5 +309,4 @@ class ProductsService {
 
 export const productsService = new ProductsService();
 export default productsService;
-
 

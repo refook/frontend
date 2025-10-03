@@ -1,10 +1,9 @@
 .card {
-  background-color: var(--token-bg);
+  background-color: var(--token-surface);
   border-radius: var(--token-radius-lg);
   box-shadow: var(--token-shadow-sm);
   overflow: hidden;
   transition: transform var(--token-duration-fast), box-shadow var(--token-duration-fast);
-  border: 1px solid var(--token-border);
 }
 
 .card:hover { transform: translateY(-2px); box-shadow: var(--token-shadow-md); }
@@ -65,17 +64,24 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
+  background: transparent;
   opacity: 0;
   transition: opacity 0.2s;
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   justify-content: flex-end;
   padding: 1rem;
+  gap: 0.5rem;
 }
 
 .card:hover .overlay {
   opacity: 1;
+}
+
+.overlayPersistent {
+  opacity: 1;
+  background: transparent;
 }
 
 .actions {
@@ -83,9 +89,24 @@
   gap: 0.5rem;
 }
 
+.actionsPersistent {
+  opacity: 1;
+}
+
+.actionsHover {
+  display: none;
+  pointer-events: none;
+  order: -1;
+}
+
+.card:hover .actionsHover {
+  display: flex;
+  pointer-events: auto;
+}
+
 .actionBtn {
-  background-color: white;
-  border: none;
+  background-color: color-mix(in oklab, var(--token-surface) 88%, transparent);
+  border: 1px solid color-mix(in oklab, var(--token-border) 65%, transparent);
   border-radius: 9999px;
   padding: 0.5rem;
   cursor: pointer;
@@ -96,10 +117,24 @@
 }
 
 .actionBtn:hover {
-  background-color: #f3f4f6;
+  background-color: color-mix(in oklab, var(--token-surface) 72%, var(--token-accent-weak) 18%);
 }
 
-.icon { width: 1.25rem; height: 1.25rem; color: var(--token-muted); }
+.actionBtnActive {
+  background-color: color-mix(in oklab, var(--token-accent-weak) 70%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent-strong) 20%, var(--token-accent-weak) 60%);
+}
+
+.actionBtnActive .icon {
+  color: var(--token-accent-strong);
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--token-muted);
+  transition: color var(--token-duration-fast);
+}
 
 .content { padding: var(--token-space-4); }
 
@@ -107,11 +142,35 @@
 
 .description { font-size: var(--token-text-sm); color: var(--token-muted); margin: 0 0 var(--token-space-4) 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-.meta { display: flex; gap: var(--token-space-4); margin-bottom: var(--token-space-4); }
+.meta {
+  display: flex;
+  gap: var(--token-space-4);
+  margin-bottom: var(--token-space-4);
+}
 
-.metaItem { display: flex; align-items: center; gap: 0.25rem; font-size: var(--token-text-sm); color: var(--token-muted); }
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--token-text-sm);
+  color: var(--token-muted);
+}
 
-.metaIcon { width: 1rem; height: 1rem; }
+.metaIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.metaRating {
+  color: var(--token-text);
+  font-weight: 600;
+}
+
+.ratingIcon {
+  color: var(--token-accent);
+}
+.metaRating { color: var(--token-text); font-weight: 600; }
+.ratingIcon { color: var(--token-accent); }
 
 .footer { display: flex; flex-direction: column; gap: var(--token-space-4); margin-top: var(--token-space-4); }
 

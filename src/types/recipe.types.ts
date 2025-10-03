@@ -136,6 +136,7 @@ export interface CreateRecipeIngredientDto {
   id: string;
   count: number;
   productUnit: ProductUnitType;
+  productMeasureId?: string;
 }
 
 // DTO для создания шага

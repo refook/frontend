@@ -1,12 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import type { ProductUnitType } from '../../types/measures.types';
-import { API_BASE_URL } from '../../services/api';
-import keycloak from '../../services/keycloak.ts';
 import { PRODUCT_UNITS, PRODUCT_UNITS_ARRAY } from '../../constants/measures';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import styles from './IngredientPicker.module.css';
-import type {ApiIngredient, CreateRecipeIngredientDto} from "../../types";
-import { getAuthHeaders, authorizedFetch } from '../../services/auth';
+import type { CreateRecipeIngredientDto } from '../../types';
+import type { ProductMeasureResponseDto } from '../../types/api.types';
+import { useVariantNames } from '../../hooks/useVariantNames';
+import { useProductMeasureCache } from '../../hooks/useProductMeasureCache';
+import { resolveIngredientIdentifiers } from '../../utils/recipeIngredient';
+import { useAvailableIngredients, type AvailableIngredient } from '../../hooks/useAvailableIngredients';
+import { productsService } from '../../services/productsService';
 
 interface IngredientPickerProps {
   ingredients: CreateRecipeIngredientDto[];
@@ -41,123 +44,272 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
   errors = {},
   compact = false
 }) => {
-  const getIngredientKey = (productId: string, variant?: string | null) => (variant ? `${productId}::${variant}` : productId);
+  const getIngredientKey = (productId: string, variant?: string | null, isVariant?: boolean) => {
+    if (variant) return `variant:${variant}`;
+    if (isVariant && productId) return `variant:${productId}`;
+    if (productId) return `base:${productId}`;
+    return '';
+  };
+
+  const resolveMeasureContext = (ingredient: unknown): {
+    baseProductId?: string;
+    variantId?: string;
+    isVariant: boolean;
+  } => {
+    const meta = resolveIngredientIdentifiers(ingredient);
+    return {
+      baseProductId: meta.baseProductId,
+      variantId: meta.variantId,
+      isVariant: meta.isVariant,
+    };
+  };
+
+  const normalizeMeasureLabel = (label?: string): string => {
+    if (typeof label !== 'string') return '';
+    return label
+      .toLowerCase()
+      .replace(/[\.,]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const MEASURE_ALIASES: Record<string, ProductUnitType> = {
+    'шт': PRODUCT_UNITS.PIECE.value,
+    'штук': PRODUCT_UNITS.PIECE.value,
+    'штука': PRODUCT_UNITS.PIECE.value,
+    'штуки': PRODUCT_UNITS.PIECE.value,
+    'шту': PRODUCT_UNITS.PIECE.value,
+    'ед': PRODUCT_UNITS.PIECE.value,
+    'единица': PRODUCT_UNITS.PIECE.value,
+    'единицы': PRODUCT_UNITS.PIECE.value,
+    'порц': PRODUCT_UNITS.PORTION.value,
+    'порция': PRODUCT_UNITS.PORTION.value,
+    'порции': PRODUCT_UNITS.PORTION.value,
+    'ч ложка': PRODUCT_UNITS.TEASPOON.value,
+    'ложка чайная': PRODUCT_UNITS.TEASPOON.value,
+    'чайная ложка': PRODUCT_UNITS.TEASPOON.value,
+    'ст ложка': PRODUCT_UNITS.TABLESPOON.value,
+    'столовая ложка': PRODUCT_UNITS.TABLESPOON.value,
+    'ложка столовая': PRODUCT_UNITS.TABLESPOON.value,
+    'гр': PRODUCT_UNITS.GRAM.value,
+    'грамм': PRODUCT_UNITS.GRAM.value,
+    'граммы': PRODUCT_UNITS.GRAM.value,
+    'кг': PRODUCT_UNITS.KILOGRAM.value,
+    'килограмм': PRODUCT_UNITS.KILOGRAM.value,
+    'килограммы': PRODUCT_UNITS.KILOGRAM.value,
+    'мл': PRODUCT_UNITS.MILLILITER.value,
+    'миллилитр': PRODUCT_UNITS.MILLILITER.value,
+    'миллилитры': PRODUCT_UNITS.MILLILITER.value,
+  };
+
+  const findUnitValueForMeasureName = (measureName?: string): ProductUnitType | undefined => {
+    const normalizedName = normalizeMeasureLabel(measureName);
+    if (!normalizedName) return undefined;
+
+    const aliasMatch = MEASURE_ALIASES[normalizedName];
+    if (aliasMatch) return aliasMatch;
+
+    const exactMatch = PRODUCT_UNITS_ARRAY.find(u => normalizeMeasureLabel(u.label) === normalizedName);
+    if (exactMatch) return exactMatch.value as ProductUnitType;
+
+    const fuzzyMatch = PRODUCT_UNITS_ARRAY.find((u) => {
+      const normalizedUnit = normalizeMeasureLabel(u.label);
+      return normalizedUnit.includes(normalizedName) || normalizedName.includes(normalizedUnit);
+    });
+
+    return fuzzyMatch?.value as ProductUnitType | undefined;
+  };
 
   type UnitsInfo = {
     units: typeof PRODUCT_UNITS_ARRAY;
     warning: string | null;
+    measures: ProductMeasureResponseDto[];
   };
 
+  const { getMeasures } = useProductMeasureCache();
+
   const [showForm, setShowForm] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] = useState<ApiIngredient | null>(null);
+  const [selectedIngredient, setSelectedIngredient] = useState<AvailableIngredient | null>(null);
   const [amount, setAmount] = useState('');
   const [unit, setUnit] = useState('');
   const [allowedUnits, setAllowedUnits] = useState<typeof PRODUCT_UNITS_ARRAY>(PRODUCT_UNITS_ARRAY);
   const [variants, setVariants] = useState<Array<{ id: string; name: string }>>([]);
   const [variantId, setVariantId] = useState<string>('');
   const [unitWarning, setUnitWarning] = useState<string | null>(null);
-  const [availableIngredients, setAvailableIngredients] = useState<ApiIngredient[]>([]);
-  const [ingredientsLoading, setIngredientsLoading] = useState(true);
+  const { ingredients: availableIngredients, loading: ingredientsLoading } = useAvailableIngredients(true);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [ingredientUnitsMap, setIngredientUnitsMap] = useState<Record<string, UnitsInfo>>({});
   const ingredientUnitsMapRef = useRef<Record<string, UnitsInfo>>({});
+  const lastUnitsInfoRef = useRef<UnitsInfo | null>(null);
+  const variantNameMap = useVariantNames(useMemo(() => ingredients as unknown[], [ingredients]));
 
   useEffect(() => {
     ingredientUnitsMapRef.current = ingredientUnitsMap;
   }, [ingredientUnitsMap]);
 
-  const fetchUnitsInfo = async (productId: string, variant?: string | null): Promise<UnitsInfo> => {
+  const fetchUnitsInfo = async (
+    params: { baseProductId?: string; variantId?: string | null; isVariant?: boolean }
+  ): Promise<UnitsInfo> => {
+    const baseId = params.baseProductId?.trim() || undefined;
+    const variantId = params.variantId?.trim() || undefined;
+    const isVariant = Boolean(variantId || params.isVariant);
+
     try {
-      const headers = getAuthHeaders();
-      let measures: Array<{ name?: string }> = [];
-      let variantFallbackUsed = false;
+      const measures = await getMeasures({
+        baseProductId: baseId,
+        variantId,
+      });
 
-      if (variant) {
-        const respVariant = await authorizedFetch(`${API_BASE_URL}/products/measures/variant/${variant}/all`, { headers });
-        const variantMeasures = respVariant.ok ? await respVariant.json() : [];
-        if (Array.isArray(variantMeasures) && variantMeasures.length > 0) {
-          measures = variantMeasures;
-        } else {
-          variantFallbackUsed = true;
-          const respBase = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
-          measures = respBase.ok ? await respBase.json() : [];
-        }
-      } else {
-        const respBase = await authorizedFetch(`${API_BASE_URL}/products/measures/base/${productId}/all`, { headers });
-        measures = respBase.ok ? await respBase.json() : [];
-      }
+      const allowedLabels = new Set(
+        (measures || [])
+          .map((m: ProductMeasureResponseDto) => String(m?.name ?? '').trim())
+          .filter(Boolean),
+      );
 
-      const allowedLabels = new Set((measures || []).map((m: any) => String(m?.name ?? '').trim()).filter(Boolean));
-      const filtered = PRODUCT_UNITS_ARRAY.filter(u => allowedLabels.has(u.label));
+      const filtered = allowedLabels.size > 0
+        ? PRODUCT_UNITS_ARRAY.filter((u) => allowedLabels.has(u.label))
+        : [];
 
       let warning: string | null = null;
-      if (variant && filtered.length === 0 && !variantFallbackUsed) {
+      if (isVariant && filtered.length === 0) {
         warning = 'Для выбранного варианта нет доступных мер. Выберите другой вариант или продукт.';
+      } else if (!isVariant && filtered.length === 0 && (measures?.length ?? 0) === 0) {
+        warning = 'Для продукта нет доступных мер. Добавьте их в админке.';
       }
 
       return {
-        units: filtered.length > 0 ? filtered : PRODUCT_UNITS_ARRAY,
+        units: filtered,
         warning,
+        measures,
       };
     } catch (error) {
       console.error('IngredientPicker: не удалось загрузить меры продукта', error);
-      return { units: PRODUCT_UNITS_ARRAY, warning: null };
+      return { units: [], warning: 'Не удалось загрузить меры продукта.', measures: [] };
     }
   };
 
   // Загружаем продукты (ингредиенты) из нового API
-  useEffect(() => {
-    const loadIngredients = async () => {
-      try {
-        setIngredientsLoading(true);
-        console.log('IngredientPicker: Загрузка продуктов из API /products/all ...');
-        const headers: Record<string, string> = getAuthHeaders();
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/all`, { headers });
-        if (!resp.ok) {
-          throw new Error(`HTTP ${resp.status}`);
-        }
-        const apiProducts = await resp.json();
-        setAvailableIngredients(apiProducts);
-        console.log(`IngredientPicker: Загружено ${apiProducts.length} продуктов`);
-      } catch (error) {
-        console.error('IngredientPicker: Ошибка при загрузке продуктов:', error);
-        // При ошибке API оставляем пустой массив
-        setAvailableIngredients([]);
-      } finally {
-        setIngredientsLoading(false);
-      }
-    };
-
-    loadIngredients();
-  }, []);
-
   // Список продуктовых единиц измерения
-  const suggestions = availableIngredients.filter(ingredient => 
-    ingredient.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    !ingredients.some(ing => ing.id === ingredient.id) &&
-    searchTerm.length > 0
-  );
+  const suggestions = availableIngredients.filter((ingredient) => {
+    if (searchTerm.length === 0) return false;
+    const term = searchTerm.toLowerCase();
+    const nameMatch = ingredient.name.toLowerCase().includes(term);
+    const descriptionMatch = ingredient.description?.toLowerCase().includes(term) ?? false;
+    const alreadySelected = ingredients.some((ing) => ing.id === ingredient.id);
+    return (nameMatch || descriptionMatch) && !alreadySelected;
+  });
 
   useEffect(() => {
     const loadUnitsForExisting = async () => {
-      for (const ingredient of ingredients) {
-        const variant = (ingredient as any)?.variantId ?? null;
-        const key = getIngredientKey(ingredient.id, variant);
-        if (!key || ingredientUnitsMapRef.current[key]) continue;
-        const info = await fetchUnitsInfo(ingredient.id, variant);
-        setIngredientUnitsMap(prev => {
-          if (prev[key]) return prev;
-          const next = { ...prev, [key]: info };
-          ingredientUnitsMapRef.current = next;
-          return next;
+      const updatesMap = new Map<number, Record<string, unknown>>();
+
+      const scheduleUpdate = (idx: number, update: Record<string, unknown>) => {
+        if (Object.keys(update).length === 0) return;
+        const existing = updatesMap.get(idx) ?? {};
+        updatesMap.set(idx, { ...existing, ...update });
+      };
+
+      for (let index = 0; index < ingredients.length; index++) {
+        const ingredient = ingredients[index];
+        const context = resolveMeasureContext(ingredient as any);
+        const cacheKeySeed = context.baseProductId || context.variantId;
+        if (!cacheKeySeed) continue;
+        const key = getIngredientKey(cacheKeySeed, context.variantId, context.isVariant);
+        const hasCached = Boolean(key && ingredientUnitsMapRef.current[key]);
+        const info = hasCached
+          ? ingredientUnitsMapRef.current[key]
+          : await fetchUnitsInfo({
+            baseProductId: context.baseProductId,
+            variantId: context.variantId,
+            isVariant: context.isVariant,
+          });
+
+        if (!hasCached && key) {
+          setIngredientUnitsMap(prev => {
+            if (prev[key]) return prev;
+            const next = { ...prev, [key]: info };
+            ingredientUnitsMapRef.current = next;
+            return next;
+          });
+        }
+
+        const measureId = (ingredient as any)?.productMeasureId as string | undefined;
+        const currentUnitValue = (ingredient as any)?.productUnit as string | undefined;
+        const measures = info.measures ?? [];
+
+        if (context.variantId) {
+          const currentVariantName = (ingredient as any)?.variantName || (ingredient as any)?.variant?.name;
+          if (!currentVariantName) {
+            const cachedVariantName = variantNameMap[context.variantId];
+            if (cachedVariantName) {
+              scheduleUpdate(index, { variantName: cachedVariantName });
+            } else {
+              try {
+                const variant = await productsService.getProductVariantById(context.variantId);
+                const resolvedName =
+                  (variant as any)?.name ??
+                  (variant as any)?.variantName ??
+                  (variant as any)?.title ??
+                  (variant as any)?.label ??
+                  (variant as any)?.product?.name ??
+                  (variant as any)?.productName;
+                if (typeof resolvedName === 'string' && resolvedName.trim().length > 0) {
+                  scheduleUpdate(index, { variantName: resolvedName.trim() });
+                }
+              } catch (error) {
+                console.warn('Не удалось получить название варианта продукта', error);
+              }
+            }
+          }
+        }
+
+        if (measures.length === 0) continue;
+
+        if (measureId) {
+          const matchedMeasure = measures.find(m => m.id === measureId);
+          if (matchedMeasure) {
+            const matchingUnit = findUnitValueForMeasureName(matchedMeasure.name);
+            if (matchingUnit && matchingUnit !== currentUnitValue) {
+              scheduleUpdate(index, { productUnit: matchingUnit });
+            }
+          }
+          continue;
+        }
+
+        const unitLabel = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue)?.label;
+        let selectedMeasure = unitLabel
+          ? measures.find(m => normalizeMeasureLabel(m.name) === normalizeMeasureLabel(unitLabel))
+          : undefined;
+
+        if (!selectedMeasure) {
+          selectedMeasure = measures.find(m => m.isDefault) ?? measures[0];
+        }
+
+        if (selectedMeasure) {
+          const updatePayload: Record<string, unknown> = { productMeasureId: selectedMeasure.id };
+          const derivedUnit = findUnitValueForMeasureName(selectedMeasure.name);
+          if (derivedUnit && derivedUnit !== currentUnitValue) {
+            updatePayload.productUnit = derivedUnit;
+          }
+          scheduleUpdate(index, updatePayload);
+        }
+      }
+
+      if (updatesMap.size > 0) {
+        const next = ingredients.map((ingredient, idx) => {
+          const update = updatesMap.get(idx);
+          if (!update) return ingredient;
+          const nextIngredient: any = { ...ingredient, ...update };
+          return nextIngredient as CreateRecipeIngredientDto;
         });
+        onChange(next);
       }
     };
 
     void loadUnitsForExisting();
-  }, [ingredients]);
+  }, [ingredients, onChange, variantNameMap]);
 
   const addIngredient = () => {
     if (selectedIngredient && amount.trim() && unit) {
@@ -168,14 +320,27 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
       };
       
       const payload: any = { ...newIngredient };
-      if (variantId) payload.variantId = variantId;
+      if (variantId) {
+        payload.variantId = variantId;
+        const v = variants.find(v => v.id === variantId);
+        if (v?.name) payload.variantName = v.name;
+      }
 
       onChange([...ingredients, payload]);
 
-      const key = getIngredientKey(selectedIngredient.id, variantId || null);
-      const info: UnitsInfo = unitWarning
-        ? { units: [], warning: unitWarning }
-        : { units: allowedUnits.length > 0 ? allowedUnits : PRODUCT_UNITS_ARRAY, warning: null };
+      const key = getIngredientKey(selectedIngredient.id, variantId || null, Boolean(variantId));
+      const infoSource = lastUnitsInfoRef.current;
+      const info: UnitsInfo = infoSource
+        ? {
+          units: [...(infoSource.units || PRODUCT_UNITS_ARRAY)],
+          warning: infoSource.warning,
+          measures: [...(infoSource.measures || [])],
+        }
+        : {
+          units: allowedUnits,
+          warning: unitWarning ?? null,
+          measures: [],
+        };
       setIngredientUnitsMap(prev => {
         const next = { ...prev, [key]: info };
         ingredientUnitsMapRef.current = next;
@@ -200,9 +365,11 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     onChange(ingredients.filter(ing => ing.id !== id));
   };
 
-  const updateIngredient = (index: number, updates: Partial<CreateRecipeIngredientDto>) => {
+  const updateIngredient = (index: number, updates: Partial<CreateRecipeIngredientDto> & Record<string, unknown>) => {
     const next = [...ingredients];
-    next[index] = { ...next[index], ...updates } as CreateRecipeIngredientDto;
+    const current: any = next[index] ?? {};
+    const nextIngredient: any = { ...current, ...updates };
+    next[index] = nextIngredient as CreateRecipeIngredientDto;
     onChange(next);
   };
 
@@ -213,7 +380,7 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
     setSelectedIngredient(null);
   };
 
-  const handleSuggestionClick = (ingredient: ApiIngredient) => {
+  const handleSuggestionClick = (ingredient: AvailableIngredient) => {
     setSelectedIngredient(ingredient);
     setSearchTerm(ingredient.name);
     // Сброс вариантов и юнитов под выбранный продукт
@@ -224,28 +391,48 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
 
   const loadVariantsAndMeasures = async (productId: string, nextVariantId: string) => {
     try {
-      // загрузим варианты продукта
-      const headers = getAuthHeaders();
-      const respVar = await authorizedFetch(`${API_BASE_URL}/products/variants/${productId}/all`, { headers });
-      const variantList: Array<{ id: string; name: string }> = respVar.ok ? await respVar.json() : [];
-      setVariants((variantList || []).map((v: any) => ({ id: v.id ?? v.uuid ?? v.value, name: v.name ?? v.title ?? 'Вариант' })).filter(v => v.id));
+      const variantList = await productsService.getProductVariantsByProduct(productId);
+      setVariants(
+        (variantList || [])
+          .map((variant) => {
+            const record = variant as any;
+            const rawName =
+              record?.name ??
+              record?.variantName ??
+              record?.title ??
+              record?.label ??
+              record?.product?.name ??
+              record?.productName;
+
+            const fallbackName = typeof rawName === 'string' && rawName.trim().length > 0 ? rawName.trim() : 'Вариант';
+
+            return {
+              id: variant.id,
+              name: fallbackName,
+            };
+          })
+          .filter((variant) => Boolean(variant.id)),
+      );
 
       const variantKey = nextVariantId || null;
-      const unitsInfo = await fetchUnitsInfo(productId, variantKey);
-      if (variantKey) {
-        setUnitWarning(unitsInfo.warning);
-      } else {
-        setUnitWarning(null);
-      }
+      const unitsInfo = await fetchUnitsInfo({
+        baseProductId: productId,
+        variantId: variantKey,
+        isVariant: Boolean(variantKey),
+      });
+
+      lastUnitsInfoRef.current = unitsInfo;
+
+      setUnitWarning(unitsInfo.warning ?? null);
       setAllowedUnits(unitsInfo.units);
       if (unitsInfo.units.length > 0) {
-        const defaultUnit = unitsInfo.units.find(u => u.value === unit) || unitsInfo.units[0] || PRODUCT_UNITS.GRAM;
-        setUnit((defaultUnit as any)?.value || 'GR');
+        const defaultUnit = unitsInfo.units.find(u => u.value === unit) || unitsInfo.units[0];
+        setUnit((defaultUnit as any)?.value || '');
       } else {
         setUnit('');
       }
 
-      const key = getIngredientKey(productId, variantKey);
+      const key = getIngredientKey(productId, variantKey, Boolean(variantKey));
       setIngredientUnitsMap(prev => {
         const next = { ...prev, [key]: unitsInfo };
         ingredientUnitsMapRef.current = next;
@@ -279,38 +466,91 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
           <div key={ingredient.id} className={styles.ingredientItem}>
             <div className={styles.ingredientInfo}>
               <span className={styles.ingredientName}>
-                {availableIngredients.find(i => i.id === ingredient.id)?.name || 'Неизвестный ингредиент'}
+                {(() => {
+                  const raw = ingredient as any;
+                  const resolvedVariantId = raw.variantId || (raw.isVariant ? raw.id : undefined);
+                  const baseProductId = raw.baseProductId || raw.productId || raw.id;
+
+                  const variantName =
+                    raw.variantName ||
+                    raw.variant?.name ||
+                    (resolvedVariantId ? variantNameMap[resolvedVariantId] : undefined);
+
+                  const baseName =
+                    availableIngredients.find((item) => item.id === baseProductId)?.name ||
+                    raw.name;
+
+                  return variantName || baseName || 'Неизвестный ингредиент';
+                })()}
               </span>
               {(() => {
-                const variant = (ingredient as any)?.variantId ?? null;
-                const key = getIngredientKey(ingredient.id, variant);
-                const info = ingredientUnitsMap[key];
+                const context = resolveMeasureContext(ingredient as any);
+                const cacheSeed = context.baseProductId || context.variantId || ingredient.id;
+                const key = cacheSeed ? getIngredientKey(cacheSeed, context.variantId, context.isVariant) : '';
+                const info = key ? ingredientUnitsMap[key] : undefined;
                 const hasInfo = Boolean(info);
                 const warningMessage = info?.warning ?? null;
-                let unitsList = hasInfo ? (info?.units ?? PRODUCT_UNITS_ARRAY) : PRODUCT_UNITS_ARRAY.filter(u => u.value === (ingredient as any).productUnit);
+                const measures = info?.measures ?? [];
+                const hasMeasures = measures.length > 0;
+                const currentMeasureId = (ingredient as any).productMeasureId as string | undefined;
+                const currentUnitValue = (ingredient as any).productUnit;
 
-                if (unitsList.length > 0 && !(unitsList.some(u => u.value === (ingredient as any).productUnit))) {
-                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === (ingredient as any).productUnit);
-                  if (currentUnit) {
-                    unitsList = [...unitsList, currentUnit];
-                  }
+                const measureOptions = hasMeasures
+                  ? measures
+                      .filter((measure) => typeof measure?.id === 'string')
+                      .map((measure) => ({
+                        id: measure.id,
+                        name: measure.name ?? (measure.id ?? 'Мера'),
+                        unitValue: findUnitValueForMeasureName(measure.name),
+                      }))
+                  : [];
+
+                if (hasMeasures && currentMeasureId && !measureOptions.some(opt => opt.id === currentMeasureId)) {
+                  const fallbackLabel = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue)?.label
+                    || measureOptions[0]?.name
+                    || 'Текущая мера';
+                  measureOptions.push({
+                    id: currentMeasureId,
+                    name: fallbackLabel,
+                    unitValue: findUnitValueForMeasureName(fallbackLabel),
+                  });
                 }
 
-                if (unitsList.length === 0) {
-                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === (ingredient as any).productUnit);
-                  if (currentUnit) {
-                    unitsList = [currentUnit];
+                let unitsList = hasInfo ? (info?.units ?? []) : [];
+
+                if (!hasInfo) {
+                  const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue);
+                  if (currentUnit) unitsList = [currentUnit];
+                } else if (!hasMeasures) {
+                  if (unitsList.length === 0) {
+                    const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue);
+                    if (currentUnit) unitsList = [currentUnit];
+                  } else if (currentUnitValue && !unitsList.some(u => u.value === currentUnitValue)) {
+                    const currentUnit = PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue);
+                    if (currentUnit) {
+                      unitsList = [...unitsList, currentUnit];
+                    }
                   }
                 }
 
                 const uniqueUnits: typeof PRODUCT_UNITS_ARRAY = [];
-                const seenUnits = new Set<string>();
-                unitsList.forEach(u => {
-                  if (!seenUnits.has(u.value)) {
-                    seenUnits.add(u.value);
-                    uniqueUnits.push(u);
-                  }
-                });
+                if (!hasMeasures) {
+                  const seenUnits = new Set<string>();
+                  unitsList.forEach(u => {
+                    if (!seenUnits.has(u.value)) {
+                      seenUnits.add(u.value);
+                      uniqueUnits.push(u);
+                    }
+                  });
+                }
+
+                const selectValue = hasMeasures
+                  ? (currentMeasureId ?? (measureOptions[0]?.id ?? ''))
+                  : (currentUnitValue || '');
+
+                const displayMeasureLabel = hasMeasures
+                  ? measureOptions.find(opt => opt.id === (currentMeasureId || selectValue))?.name
+                  : PRODUCT_UNITS_ARRAY.find(u => u.value === currentUnitValue)?.label;
 
                 return (
                   <div className={styles.ingredientControls}>
@@ -329,18 +569,45 @@ const IngredientPicker: React.FC<IngredientPickerProps> = ({
                       Мера
                       <select
                         className={styles.controlSelect}
-                        value={(ingredient as any).productUnit || ''}
-                        onChange={(e) => updateIngredient(index, { productUnit: e.target.value as ProductUnitType })}
-                        disabled={!hasInfo || (Boolean(warningMessage) && (info?.units?.length ?? 0) === 0)}
+                        value={selectValue}
+                        onChange={(e) => {
+                          if (hasMeasures) {
+                            const selectedMeasureId = e.target.value;
+                            if (selectedMeasureId === currentMeasureId) return;
+                            const selectedMeasure = measureOptions.find(opt => opt.id === selectedMeasureId);
+                            if (!selectedMeasure) return;
+                            const updates: any = {
+                              productMeasureId: selectedMeasure.id,
+                            };
+                            if (selectedMeasure.unitValue) {
+                              updates.productUnit = selectedMeasure.unitValue;
+                            }
+                            updateIngredient(index, updates);
+                          } else {
+                            const nextUnit = e.target.value as ProductUnitType;
+                            if (nextUnit === currentUnitValue) return;
+                            updateIngredient(index, { productUnit: nextUnit });
+                          }
+                        }}
+                        disabled={!hasInfo || (hasMeasures ? measureOptions.length === 0 : uniqueUnits.length === 0)}
                       >
-                        {uniqueUnits.map(unitOption => (
-                          <option key={unitOption.value} value={unitOption.value}>{unitOption.label}</option>
-                        ))}
-                        {!hasInfo && (
+                        {hasMeasures
+                          ? measureOptions.map(option => (
+                            <option key={option.id} value={option.id}>{option.name}</option>
+                          ))
+                          : uniqueUnits.map(unitOption => (
+                            <option key={unitOption.value} value={unitOption.value}>{unitOption.label}</option>
+                          ))}
+                        {!hasInfo && !hasMeasures && (
                           <option value="" disabled>Загрузка…</option>
                         )}
                       </select>
                     </label>
+                    {displayMeasureLabel && (
+                      <span style={{ marginLeft: 6, color: 'var(--token-muted)', fontSize: 12 }}>
+                        {displayMeasureLabel}
+                      </span>
+                    )}
                     {warningMessage && (
                       <div className={styles.controlWarning}>{warningMessage}</div>
                     )}

@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import type { Recipe } from '../../types';
 import type { CreateRecipeDto } from '../../types/recipe.types';
-import { 
-  ClockIcon, 
-  UserIcon, 
-  StarIcon, 
+import {
+  ClockIcon,
+  StarIcon as StarIconOutline,
   HeartIcon,
-  BookmarkIcon
+  BookmarkIcon,
 } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import {
+  HeartIcon as HeartIconSolid,
+  BookmarkIcon as BookmarkIconSolid,
+  StarIcon as StarIconSolid,
+} from '@heroicons/react/24/solid';
 import styles from './RecipeCard.module.css';
 import { FOOD_PLACEHOLDER_EMOJIS, hashStringToIndex } from '../../utils/emoji';
+import { RecipesService } from '../../services/recipesService';
 
 interface RecipeCardProps {
   recipe: Recipe | CreateRecipeDto;
@@ -65,11 +69,127 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   // Получаем значения в зависимости от типа данных
   const prepTime = isFormData ? (recipe as CreateRecipeDto).allTime : ((recipe as Recipe).prepTime || 0);
   const cookTime = isFormData ? (recipe as CreateRecipeDto).cookTime : ((recipe as Recipe).cookTime || 0);
-  const servingsCount = isFormData ? 1 : ((recipe as Recipe).servings || 4);
+  //console.log('Calculated values:', { prepTime, cookTime });
 
-  //console.log('Calculated values:', { prepTime, cookTime, servingsCount });
-  
   const totalTime = formatTime(prepTime + cookTime);
+  const ratingValue = !isFormData
+    ? Number(
+        (recipe as Recipe)?.stats?.rating ??
+          (recipe as any)?.stats?.avgRating ??
+          (recipe as any)?.stats?.rating ??
+          (recipe as any)?.stats?.avgRating ??
+          0,
+      )
+    : undefined;
+  const hasRating = ratingValue !== undefined && !Number.isNaN(ratingValue);
+
+  const recipeState = !isFormData ? (recipe as Recipe).state : undefined;
+  const recipeId = !isFormData ? (recipe as Recipe).id : undefined;
+
+  const [isLiked, setIsLiked] = useState(Boolean(recipeState?.liked));
+  const [isFavorite, setIsFavorite] = useState(Boolean(recipeState?.favorite));
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+  const handleToggleLike = useCallback(
+    async (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!recipeId || likeLoading) return;
+
+      const next = !isLiked;
+      setIsLiked(next);
+      setLikeLoading(true);
+      try {
+        await RecipesService.toggleLike(recipeId, next);
+      } catch (error) {
+        console.error('RecipeCard: не удалось переключить лайк', error);
+        setIsLiked(!next);
+      } finally {
+        setLikeLoading(false);
+      }
+    },
+    [recipeId, isLiked, likeLoading],
+  );
+
+  const handleToggleFavorite = useCallback(
+    async (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!recipeId || favoriteLoading) return;
+
+      const next = !isFavorite;
+      setIsFavorite(next);
+      setFavoriteLoading(true);
+      try {
+        await RecipesService.toggleFavorite(recipeId, next);
+      } catch (error) {
+        console.error('RecipeCard: не удалось переключить избранное', error);
+        setIsFavorite(!next);
+      } finally {
+        setFavoriteLoading(false);
+      }
+    },
+    [recipeId, isFavorite, favoriteLoading],
+  );
+
+  const LikeIcon = isLiked ? HeartIconSolid : HeartIcon;
+  const FavoriteIcon = isFavorite ? BookmarkIconSolid : BookmarkIcon;
+
+  const renderLikeButton = (suffix: string) => {
+    const LikeIconComponent = isLiked ? HeartIconSolid : HeartIcon;
+
+    return (
+      <button
+        key={`like-${suffix}`}
+        className={`${styles.actionBtn} ${isLiked ? styles.actionBtnActive : ''}`}
+        type="button"
+        aria-pressed={isLiked}
+        aria-label={isLiked ? 'Убрать лайк' : 'Поставить лайк'}
+        title={isLiked ? 'Лайк поставлен' : 'Поставить лайк'}
+        onClick={handleToggleLike}
+        disabled={likeLoading}
+      >
+        <LikeIconComponent className={styles.icon} />
+      </button>
+    );
+  };
+
+  const renderFavoriteButton = (suffix: string) => {
+    const FavoriteIconComponent = isFavorite ? BookmarkIconSolid : BookmarkIcon;
+
+    return (
+      <button
+        key={`favorite-${suffix}`}
+        className={`${styles.actionBtn} ${isFavorite ? styles.actionBtnActive : ''}`}
+        type="button"
+        aria-pressed={isFavorite}
+        aria-label={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+        title={isFavorite ? 'В избранном' : 'Добавить в избранное'}
+        onClick={handleToggleFavorite}
+        disabled={favoriteLoading}
+      >
+        <FavoriteIconComponent className={styles.icon} />
+      </button>
+    );
+  };
+
+  const persistentButtons: React.ReactNode[] = [];
+  const hoverButtons: React.ReactNode[] = [];
+
+  if (isLiked) {
+    persistentButtons.push(renderLikeButton('persistent'));
+  } else {
+    hoverButtons.push(renderLikeButton('hover'));
+  }
+
+  if (isFavorite) {
+    persistentButtons.push(renderFavoriteButton('persistent'));
+  } else {
+    hoverButtons.push(renderFavoriteButton('hover'));
+  }
+
+  const overlayClassName = `${styles.overlay} ${isLiked || isFavorite ? styles.overlayPersistent : ''}`;
 
   return (
     <div className={`${styles.card} ${viewMode === 'list' ? styles.listCard : styles.gridCard}`}>
@@ -88,15 +208,17 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               <span className={styles.placeholderEmoji}>{fallbackEmoji}</span>
             </div>
           )}
-          <div className={styles.overlay}>
-            <div className={styles.actions}>
-              <button className={styles.actionBtn}>
-                <HeartIcon className={styles.icon} />
-              </button>
-              <button className={styles.actionBtn}>
-                <BookmarkIcon className={styles.icon} />
-              </button>
-            </div>
+          <div className={overlayClassName}>
+            {persistentButtons.length > 0 && (
+              <div className={`${styles.actions} ${styles.actionsPersistent}`}>
+                {persistentButtons}
+              </div>
+            )}
+            {hoverButtons.length > 0 && (
+              <div className={`${styles.actions} ${styles.actionsHover}`}>
+                {hoverButtons}
+              </div>
+            )}
           </div>
         </div>
         
@@ -105,19 +227,19 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           <p className={styles.description}>{isFormData ? (recipe as CreateRecipeDto).description : (recipe as Recipe).description}</p>
           
           <div className={styles.meta}>
+            {!isFormData && hasRating && (
+              <div className={`${styles.metaItem} ${styles.metaRating}`}>
+                <StarIconSolid className={`${styles.metaIcon} ${styles.ratingIcon}`} />
+                <span>{(ratingValue ?? 0).toFixed(1)}</span>
+              </div>
+            )}
             <div className={styles.metaItem}>
               <ClockIcon className={styles.metaIcon} />
               <span>{totalTime}</span>
             </div>
-            {false && (
-              <div className={styles.metaItem}>
-                <UserIcon className={styles.metaIcon} />
-                <span>{servingsCount} порций</span>
-              </div>
-            )}
             <div className={styles.metaItem}>
-              <StarIcon 
-                className={styles.metaIcon} 
+              <StarIconOutline
+                className={styles.metaIcon}
                 style={{ color: getDifficultyColor(isFormData ? (recipe as CreateRecipeDto).level : (recipe as Recipe).difficulty) }}
               />
               <span>{getDifficultyLabel(isFormData ? (recipe as CreateRecipeDto).level : (recipe as Recipe).difficulty)}</span>

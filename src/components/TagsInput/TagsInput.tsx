@@ -1,8 +1,7 @@
 import React, { useState, useRef, type KeyboardEvent, useEffect } from 'react';
-import { API_BASE_URL } from '../../services/api';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import styles from './TagsInput.module.css';
-import { getAuthHeaders } from '../../services/auth';
+import { tagsService } from '../../services/tagsService';
 
 interface TagsInputProps {
   tags: { id: string; name: string }[];
@@ -23,19 +22,23 @@ const TagsInput: React.FC<TagsInputProps> = ({
   const [availableTags, setAvailableTags] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
+    let isMounted = true;
     const loadTags = async () => {
       try {
-        const headers = getAuthHeaders();
-        const resp = await fetch(`${API_BASE_URL}/tags/all`, { headers });
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-        const normalized = (Array.isArray(data) ? data : []).map((t: any) => ({ id: t.id, name: t.name })).filter((t: any) => t.id && t.name);
-        setAvailableTags(normalized);
-      } catch (e) {
-        setAvailableTags([]);
+        const data = await tagsService.getAll();
+        if (isMounted) {
+          setAvailableTags(data);
+        }
+      } catch {
+        if (isMounted) {
+          setAvailableTags([]);
+        }
       }
     };
-    loadTags();
+    void loadTags();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const suggestions = availableTags

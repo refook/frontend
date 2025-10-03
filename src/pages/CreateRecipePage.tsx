@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../store';
 import type { CreateRecipeDto, ApiCreateRecipeDto } from '../types/recipe.types';
-import { BASE_UNITS_ARRAY, PRODUCT_UNITS_ARRAY } from '../constants/measures';
 import RecipeForm from '../components/RecipeForm/RecipeForm';
 import RecipePreview from '../components/RecipePreview/RecipePreview';
 import { EyeIcon, DocumentTextIcon } from '@heroicons/react/24/outline';
@@ -10,33 +9,18 @@ import { createRecipe } from '../store/thunks';
 import { useNotification } from '../hooks/useNotification';
 import Notification from '../components/Notification';
 import styles from './CreateRecipePage.module.css';
+import { createEmptyRecipeForm } from '../adapters/recipeAdapter';
 
 interface CreateRecipePageProps { fullWidth?: boolean }
 
 const CreateRecipePage: React.FC<CreateRecipePageProps> = ({ fullWidth = false }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { notification, showSuccess, showError, hideNotification } = useNotification();
+  const { notification, showError, hideNotification } = useNotification();
   
   const [activeTab, setActiveTab] = useState<'form' | 'preview'>('form');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CreateRecipeDto>({
-    name: '',
-    description: '',
-    level: 'EASY',
-    kitchens: [],
-    cookTime: 0,
-    allTime: 0,
-    // portion убран из DTO — используем serving.unitCount на бэке
-    photos: [],
-    tags: [],
-    ingredients: [],
-    steps: [],
-    baseUnit: 'GR',
-    avgWeight: 100,
-    unit: 'GRAM',
-    macros: { calories: 0, proteins: 0, fats: 0, carbs: 0 }
-  });
+  const [formData, setFormData] = useState<CreateRecipeDto>(() => createEmptyRecipeForm());
 
   const handleFormChange = (newFormData: CreateRecipeDto) => {
     setFormData(newFormData);
