@@ -47,8 +47,8 @@ const EditRecipePage: React.FC = () => {
 
     const normalized: any = {
       ...source,
-      id: baseProductId || source?.id,
-      baseProductId: baseProductId || source?.baseProductId,
+      id: source?.id,
+      baseProductId: baseProductId || source?.baseProductId || source?.productId,
       count: Number(source?.count) || 0,
       productUnit: source?.productUnit || source?.measure,
       productMeasureId: source?.productMeasureId,
@@ -56,8 +56,15 @@ const EditRecipePage: React.FC = () => {
 
     if (variantId) {
       normalized.variantId = variantId;
+      if (!normalized.variantName) {
+        normalized.variantName = source?.variantName ?? source?.name ?? variantId;
+      }
     } else {
       delete normalized.variantId;
+    }
+
+    if (!normalized.baseProductId) {
+      normalized.baseProductId = normalized.id;
     }
 
     normalized.isVariant = Boolean(variantId || source?.isVariant);

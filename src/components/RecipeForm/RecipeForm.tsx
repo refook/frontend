@@ -256,7 +256,10 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         if (inheritedUnit) {
           const measures = await getMeasures(selectedId, isVariant);
           const wantedLabel = unitLabelByValue(String(inheritedUnit));
-          const found = measures.find(m => m.name === wantedLabel);
+          let found = measures.find(m => m.name === wantedLabel);
+          if (!found) {
+            found = measures.find(m => m.isDefault) ?? measures[0];
+          }
           if (!found) {
             setErrors(prev => ({ ...prev, [`ingredients.measure.${errorSuffixId}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
             return null;
@@ -268,7 +271,10 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         // Иначе подбираем по выбранной единице
         const measures = await getMeasures(selectedId, isVariant);
         const wantedLabel = unitLabelByValue((ing as any).productUnit as string);
-        const found = measures.find(m => m.name === wantedLabel);
+        let found = measures.find(m => m.name === wantedLabel);
+        if (!found) {
+          found = measures.find(m => m.isDefault) ?? measures[0];
+        }
         if (!found) {
           setErrors(prev => ({ ...prev, [`ingredients.measure.${errorSuffixId}`]: 'Не найдена подходящая базовая мера для выбранной единицы' }));
           return null;
