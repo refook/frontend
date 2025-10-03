@@ -13,7 +13,8 @@ import type { CreateStepDto, CreateRecipeIngredientDto } from "../../types";
 import { API_BASE_URL } from '../../services/api';
 import { authorizedFetch, getAuthHeaders } from '../../services/auth';
 import { PRODUCT_UNITS_ARRAY } from '../../constants/measures';
-import { productsService } from '../../services/productsService';
+import { useVariantNames } from '../../hooks/useVariantNames';
+import { useAvailableIngredients } from '../../hooks/useAvailableIngredients';
 
 export type StepIngredientOveruse = {
   key: string;
@@ -50,56 +51,27 @@ const StepsEditor: React.FC<StepsEditorProps> = ({ steps, onChange, errors = {},
   const [editingName, setEditingName] = useState('');
   const [expandedSteps, setExpandedSteps] = useState<Set<number>>(new Set());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [idToName, setIdToName] = useState<Record<string, string>>({});
-  const [variantNames, setVariantNames] = useState<Record<string, string>>({});
+  const { ingredients: availableIngredients } = useAvailableIngredients(true);
 
-  useEffect(() => {
-    // Подгрузим справочник продуктов для отображения названий
-    const load = async () => {
-      try {
-        const headers = getAuthHeaders();
-        const resp = await authorizedFetch(`${API_BASE_URL}/products/all`, { headers });
-        if (!resp.ok) return;
-        const list = await resp.json();
-        const map: Record<string, string> = {};
-        (list || []).forEach((p: any) => { if (p?.id) map[p.id] = p.name ?? 'Продукт'; });
-        setIdToName(map);
-      } catch {
-        setIdToName({});
-      }
-    };
-    load();
-  }, []);
-
-  // Подгрузка названий вариантов по variantId (или по id, если isVariant=true и variantId нет)
-  useEffect(() => {
-    const ids = new Set<string>();
-    const collect = (arr: any[] | undefined) => {
-      (arr || []).forEach((i: any) => {
-        const vid = i?.variantId || (i?.isVariant ? i?.id : undefined);
-        if (typeof vid === 'string' && vid && !variantNames[vid]) ids.add(vid);
-      });
-    };
-    collect(baseIngredients as any);
-    (steps || []).forEach((s) => collect((s as any)?.ingredients));
-    if (ids.size === 0) return;
-    let cancelled = false;
-    (async () => {
-      const updates: Record<string, string> = {};
-      for (const vid of ids) {
-        try {
-          const v = await productsService.getProductVariantById(vid);
-          if (v?.name) updates[vid] = v.name;
-        } catch { /* ignore */ }
-      }
-      if (!cancelled && Object.keys(updates).length > 0) {
-        setVariantNames((prev) => ({ ...prev, ...updates }));
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [baseIngredients, steps, variantNames]);
+  const idToName = useMemo(() => {
+    const map: Record<string, string> = {};
+    (availableIngredients || []).forEach((product) => {
+      if (product?.id) map[product.id] = product.name ?? 'Продукт';
+    });
+    return map;
+  }, [availableIngredients]);
 
   const selectableBaseIngredients = useMemo(() => baseIngredients || [], [baseIngredients]);
+
+  const variantNameSources = useMemo(
+    () => [
+      ...(baseIngredients || []),
+      ...((steps || []).flatMap((step) => step.ingredients || [])),
+    ],
+    [baseIngredients, steps],
+  );
+
+  const variantNames = useVariantNames(variantNameSources as unknown[]);
 
   const baseTotals = useMemo(() => {
     const map = new Map<string, number>();
