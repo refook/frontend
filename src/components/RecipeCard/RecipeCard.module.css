@@ -1,10 +1,9 @@
 .card {
-  background-color: var(--token-bg);
+  background-color: var(--token-surface);
   border-radius: var(--token-radius-lg);
   box-shadow: var(--token-shadow-sm);
   overflow: hidden;
   transition: transform var(--token-duration-fast), box-shadow var(--token-duration-fast);
-  border: 1px solid var(--token-border);
 }
 
 .card:hover { transform: translateY(-2px); box-shadow: var(--token-shadow-md); }
@@ -65,7 +64,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.4));
+  background: transparent;
   opacity: 0;
   transition: opacity 0.2s;
   display: flex;
@@ -78,14 +77,19 @@
   opacity: 1;
 }
 
+.overlayPersistent {
+  opacity: 1;
+  background: transparent;
+}
+
 .actions {
   display: flex;
   gap: 0.5rem;
 }
 
 .actionBtn {
-  background-color: white;
-  border: none;
+  background-color: color-mix(in oklab, var(--token-surface) 88%, transparent);
+  border: 1px solid color-mix(in oklab, var(--token-border) 65%, transparent);
   border-radius: 9999px;
   padding: 0.5rem;
   cursor: pointer;
@@ -96,10 +100,24 @@
 }
 
 .actionBtn:hover {
-  background-color: #f3f4f6;
+  background-color: color-mix(in oklab, var(--token-surface) 72%, var(--token-accent-weak) 18%);
 }
 
-.icon { width: 1.25rem; height: 1.25rem; color: var(--token-muted); }
+.actionBtnActive {
+  background-color: color-mix(in oklab, var(--token-accent-weak) 70%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent-strong) 20%, var(--token-accent-weak) 60%);
+}
+
+.actionBtnActive .icon {
+  color: var(--token-accent-strong);
+}
+
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--token-muted);
+  transition: color var(--token-duration-fast);
+}
 
 .content { padding: var(--token-space-4); }
 

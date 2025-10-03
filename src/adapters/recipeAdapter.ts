@@ -5,6 +5,13 @@ import { API_BASE_URL } from '../services/api';
 
 const DEFAULT_MACROS = { calories: 0, proteins: 0, fats: 0, carbs: 0 };
 
+const toRecord = (value: unknown): Record<string, unknown> | null => {
+  if (value && typeof value === 'object') {
+    return value as Record<string, unknown>;
+  }
+  return null;
+};
+
 export type RecipeLike = Recipe & {
   kitchenIds?: string[];
   metaInfo?: {
@@ -294,6 +301,8 @@ export const mapShortRecipeResponseToRecipe = (
         avatar: undefined,
       };
 
+  const stateSource = toRecord(short?.state) ?? {};
+
   return {
     id: String(short.id),
     title: short.name ?? 'Без названия',
@@ -314,7 +323,18 @@ export const mapShortRecipeResponseToRecipe = (
     ...(tagObjects ? { tagObjects } : {}),
     ingredients: [],
     steps: [],
-    state: undefined,
+    state: {
+      liked:
+        Boolean(stateSource?.liked) || Boolean((short as any)?.state?.liked) || Boolean((short as any)?.isLiked),
+      favorite:
+        Boolean(stateSource?.favorite) || Boolean((short as any)?.state?.favorite) || Boolean((short as any)?.isFavorite),
+      rate:
+        typeof stateSource?.rate === 'number'
+          ? stateSource.rate
+          : typeof stateSource?.rate === 'string'
+            ? Number(stateSource.rate) || 0
+            : Number((short as any)?.state?.rate ?? (short as any)?.rate ?? 0) || 0,
+    },
     author,
     macros: undefined,
     stats: {
