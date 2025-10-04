@@ -2,38 +2,10 @@ import { apiLogger } from '../utils/apiLogger';
 import { API_BASE_URL } from './api';
 import { authorizedFetch, getAuthHeaders } from './auth';
 import type { TagResponseDto } from '../types/recipe.types';
+import { ensureNamedEntityArray } from './namedEntityUtils';
 
 let tagsCache: TagResponseDto[] | null = null;
 let tagsInflight: Promise<TagResponseDto[]> | null = null;
-
-const toRecord = (value: unknown): Record<string, unknown> | null => {
-  return typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : null;
-};
-
-const toNonEmptyString = (value: unknown): string | null => {
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
-  }
-  if (typeof value === 'number') {
-    return String(value);
-  }
-  return null;
-};
-
-const normalizeTags = (payload: unknown): TagResponseDto[] => {
-  if (!Array.isArray(payload)) return [];
-  return payload
-    .map((entry) => {
-      const record = toRecord(entry);
-      if (!record) return null;
-      const id = toNonEmptyString(record.id ?? record.uuid ?? record.value);
-      const name = toNonEmptyString(record.name ?? record.title ?? record.label);
-      if (!id || !name) return null;
-      return { id, name } satisfies TagResponseDto;
-    })
-    .filter((tag): tag is TagResponseDto => tag !== null);
-};
 
 const requestAllTags = async (): Promise<TagResponseDto[]> => {
   const url = `${API_BASE_URL}/tags/all`;
@@ -42,7 +14,7 @@ const requestAllTags = async (): Promise<TagResponseDto[]> => {
   const response = await authorizedFetch(url, { method: 'GET', headers });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const json = await response.json();
-  const normalized = normalizeTags(json);
+  const normalized = ensureNamedEntityArray<TagResponseDto>(json);
   tagsCache = normalized;
   return normalized;
 };
@@ -81,6 +53,28 @@ export class TagsService {
 
   static clearCache(): void {
     tagsCache = null;
+  }
+
+  static async search(name: string): Promise<TagResponseDto[]> {
+    const url = `${API_BASE_URL}/tags/search?name=${encodeURIComponent(name)}`;
+    const headers = getAuthHeaders();
+    apiLogger.logRequest(url, 'GET', headers);
+    const response = await authorizedFetch(url, { method: 'GET', headers });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    return ensureNamedEntityArray<TagResponseDto>(data);
+  }
+
+  static async update(id: string, name: string): Promise<TagResponseDto> {
+    const url = `${API_BASE_URL}/tags/${id}`;
+    const headers = getAuthHeaders();
+    const body = { name };
+    apiLogger.logRequest(url, 'PUT', headers, body);
+    const response = await authorizedFetch(url, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const updated = await response.json();
+    tagsCache = tagsCache?.map((tag) => (tag.id === id ? { ...tag, name } : tag)) ?? null;
+    return updated as TagResponseDto;
   }
 }
 

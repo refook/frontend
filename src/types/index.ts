@@ -10,6 +10,7 @@ export * from './step.types.ts'
 export * from './user.types.ts'
 export * from './recipe.types.ts'
 export * from './api.types.ts'
+export * from './category.types.ts'
 
 export interface BaseEntity {
   id: string;

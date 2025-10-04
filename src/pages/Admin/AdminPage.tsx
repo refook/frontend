@@ -1,18 +1,19 @@
 import React, { useState } from 'react';
 import styles from './AdminPage.module.css';
 import Tabs from '../../components/Tabs/Tabs';
-import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon } from '@heroicons/react/24/outline';
+import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon, FolderIcon } from '@heroicons/react/24/outline';
 import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
 import CreateProductForm from './components/CreateProductForm/CreateProductForm';
 import ProductListSubTab from './components/ProductListSubTab/ProductListSubTab';
 import TagSubTabs from './components/TagSubTabs/TagSubTabs';
 import KitchenSubTabs from './components/KitchenSubTabs/KitchenSubTabs';
+import CategorySubTabs from './components/CategorySubTabs/CategorySubTabs';
 
 /**
  * Тип ключей доступных вкладок админ-панели
- * @typedef {'products' | 'recipes' | 'tags' | 'users' | 'settings'} TabKey
+ * @typedef {'products' | 'recipes' | 'tags' | 'users' | 'settings' | 'categories' | 'kitchens'} TabKey
  */
-type TabKey = 'products' | 'recipes' | 'tags' | 'users' | 'settings' | 'kitchens';
+type TabKey = 'products' | 'recipes' | 'tags' | 'users' | 'settings' | 'kitchens' | 'categories';
 
 /**
  * Главная страница админ-панели с управлением системными функциями.
@@ -86,6 +87,15 @@ const AdminPage: React.FC = () => {
             ],
           },
           {
+            id: 'categories',
+            label: 'Категории',
+            Icon: FolderIcon,
+            subtabs: [
+              { id: 'categories:create', label: 'Создать', title: 'Создать категорию', content: <CategorySubTabs mode="create" /> },
+              { id: 'categories:manage', label: 'Управление', title: 'Управление категориями', content: <CategorySubTabs mode="manage" /> },
+            ],
+          },
+          {
             id: 'kitchens',
             label: 'Кухни',
             Icon: Squares2X2Icon,
@@ -107,5 +117,4 @@ const AdminPage: React.FC = () => {
 };
 
 export default AdminPage;
-
 
