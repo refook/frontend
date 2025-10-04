@@ -1,5 +1,6 @@
 import type {FormIngredient, FormStep, Ingredient, Recipe} from "./index.ts";
 import type { BaseUnitType, ProductUnitType } from './measures.types';
+import type { CategoryResponseDto } from './category.types';
 
 export type KitchenType = 'RUSSIAN' | 'ASIAN';
 export type DifficultyLevel = 'EASY' | 'MEDIUM' | 'HARD';
@@ -43,6 +44,7 @@ export interface CreateRecipeDto {
   allTime: number; // секунды
   photos?: string[];
   tags?: TagResponseDto[] | null;
+  categories?: CategoryResponseDto[] | null;
   ingredients: CreateRecipeIngredientDto[];
   steps: CreateStepDto[];
   baseUnit?: BaseUnitType;
@@ -89,6 +91,7 @@ export interface ApiRecipeCompositionDto {
 export interface ApiCreateMetaInfoDto {
   kitchens?: string[]; // array of UUIDs
   tags?: string[] | null; // array of UUIDs
+  categories?: string[] | null; // array of UUIDs
   photos?: string[];
 }
 

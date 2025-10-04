@@ -13,6 +13,7 @@ import { productsService } from '../../services';
 import IngredientPicker from '../IngredientPicker/IngredientPicker';
 import StepsEditor, { type StepIngredientOveruse } from '../StepsEditor/StepsEditor';
 import TagsInput from '../TagsInput/TagsInput';
+import CategoriesInput from '../CategoriesInput/CategoriesInput';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import styles from './RecipeForm.module.css';
 import { getAuthHeaders, authorizedFetch } from '../../services/auth';
@@ -37,6 +38,7 @@ const buildInitialFormState = (data: CreateRecipeDto): CreateRecipeDto => ({
   allTime: data.allTime || 0,
   photos: data.photos || [],
   tags: data.tags || [],
+  categories: (data as any).categories || [],
   ingredients: data.ingredients || [],
   steps: data.steps || [],
   baseUnit: data.baseUnit || 'GR',
@@ -405,6 +407,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
       metaInfo: {
         kitchens: formData.kitchens,
         tags: (formData.tags as any[] | undefined)?.map((t: any) => (typeof t === 'string' ? t : t?.id)).filter(Boolean) as string[] | undefined,
+        categories: (formData.categories as any[] | undefined)?.map((c: any) => (typeof c === 'string' ? c : c?.id)).filter(Boolean) as string[] | undefined,
         photos: formData.photos,
       },
       cookingTime: {
@@ -497,6 +500,16 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Теги</h2>
           <TagsInput tags={(formData.tags as any) || []} onChange={(selected) => updateField('tags', selected as any)} placeholder="Выберите тег из списка" />
+        </section>
+
+        {/* Категории */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Категории</h2>
+          <CategoriesInput
+            categories={(formData.categories as any) || []}
+            onChange={(next) => updateField('categories', next as any)}
+            placeholder="Выберите категорию из списка"
+          />
         </section>
 
         {/* Единицы итогового продукта */}
