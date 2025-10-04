@@ -26,8 +26,9 @@ export interface ActivityItem {
   dateISO: string;
 }
 
-const RightIcon: React.FC<{ type: ActivityType }> = ({ type }) => {
-  const cls = `${styles.rightIcon} ${
+const RightIcon: React.FC<{ type: ActivityType; compact?: boolean }> = ({ type, compact }) => {
+  const baseClass = compact ? styles.compactIcon : styles.rightIcon;
+  const cls = `${baseClass} ${
     type === 'create' ? styles.right_create :
     type === 'like' ? styles.right_like :
     type === 'cook' ? styles.right_cook :
@@ -43,22 +44,31 @@ const RightIcon: React.FC<{ type: ActivityType }> = ({ type }) => {
  * Строка активности внутри списка.
  * @param props Параметры
  * @param props.item Объект активности `ActivityItem`
+ * @param props.variant Вид отображения строки
  */
-const ActivityRow: React.FC<{ item: ActivityItem }> = ({ item }) => {
+const ActivityRow: React.FC<{ item: ActivityItem; variant?: 'default' | 'compact' }> = ({ item, variant = 'default' }) => {
+  const compact = variant === 'compact';
   const ph = FOOD_PLACEHOLDER_EMOJIS[hashStringToIndex(item.imageTitle ?? item.title, FOOD_PLACEHOLDER_EMOJIS.length)];
   return (
-    <div className={styles.row}>
-      <div className={styles.thumb} aria-label={item.title}>{ph}</div>
-      <div>
-        <h4 className={styles.title}>{item.title}</h4>
-        {item.subtitle && <p className={styles.subtitle}>{item.subtitle}</p>}
-        <div className={styles.timeRow}><ClockIcon className={styles.timeIcon} />{new Date(item.dateISO).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' })} назад</div>
+    <div className={compact ? styles.compactRow : styles.row}>
+      {!compact && (
+        <div className={styles.thumb} aria-label={item.title}>{ph}</div>
+      )}
+      <div className={compact ? styles.compactContent : undefined}>
+        {compact ? (
+          <div className={styles.compactTitleRow}>
+            <h4 className={`${styles.title} ${styles.titleCompact}`}>{item.title}</h4>
+            <RightIcon type={item.type} compact />
+          </div>
+        ) : (
+          <h4 className={styles.title}>{item.title}</h4>
+        )}
+        {item.subtitle && <p className={compact ? `${styles.subtitle} ${styles.subtitleCompact}` : styles.subtitle}>{item.subtitle}</p>}
+        <div className={compact ? `${styles.timeRow} ${styles.timeRowCompact}` : styles.timeRow}><ClockIcon className={styles.timeIcon} />{new Date(item.dateISO).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' })} назад</div>
       </div>
-      <RightIcon type={item.type} />
+      {!compact && <RightIcon type={item.type} />}
     </div>
   );
 };
 
 export default ActivityRow;
-
-
