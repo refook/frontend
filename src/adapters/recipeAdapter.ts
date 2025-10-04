@@ -1,4 +1,4 @@
-import type { Recipe, RecipeResponseDto, StepResponseDto } from '../types';
+import type { Recipe, RecipeResponseDto, StepResponseDto, CategoryResponseDto } from '../types';
 import type { CreateRecipeDto, DifficultyLevel, TagResponseDto, UserInfoResponseDto } from '../types/recipe.types';
 import { normalizeIngredientFromApi } from '../utils/recipeIngredient';
 import { API_BASE_URL } from '../services/api';
@@ -17,8 +17,11 @@ export type RecipeLike = Recipe & {
   metaInfo?: {
     kitchens?: string[];
     tags?: Array<TagResponseDto | string>;
+    categories?: Array<CategoryResponseDto | string>;
   };
   tagObjects?: Array<TagResponseDto | string>;
+  categoryObjects?: Array<CategoryResponseDto | string>;
+  categories?: Array<CategoryResponseDto | string>;
   [key: string]: unknown;
 };
 
@@ -31,6 +34,7 @@ export const createEmptyRecipeForm = (): CreateRecipeDto => ({
   allTime: 0,
   photos: [],
   tags: [],
+  categories: [],
   ingredients: [],
   steps: [],
   baseUnit: 'GR',
@@ -74,6 +78,31 @@ const extractTags = (recipe: RecipeLike): TagResponseDto[] => {
   return [];
 };
 
+const asCategory = (value: unknown): CategoryResponseDto | null => {
+  if (!value) return null;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    return { id: trimmed, name: trimmed };
+  }
+  const record = value as Record<string, unknown>;
+  const idRaw = record.id ?? record.uuid ?? record.value;
+  if (!idRaw || typeof idRaw !== 'string') return null;
+  const nameRaw = record.name ?? record.title ?? record.label ?? idRaw;
+  const name = typeof nameRaw === 'string' && nameRaw.trim().length > 0 ? nameRaw.trim() : idRaw;
+  return { id: idRaw, name };
+};
+
+const extractCategories = (recipe: RecipeLike): CategoryResponseDto[] => {
+  const sources = [recipe.categoryObjects, recipe.metaInfo?.categories, (recipe as any)?.categories];
+  for (const source of sources) {
+    if (Array.isArray(source) && source.length > 0) {
+      return source.map(asCategory).filter(Boolean) as CategoryResponseDto[];
+    }
+  }
+  return [];
+};
+
 export const mapRecipeToInitialData = (recipe?: RecipeLike | null): CreateRecipeDto => {
   if (!recipe) {
     return createEmptyRecipeForm();
@@ -90,6 +119,7 @@ export const mapRecipeToInitialData = (recipe?: RecipeLike | null): CreateRecipe
     allTime: Number((recipe.prepTime || 0) + (recipe.cookTime || 0)) * 60,
     photos: recipe.photos || [],
     tags: extractTags(recipe),
+    categories: extractCategories(recipe),
     ingredients: (recipe.ingredients || []).map((ingredient: unknown) =>
       normalizeIngredientFromApi(ingredient),
     ),
@@ -159,6 +189,15 @@ const normalizeTagEntries = (apiRecipe: RecipeResponseDto): TagResponseDto[] => 
     .filter(Boolean) as TagResponseDto[];
 };
 
+const normalizeCategoryEntries = (apiRecipe: RecipeResponseDto): CategoryResponseDto[] => {
+  const rawCategories = (apiRecipe as any)?.metaInfo?.categories ?? (apiRecipe as any)?.categories ?? [];
+  if (!Array.isArray(rawCategories)) return [];
+
+  return rawCategories
+    .map(asCategory)
+    .filter(Boolean) as CategoryResponseDto[];
+};
+
 const resolveUserRate = (apiState: unknown): number | null => {
   const rate = (apiState as any)?.rate;
   if (typeof rate === 'number') return rate;
@@ -192,6 +231,9 @@ export const mapRecipeResponseToRecipe = (
   const tagEntries = normalizeTagEntries(apiRecipe);
   const tags = tagEntries.map((tag) => tag.name).filter(Boolean);
   const tagObjects = tagEntries.length > 0 ? tagEntries : undefined;
+  const categoryEntries = normalizeCategoryEntries(apiRecipe);
+  const categories = categoryEntries.map((category) => category.name).filter(Boolean);
+  const categoryObjects = categoryEntries.length > 0 ? categoryEntries : undefined;
 
   const apiState = (apiRecipe as any)?.state || {};
   const userRate = resolveUserRate(apiState);
@@ -221,6 +263,12 @@ export const mapRecipeResponseToRecipe = (
       };
 
   const apiStats = ((apiRecipe as any)?.stats ?? (apiRecipe as any)?.statistic ?? {}) as Record<string, unknown>;
+  const apiMetaInfo = toRecord((apiRecipe as any)?.metaInfo) ?? {};
+  const metaInfo = {
+    ...apiMetaInfo,
+    ...(tagObjects ? { tags: tagObjects } : {}),
+    ...(categoryObjects ? { categories: categoryObjects } : {}),
+  };
 
   return {
     id: apiRecipe.id,
@@ -236,6 +284,8 @@ export const mapRecipeResponseToRecipe = (
     kitchenIds: extractKitchenIdsFromResponse(apiRecipe),
     tags,
     ...(tagObjects ? { tagObjects } : {}),
+    categories,
+    ...(categoryObjects ? { categoryObjects } : {}),
     ingredients,
     steps,
     servingBaseUnit: servingInfo?.baseUnit,
@@ -271,6 +321,7 @@ export const mapRecipeResponseToRecipe = (
     },
     createdAt: apiRecipe.createdAt,
     updatedAt: apiRecipe.updatedAt,
+    ...(Object.keys(metaInfo).length > 0 ? { metaInfo } : {}),
   };
 };
 
@@ -287,6 +338,9 @@ export const mapShortRecipeResponseToRecipe = (
   const tagEntries = normalizeTagEntries(short as RecipeResponseDto);
   const tags = tagEntries.map((tag) => tag.name).filter(Boolean);
   const tagObjects = tagEntries.length > 0 ? tagEntries : undefined;
+  const categoryEntries = normalizeCategoryEntries(short as RecipeResponseDto);
+  const categories = categoryEntries.map((category) => category.name).filter(Boolean);
+  const categoryObjects = categoryEntries.length > 0 ? categoryEntries : undefined;
 
   const authorSource = short?.ownerUser || fallbackAuthor;
   const author = authorSource
@@ -321,6 +375,8 @@ export const mapShortRecipeResponseToRecipe = (
     kitchenIds: undefined,
     tags,
     ...(tagObjects ? { tagObjects } : {}),
+    categories,
+    ...(categoryObjects ? { categoryObjects } : {}),
     ingredients: [],
     steps: [],
     state: {

@@ -301,6 +301,177 @@
   border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border));
 }
 
+.notifications {
+  position: relative;
+}
+
+.notificationButton {
+  position: relative;
+}
+
+.notificationsPanel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  max-width: 90vw;
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-3);
+  padding: var(--token-space-4) var(--token-space-4) var(--token-space-3);
+  background: var(--token-surface);
+  border-radius: var(--token-radius-lg);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity var(--token-duration-normal), transform var(--token-duration-normal), visibility var(--token-duration-normal);
+  z-index: calc(var(--z-sticky) + 1);
+}
+
+.notificationsPanelMobile {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  border: 0;
+  padding: calc(var(--token-space-6) + 20px) var(--token-space-4) calc(var(--token-space-6));
+  gap: var(--token-space-4);
+  transform: translateY(8px);
+  z-index: calc(var(--z-sticky) + 2);
+  background: var(--token-surface);
+}
+
+.notificationsPanelMobile.notificationsPanelOpen {
+  transform: translateY(0);
+}
+
+.notificationsMobileBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 18, 27, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: calc(var(--z-sticky) + 1);
+}
+
+.notificationsPanelOpen {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.notificationsHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-1);
+  padding: var(--token-space-3) var(--token-space-4) var(--token-space-2);
+}
+
+.notificationsHeaderMobile {
+  gap: var(--token-space-3);
+  padding: 0;
+}
+
+.notificationsHeaderTop {
+  display: flex;
+  align-items: center;
+  gap: var(--token-space-2);
+}
+
+.notificationsHeaderTop .notificationsTitle {
+  flex: 1 1 auto;
+}
+
+.notificationsCloseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid color-mix(in oklab, var(--token-border) 70%, transparent);
+  background: color-mix(in oklab, var(--token-surface) 92%, transparent);
+  color: var(--token-text);
+  transition: background var(--token-duration-fast), border-color var(--token-duration-fast), transform var(--token-duration-fast);
+}
+
+.notificationsCloseButton:hover {
+  background: color-mix(in oklab, var(--token-accent-weak) 45%, transparent);
+  border-color: color-mix(in oklab, var(--token-accent) 40%, var(--token-border));
+}
+
+.notificationsCloseIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.notificationsTitle {
+  font-size: var(--token-text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--token-text);
+  line-height: 1.2;
+}
+
+.notificationsHint {
+  font-size: var(--token-text-sm);
+  color: var(--token-muted-strong, var(--token-muted));
+  line-height: 1.4;
+}
+
+.notificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--token-space-2);
+  overflow-y: auto;
+  padding: var(--token-space-2) 2px;
+  background: var(--token-surface);
+  border-radius: var(--token-radius-md);
+}
+
+.notificationsPanelMobile .notificationsList {
+  flex: 1 1 auto;
+  background: var(--token-surface);
+  border-radius: var(--token-radius-md);
+}
+
+.notificationsList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notificationsList::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--token-muted) 50%, transparent);
+  border-radius: var(--token-radius-full);
+}
+
+.notificationsAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  border-radius: var(--token-radius-full);
+  border: 1px solid color-mix(in oklab, var(--token-accent) 35%, var(--token-border));
+  background: color-mix(in oklab, var(--token-accent-weak) 35%, transparent);
+  color: var(--token-accent-strong);
+  font-size: var(--token-text-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  transition: background var(--token-duration-fast), border-color var(--token-duration-fast);
+}
+
+.notificationsAction:hover {
+  background: color-mix(in oklab, var(--token-accent-weak) 55%, transparent);
+  border-color: var(--token-accent);
+}
+
+.notificationsPanelMobile .notificationsAction {
+  width: 100%;
+}
+
 /* Mobile Menu */
 .mobileMenu {
   position: fixed;
@@ -646,6 +817,10 @@
   }
 
   .authButtons {
+    display: none;
+  }
+
+  .profile {
     display: none;
   }
 

@@ -16,9 +16,40 @@ import {
   SparklesIcon,
   HomeModernIcon,
   Squares2X2Icon,
+  BellIcon,
 } from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
+import ActivityRow, { type ActivityItem } from '../../pages/AdvancedProfile/components/ActivityRow/ActivityRow';
+
+const minutesAgoISO = (minutes: number) => new Date(Date.now() - minutes * 60 * 1000).toISOString();
+
+const NOTIFICATION_ITEMS: ActivityItem[] = [
+  {
+    id: 'notif-1',
+    type: 'like',
+    title: 'Алексей сохранил ваш рецепт «Тёплый салат с киноа»',
+    subtitle: 'Теперь он в его подборке любимых блюд',
+    imageTitle: 'Тёплый салат с киноа',
+    dateISO: minutesAgoISO(7),
+  },
+  {
+    id: 'notif-2',
+    type: 'create',
+    title: 'Новый рецепт недели: «Чиа-пудинг с манго»',
+    subtitle: 'Попробуйте свежую подборку от редакции Refook',
+    imageTitle: 'Чиа-пудинг с манго',
+    dateISO: minutesAgoISO(42),
+  },
+  {
+    id: 'notif-3',
+    type: 'cook',
+    title: 'Вы отметили «Суп Том Ям» как приготовленный',
+    subtitle: 'Добавим ингредиенты снова в список покупок?',
+    imageTitle: 'Суп Том Ям',
+    dateISO: minutesAgoISO(135),
+  },
+];
 
 const Header: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +57,10 @@ const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
 
   const context = useContext(KeycloakContext);
 
@@ -38,6 +72,7 @@ const Header: React.FC = () => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
+    setIsNotificationsOpen(false);
   };
 
   const closeMobileMenu = () => {
@@ -48,6 +83,7 @@ const Header: React.FC = () => {
   const location = useLocation();
   useEffect(() => {
     closeMobileMenu();
+    setIsNotificationsOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -55,27 +91,44 @@ const Header: React.FC = () => {
       if (event.key === 'Escape') {
         closeMobileMenu();
         setIsProfileMenuOpen(false);
+        setIsNotificationsOpen(false);
       }
     };
     const handleResize = () => {
-      if (window.innerWidth > 768) {
-        closeMobileMenu();
-      }
+      const nowMobile = window.innerWidth <= 768;
+      setIsMobile((prev) => {
+        if (prev !== nowMobile && !nowMobile) {
+          closeMobileMenu();
+        }
+        return nowMobile;
+      });
     };
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 2);
     };
     const handleClickOutside = (event: MouseEvent) => {
-      if (!profileMenuRef.current) return;
       const target = event.target as Node;
-      if (!profileMenuRef.current.contains(target)) {
+      const profileNode = profileMenuRef.current;
+      const notificationNode = notificationsRef.current;
+
+      if (profileNode && !profileNode.contains(target)) {
         setIsProfileMenuOpen(false);
+      }
+      if (notificationNode && !notificationNode.contains(target)) {
+        if (isMobile && isNotificationsOpen && target instanceof Element) {
+          const mobilePanel = target.closest(`.${styles.notificationsPanelMobile}`);
+          if (mobilePanel) {
+            return;
+          }
+        }
+        setIsNotificationsOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll, { passive: true });
     document.addEventListener('mousedown', handleClickOutside);
+    handleResize();
     handleScroll();
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -83,7 +136,7 @@ const Header: React.FC = () => {
       window.removeEventListener('scroll', handleScroll);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isMobile, isNotificationsOpen]);
 
   useEffect(() => {
     const body = document.body;
@@ -100,29 +153,93 @@ const Header: React.FC = () => {
   const handleLogin = () => {
     closeMobileMenu();
     setIsProfileMenuOpen(false);
+    setIsNotificationsOpen(false);
     login();
   };
 
   const handleRegister = () => {
     closeMobileMenu();
     setIsProfileMenuOpen(false);
+    setIsNotificationsOpen(false);
     register();
   };
 
   const handleLogout = () => {
     closeMobileMenu();
     setIsProfileMenuOpen(false);
+    setIsNotificationsOpen(false);
     logout();
   };
 
   const handleToggleTheme = () => {
     setIsProfileMenuOpen(false);
+    setIsNotificationsOpen(false);
     dispatch(setTheme(theme === 'light' ? 'dark' : 'light'));
   };
 
   const toggleProfileMenu = () => {
+    setIsNotificationsOpen(false);
     setIsProfileMenuOpen((prev) => !prev);
   };
+
+  const toggleNotifications = () => {
+    setIsProfileMenuOpen(false);
+    closeMobileMenu();
+    setIsNotificationsOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!isMobile || !isNotificationsOpen) {
+      return;
+    }
+    const body = document.body;
+    const previousOverflow = body.style.overflow;
+    body.style.overflow = 'hidden';
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isMobile, isNotificationsOpen]);
+
+  const renderNotificationsPanel = (variant: 'desktop' | 'mobile') => (
+    <div
+      className={`${styles.notificationsPanel} ${isNotificationsOpen ? styles.notificationsPanelOpen : ''} ${variant === 'mobile' ? styles.notificationsPanelMobile : ''}`}
+      role={variant === 'mobile' ? 'dialog' : 'menu'}
+      aria-modal={variant === 'mobile' ? true : undefined}
+      aria-label="Список последних уведомлений"
+    >
+      <div className={`${styles.notificationsHeader} ${variant === 'mobile' ? styles.notificationsHeaderMobile : ''}`}>
+        <div className={styles.notificationsHeaderTop}>
+          <span className={styles.notificationsTitle}>Уведомления</span>
+          {variant === 'mobile' && (
+            <button
+              type="button"
+              className={styles.notificationsCloseButton}
+              aria-label="Закрыть уведомления"
+              onClick={() => setIsNotificationsOpen(false)}
+            >
+              <XMarkIcon className={styles.notificationsCloseIcon} />
+            </button>
+          )}
+        </div>
+        <span className={styles.notificationsHint}>Последние события в вашем профиле</span>
+      </div>
+      <div className={styles.notificationsList}>
+        {NOTIFICATION_ITEMS.map((item) => (
+          <ActivityRow key={item.id} item={item} variant="compact" />
+        ))}
+      </div>
+      <Link
+        to="/profile/advanced?tab=activity"
+        className={styles.notificationsAction}
+        onClick={() => {
+          setIsNotificationsOpen(false);
+          closeMobileMenu();
+        }}
+      >
+        Перейти в ленту активности
+      </Link>
+    </div>
+  );
 
   const mobileNavItems = [
     {
@@ -312,123 +429,136 @@ const Header: React.FC = () => {
             <span className={styles.logoText}>Refook</span>
           </Link>
 
-        {/* Desktop Navigation */}
-        <nav className={styles.nav}>
-          <Link
-            to="/recipes"
-            className={`${styles.navLink} ${location.pathname.startsWith('/recipes') ? styles.navLinkActive : ''}`}
-            aria-current={location.pathname.startsWith('/recipes') ? 'page' : undefined}
-          >
-            Рецепты
-          </Link>
-          <Link
-            to="/fridge"
-            className={`${styles.navLink} ${location.pathname.startsWith('/fridge') ? styles.navLinkActive : ''}`}
-            aria-current={location.pathname.startsWith('/fridge') ? 'page' : undefined}
-          >
-            Холодильник
-          </Link>
-          <Link
-            to="/discover"
-            className={`${styles.navLink} ${location.pathname.startsWith('/discover') ? styles.navLinkActive : ''}`}
-            aria-current={location.pathname.startsWith('/discover') ? 'page' : undefined}
-          >
-            Discover
-          </Link>
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className={styles.nav}>
+            <Link
+              to="/recipes"
+              className={`${styles.navLink} ${location.pathname.startsWith('/recipes') ? styles.navLinkActive : ''}`}
+              aria-current={location.pathname.startsWith('/recipes') ? 'page' : undefined}
+            >
+              Рецепты
+            </Link>
+            <Link
+              to="/fridge"
+              className={`${styles.navLink} ${location.pathname.startsWith('/fridge') ? styles.navLinkActive : ''}`}
+              aria-current={location.pathname.startsWith('/fridge') ? 'page' : undefined}
+            >
+              Холодильник
+            </Link>
+            <Link
+              to="/discover"
+              className={`${styles.navLink} ${location.pathname.startsWith('/discover') ? styles.navLinkActive : ''}`}
+              aria-current={location.pathname.startsWith('/discover') ? 'page' : undefined}
+            >
+              Discover
+            </Link>
+          </nav>
 
-        {/* Right section */}
-        <div className={styles.rightSection}>
-          {/* Кнопка переключения темы (на месте старого "Избранное") */}
+          {/* Right section */}
+          <div className={styles.rightSection}>
+            {/* Кнопка переключения темы (на месте старого "Избранное") */}
+            <button
+              type="button"
+              className={styles.iconButton}
+              aria-label={theme === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему'}
+              onClick={handleToggleTheme}
+            >
+              {theme === 'light' ? (
+                <MoonIcon className={styles.icon} />
+              ) : (
+                <SunIcon className={styles.icon} />
+              )}
+            </button>
+
+        {/* Notifications */}
+        <div className={styles.notifications} ref={notificationsRef}>
           <button
             type="button"
-            className={styles.iconButton}
-            aria-label={theme === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему'}
-            onClick={handleToggleTheme}
+            className={`${styles.iconButton} ${styles.notificationButton}`}
+            aria-label={isNotificationsOpen ? 'Скрыть уведомления' : 'Открыть уведомления'}
+            aria-expanded={isNotificationsOpen}
+            aria-haspopup="menu"
+            onClick={toggleNotifications}
           >
-            {theme === 'light' ? (
-              <MoonIcon className={styles.icon} />
-            ) : (
-              <SunIcon className={styles.icon} />
-            )}
+            <BellIcon className={styles.icon} />
           </button>
+          {!isMobile && renderNotificationsPanel('desktop')}
+        </div>
 
-          {/* Profile / Auth */}
+            {/* Profile / Auth */}
+            {authenticated ? (
+              <div className={styles.profile} ref={profileMenuRef}>
+                <button
+                  className={styles.avatarButton}
+                  onClick={toggleProfileMenu}
+                  aria-label="Открыть меню профиля"
+                  aria-expanded={isProfileMenuOpen}
+                  aria-haspopup="menu"
+                >
+                  {user?.photoUrl ? (
+                    <img src={user.photoUrl} alt="Avatar" className={styles.avatar} />
+                  ) : (
+                    <UserCircleIcon className={styles.icon} />
+                  )}
+                </button>
 
-          {authenticated ? (
-            <div className={styles.profile} ref={profileMenuRef}>
-              <button
-                className={styles.avatarButton}
-                onClick={toggleProfileMenu}
-                aria-label="Открыть меню профиля"
-                aria-expanded={isProfileMenuOpen}
-                aria-haspopup="menu"
-              >
-                {user?.photoUrl ? (
-                  <img src={user.photoUrl} alt="Avatar" className={styles.avatar} />
-                ) : (
-                  <UserCircleIcon className={styles.icon} />
-                )}
-              </button>
-
-              <div
-                className={`${styles.profileMenu} ${isProfileMenuOpen ? styles.profileMenuOpen : ''}`}
-                role="menu"
-                aria-label="Меню профиля"
-              >
-                <div className={styles.menuList}>
-                  <Link to="/admin" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                    <SparklesIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Админ-панель</span>
-                  </Link>
-                  <Link to="/profile/advanced" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
-                    <SparklesIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Профиль</span>
-                  </Link>
-                  <button className={styles.menuItem} role="menuitem" onClick={() => { setIsProfileMenuOpen(false); manageAccount(); }}>
-                    <Cog6ToothIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Настройки</span>
-                  </button>
-                  <div className={styles.menuDivider} />
-                  <button className={styles.menuItem} role="menuitem" onClick={handleToggleTheme}>
-                    {theme === 'light' ? (
-                      <MoonIcon className={styles.menuIcon} />
-                    ) : (
-                      <SunIcon className={styles.menuIcon} />
-                    )}
-                    <span className={styles.menuLabel}>{theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}</span>
-                  </button>
-                  <div className={styles.menuDivider} />
-                  <button className={styles.menuItem} role="menuitem" onClick={handleLogout}>
-                    <ArrowRightOnRectangleIcon className={styles.menuIcon} />
-                    <span className={styles.menuLabel}>Выйти</span>
-                  </button>
+                <div
+                  className={`${styles.profileMenu} ${isProfileMenuOpen ? styles.profileMenuOpen : ''}`}
+                  role="menu"
+                  aria-label="Меню профиля"
+                >
+                  <div className={styles.menuList}>
+                    <Link to="/admin" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                      <SparklesIcon className={styles.menuIcon} />
+                      <span className={styles.menuLabel}>Админ-панель</span>
+                    </Link>
+                    <Link to="/profile/advanced" className={styles.menuItem} role="menuitem" onClick={() => setIsProfileMenuOpen(false)}>
+                      <SparklesIcon className={styles.menuIcon} />
+                      <span className={styles.menuLabel}>Профиль</span>
+                    </Link>
+                    <button className={styles.menuItem} role="menuitem" onClick={() => { setIsProfileMenuOpen(false); manageAccount(); }}>
+                      <Cog6ToothIcon className={styles.menuIcon} />
+                      <span className={styles.menuLabel}>Настройки</span>
+                    </button>
+                    <div className={styles.menuDivider} />
+                    <button className={styles.menuItem} role="menuitem" onClick={handleToggleTheme}>
+                      {theme === 'light' ? (
+                        <MoonIcon className={styles.menuIcon} />
+                      ) : (
+                        <SunIcon className={styles.menuIcon} />
+                      )}
+                      <span className={styles.menuLabel}>{theme === 'light' ? 'Тёмная тема' : 'Светлая тема'}</span>
+                    </button>
+                    <div className={styles.menuDivider} />
+                    <button className={styles.menuItem} role="menuitem" onClick={handleLogout}>
+                      <ArrowRightOnRectangleIcon className={styles.menuIcon} />
+                      <span className={styles.menuLabel}>Выйти</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className={styles.authButtons}>
-              <button onClick={handleLogin} className="ui-btn ui-btn--primary">Войти</button>
-            </div>
-          )}
-
-          {/* Mobile menu button */}
-          <button
-            className={styles.mobileMenuButton}
-            onClick={toggleMobileMenu}
-            aria-label={isMobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobileMenu"
-          >
-            {isMobileMenuOpen ? (
-              <XMarkIcon className={styles.icon} />
             ) : (
-              <Bars3Icon className={styles.icon} />
+              <div className={styles.authButtons}>
+                <button onClick={handleLogin} className="ui-btn ui-btn--primary">Войти</button>
+              </div>
             )}
-          </button>
-        </div>
-      </div>
 
+            {/* Mobile menu button */}
+            <button
+              className={styles.mobileMenuButton}
+              onClick={toggleMobileMenu}
+              aria-label={isMobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobileMenu"
+            >
+              {isMobileMenuOpen ? (
+                <XMarkIcon className={styles.icon} />
+              ) : (
+                <Bars3Icon className={styles.icon} />
+              )}
+            </button>
+          </div>
+        </div>
       </header>
 
       {createPortal(
@@ -437,6 +567,16 @@ const Header: React.FC = () => {
           {isMobileMenuOpen && (
             <div className={styles.mobileMenuOverlay} onClick={closeMobileMenu} />
           )}
+          {isMobile && isNotificationsOpen && (
+            <>
+              <div
+                className={styles.notificationsMobileBackdrop}
+                onClick={() => setIsNotificationsOpen(false)}
+                aria-hidden="true"
+              />
+              {renderNotificationsPanel('mobile')}
+            </>
+          )}
         </>,
         document.body
       )}
@@ -444,4 +584,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header; 
+export default Header;

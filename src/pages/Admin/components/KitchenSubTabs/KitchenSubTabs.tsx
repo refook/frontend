@@ -1,75 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styles from './KitchenSubTabs.module.css';
 import EditableTable, { type EditableRow } from '../EditableTable/EditableTable';
 import KitchensService, { type KitchenResponseDto } from '../../../../services/kitchensService';
 import AdminCard from '../AdminCard/AdminCard';
 import CreateTagForm from '../CreateTagForm/CreateTagForm';
+import { useAdminNamedEntities } from '../../hooks/useAdminNamedEntities';
 
 interface KitchenSubTabsProps { mode: 'create' | 'manage' }
 
 const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<KitchenResponseDto[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState<string>('');
+  const getAll = useCallback((options?: { force?: boolean }) => KitchensService.getAll(options), []);
+  const searchKitchens = useCallback((value: string) => KitchensService.search(value), []);
+  const updateKitchen = useCallback((id: string, name: string) => KitchensService.update(id, name), []);
 
-  const load = async () => {
-    const list = await KitchensService.getAll();
-    setItems(list);
-  };
+  const { items, loading, error, query, editing, updatingId, setEditing, refresh, handleQueryChange, save } =
+    useAdminNamedEntities<KitchenResponseDto>({
+      getAll,
+      search: searchKitchens,
+      update: updateKitchen,
+    });
 
-  const search = async (name: string) => {
-    if (!name || name.length < 3) {
-      await load();
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await KitchensService.search(name);
-      setItems(Array.isArray(data) ? data : []);
-    } catch (e: any) {
-      setError(e?.message || 'Не удалось выполнить поиск');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { load(); }, []);
-
-  const onCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await KitchensService.create(name.trim());
-      setName('');
-      await load();
-    } catch (e: any) {
-      setError(e?.message || 'Не удалось создать кухню');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [editing, setEditing] = useState<Record<string, string>>({});
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-
-  const onUpdate = async (id: string) => {
-    const newName = editing[id]?.trim();
-    if (!newName) return;
-    setUpdatingId(id);
-    try {
-      await KitchensService.update(id, newName);
-      setItems(prev => prev.map(k => (k.id === id ? { ...k, name: newName } : k)));
-    } catch (e) {
-      console.error('Не удалось обновить кухню');
-    } finally {
-      setUpdatingId(null);
-    }
-  };
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   return (
     <div className={styles.wrapper}>
@@ -86,7 +39,7 @@ const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
               submitLabel="Создать кухню"
               successMessage="Кухня успешно создана"
               onCreated={async () => {
-                await load();
+                await refresh({ force: true });
               }}
             />
           </AdminCard>
@@ -103,13 +56,12 @@ const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
                 placeholder="Поиск кухонь (мин. 3 символа)"
                 value={query}
                 onChange={(e) => {
-                  const v = e.target.value;
-                  setQuery(v);
-                  search(v);
+                  void handleQueryChange(e.target.value);
                 }}
               />
-              <button className="ui-btn" onClick={() => load()} disabled={loading}>Обновить</button>
+              <button className="ui-btn" onClick={() => refresh({ force: true })} disabled={loading}>Обновить</button>
             </div>
+            {error && <div className={styles.error}>{error}</div>}
             {items.length === 0 ? (
               <div className={styles.empty}>Список пуст</div>
             ) : (
@@ -118,7 +70,7 @@ const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
                 editing={editing}
                 setEditing={(updater) => setEditing((prev) => updater(prev))}
                 updatingId={updatingId}
-                onSave={onUpdate}
+                onSave={(id) => { void save(id); }}
                 loading={loading}
                 emptyText="Кухни не найдены"
                 enableCopyId
@@ -135,5 +87,4 @@ const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
 };
 
 export default KitchenSubTabs;
-
 

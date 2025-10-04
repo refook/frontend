@@ -9,6 +9,7 @@ export * from './storageUtils';
 export { productsService } from './productsService';
 export { tagsService, TagsService } from './tagsService';
 export { KitchensService } from './kitchensService';
+export { CategoriesService } from './categoriesService';
 
 // Экспорт типов для удобства
 export type { 

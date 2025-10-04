@@ -466,6 +466,19 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
       .filter(Boolean) as string[];
   }, [apiFormData, legacyFormData, recipeData]);
 
+  const categories = useMemo(() => {
+    if (apiFormData) {
+      const raw = (apiFormData as any)?.metaInfo?.categories ?? [];
+      return (raw || []).map((c: any) => (typeof c === 'string' ? c : c?.name ?? '')).filter(Boolean);
+    }
+    if (legacyFormData) {
+      const raw = (legacyFormData as any)?.categories ?? [];
+      return (raw || []).map((c: any) => (typeof c === 'string' ? c : c?.name ?? '')).filter(Boolean);
+    }
+    const recipeCategories = (((recipeData as any)?.categories) ?? []) as any[];
+    return recipeCategories.map((c: any) => (typeof c === 'string' ? c : c?.name ?? '')).filter(Boolean);
+  }, [apiFormData, legacyFormData, recipeData]);
+
   const normalizedIngredients = useMemo<NormalizedIngredient[]>(() => {
     return ingredientsSource.map((ingredient: any) => {
       if (apiFormData) {
@@ -589,6 +602,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           getIngredientName={getIngredientName}
           measureLabels={measureLabels}
           tags={tags}
+      categories={categories}
         />
 
         {!isFormData && (
@@ -697,6 +711,7 @@ const RecipePreviewMainSections: React.FC<{
   getIngredientName: (id: string) => string | undefined;
   measureLabels: Record<string, string>;
   tags: string[];
+  categories: string[];
 }> = ({
   title,
   servings,
@@ -709,6 +724,7 @@ const RecipePreviewMainSections: React.FC<{
   getIngredientName,
   measureLabels,
   tags,
+  categories,
 }) => (
   <div className={styles.contentGrid}>
     <IngredientsSection
@@ -734,6 +750,7 @@ const RecipePreviewMainSections: React.FC<{
     />
 
     <RecipeTags tags={tags} />
+    <RecipeTags tags={categories} title="Категории" />
   </div>
 );
 

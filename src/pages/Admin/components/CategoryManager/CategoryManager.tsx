@@ -1,20 +1,20 @@
 import React, { useCallback, useEffect } from 'react';
-import styles from './TagManager.module.css';
 import EditableTable, { type EditableRow } from '../EditableTable/EditableTable';
-import type { TagResponseDto } from '../../../../types/recipe.types';
-import { tagsService } from '../../../../services/tagsService';
 import { useAdminNamedEntities } from '../../hooks/useAdminNamedEntities';
+import { CategoriesService } from '../../../../services/categoriesService';
+import type { CategoryResponseDto } from '../../../../types/category.types';
+import styles from '../TagManager/TagManager.module.css';
 
-const TagManager: React.FC = () => {
-  const getAll = useCallback((options?: { force?: boolean }) => tagsService.getAll(options), []);
-  const searchTags = useCallback((name: string) => tagsService.search(name), []);
-  const updateTag = useCallback((id: string, name: string) => tagsService.update(id, name), []);
+const CategoryManager: React.FC = () => {
+  const getAll = useCallback((options?: { force?: boolean }) => CategoriesService.getAll(options), []);
+  const searchCategories = useCallback((value: string) => CategoriesService.search(value), []);
+  const updateCategory = useCallback((id: string, name: string) => CategoriesService.update(id, name), []);
 
   const { items, loading, error, query, editing, updatingId, setEditing, refresh, handleQueryChange, save } =
-    useAdminNamedEntities<TagResponseDto>({
+    useAdminNamedEntities<CategoryResponseDto>({
       getAll,
-      search: searchTags,
-      update: updateTag,
+      search: searchCategories,
+      update: updateCategory,
     });
 
   useEffect(() => {
@@ -35,11 +35,10 @@ const TagManager: React.FC = () => {
         <input
           className={styles.input}
           type="text"
-          placeholder="Поиск тегов (мин. 3 символа)"
+          placeholder="Поиск категорий (мин. 3 символа)"
           value={query}
           onChange={(e) => {
-            const value = e.target.value;
-            void handleQueryChange(value);
+            void handleQueryChange(e.target.value);
           }}
         />
         <button className="ui-btn" onClick={() => refresh({ force: true })} disabled={loading}>
@@ -56,7 +55,7 @@ const TagManager: React.FC = () => {
         updatingId={updatingId}
         onSave={(id) => { void save(id); }}
         loading={loading}
-        emptyText="Теги не найдены"
+        emptyText="Категории не найдены"
         enableCopyId
         onCopyId={(id) => { void handleCopyId(id); }}
       />
@@ -64,4 +63,4 @@ const TagManager: React.FC = () => {
   );
 };
 
-export default TagManager;
+export default CategoryManager;
