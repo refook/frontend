@@ -452,6 +452,13 @@ const Header: React.FC = () => {
             >
               Discover
             </Link>
+            <Link
+                to="/roadmap"
+                className={`${styles.navLink} ${location.pathname.startsWith('/roadmap') ? styles.navLinkActive : ''}`}
+                aria-current={location.pathname.startsWith('/roadmap') ? 'page' : undefined}
+            >
+              Roadmap
+            </Link>
           </nav>
 
           {/* Right section */}
