@@ -9,6 +9,7 @@ import DiscoverPage from './pages/DiscoverPage';
 import {DevTools} from './components/DevTools';
 import { useInitializeTheme } from './hooks/useInitializeTheme';
 import CookieConsent from './components/CookieConsent';
+import Roadmap from "./pages/Roadmap/Roadmap.tsx";
 
 function App() {
     useInitializeTheme();
@@ -27,6 +28,7 @@ function App() {
                     {false && <Route path="/favorites" element={<div />}/>}
                     <Route path="/profile/advanced" element={<AdvancedProfilePage/>}/>
                     <Route path="/admin" element={<AdminPage/>}/>
+                    <Route path="/roadmap" element={<Roadmap/>}/>
                 </Routes>
             </Layout>
             <DevTools/>

@@ -1,0 +1,318 @@
+/* ================================================================= */
+/* ЦВЕТОВЫЕ ПЕРЕМЕННЫЕ */
+/* ================================================================= */
+
+/* Light Theme (Default) */
+:root, [data-theme="light"] {
+    --bg-primary: #f9fafb;
+    --bg-card: #ffffff;
+    --text-header: #111827;
+    --text-body: #4b5563;
+    --text-task-default: #374151;
+    --text-task-done: #9ca3af;
+    --border-timeline: #d1d5db;
+    --bg-progress-shell: #e5e7eb;
+    --bg-code-highlight: #e5e7eb;
+    --text-code-highlight: #1f2937;
+
+    --shadow-base: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+    --bg-primary: #1a202c; /* charcoal gray */
+    --bg-card: #2d3748;    /* dark slate */
+    --text-header: #ffffff;
+    --text-body: #a0aec0;  /* light gray */
+    --text-task-default: #e2e8f0; /* off-white */
+    --text-task-done: #718096; /* muted gray */
+    --border-timeline: #4a5568;
+    --bg-progress-shell: #4a5568;
+    --bg-code-highlight: #4a5568;
+    --text-code-highlight: #ffffff;
+
+    /* Dark mode shadows */
+    --shadow-base: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.15);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.25);
+}
+
+/* ================================================================= */
+/* ГЛОБАЛЬНЫЕ СТИЛИ (ИСПОЛЬЗУЮТ ПЕРЕМЕННЫЕ) */
+/* ================================================================= */
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background-color: var(--bg-primary);
+    color: var(--text-body);
+    transition: background-color 0.3s, color 0.3s; /* Плавный переход */
+}
+
+.roadmap-container {
+    padding: 1rem; /* Имитация p-4 */
+    min-height: 100vh;
+}
+
+.roadmap-content {
+    max-width: 960px; /* Имитация max-w-4xl */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Заголовок */
+.header-card {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-base);
+    border-radius: 1rem;
+    border-bottom: 4px solid #4f46e5; /* Фиксированный цвет */
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.header-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--text-header);
+    margin-bottom: 0.5rem;
+}
+
+.header-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-body);
+    max-width: 600px;
+}
+
+/* Кнопка переключения темы */
+.theme-toggle-button {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.1s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.theme-toggle-button:hover {
+    background-color: #4338ca;
+    transform: translateY(-1px);
+}
+
+/* Прогресс-бар */
+.progress-card {
+    margin-bottom: 3rem;
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    box-shadow: var(--shadow-medium);
+    border-radius: 0.75rem;
+}
+
+.progress-bar-shell {
+    width: 100%;
+    background-color: var(--bg-progress-shell);
+    border-radius: 9999px;
+    height: 0.875rem;
+}
+
+.progress-bar-fill {
+    background-color: #4f46e5; /* Фиксированный цвет */
+    height: 0.875rem;
+    border-radius: 9999px;
+    transition: width 0.7s ease-out;
+}
+
+.progress-summary {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-body);
+}
+
+.stage-section-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-timeline);
+    color: var(--text-header);
+}
+
+
+/* Таймлайн контейнер */
+.timeline-container {
+    position: relative;
+    padding-left: 1rem;
+    border-left: 4px solid var(--border-timeline);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Этап (StageItem) */
+.stage-item {
+    position: relative;
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-medium);
+    border-left: 8px solid;
+    transition: box-shadow 0.3s, background-color 0.3s;
+}
+
+.stage-item:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* Маркер таймлайна */
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 1.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    border: 4px solid var(--bg-primary); /* Цвет обода - основной фон */
+    z-index: 10;
+    transform: translateX(-50%);
+    display: none;
+}
+
+/* Заголовок этапа */
+.stage-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.stage-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+}
+
+/* Список задач */
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Задача */
+.task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+/* Иконка задачи */
+.task-icon-container {
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.25rem;
+}
+
+.task-icon-default {
+    border: 2px solid var(--border-timeline);
+    background-color: var(--bg-card);
+}
+
+.task-icon-done {
+    background-color: #10b981; /* Фиксированный цвет */
+    color: #ffffff;
+}
+
+.task-icon-done svg {
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+/* Текст задачи */
+.task-text {
+    flex: 1;
+    font-size: 1rem;
+}
+
+.task-text-done {
+    color: var(--text-task-done);
+    text-decoration: line-through;
+}
+
+.task-text-default {
+    color: var(--text-task-default);
+}
+
+/* Подзадача */
+.task-subtask {
+    padding-left: 1rem;
+}
+
+/* Заголовок в списке задач */
+.task-heading-text {
+    font-weight: 600;
+    color: var(--text-task-default);
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+}
+
+/* Подсветка кода */
+.code-highlight {
+    background-color: var(--bg-code-highlight);
+    padding: 2px 5px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-code-highlight);
+    white-space: nowrap;
+    font-family: monospace;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* Адаптивность и медиазапросы */
+@media (min-width: 768px) { /* md breakpoint */
+    .roadmap-container {
+        padding: 2rem;
+    }
+    .timeline-container {
+        padding-left: 3rem;
+    }
+    .timeline-marker {
+        display: block;
+        left: 0;
+    }
+}
+
+/* Статусные цвета (фиксированы) */
+.status-done-text { color: #16a34a; }
+.status-done-border { border-color: #16a34a; }
+.status-done-bg { background-color: #16a34a; }
+
+.status-in-progress-text { color: #f59e0b; }
+.status-in-progress-border { border-color: #f59e0b; }
+.status-in-progress-bg { background-color: #f59e0b; }
+
+.status-planned-text { color: #4f46e5; }
+.status-planned-border { border-color: #4f46e5; }
+.status-planned-bg { background-color: #4f46e5; }
