@@ -23,7 +23,7 @@ const getStatusClasses = (status: Status, type: 'text' | 'border' | 'bg'): strin
 const CodeHighlighter: React.FC<{ text: string }> = ({ text }) => {
     // Список ключевых слов для выделения
     const keywords = [
-        'VDS', 'CI/CD', 'КБЖУ', 'Keycloak', 'postgresql', 'backend', 'frontend',
+        'VDS', 'CI/CD', 'КБЖУ', 'Keycloak', 'keycloak', 'postgresql', 'backend', 'frontend',
         'nginx', 'ИИ', 'fit-tracker', 'S3', 'backup', 'prometheus', 'графаны',
         'ELK', 'логгов', 'kafka', 'микросервисов', 'TON', 'ИП', 'end-to-end'
     ];
