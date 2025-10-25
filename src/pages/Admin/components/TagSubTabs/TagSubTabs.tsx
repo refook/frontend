@@ -3,6 +3,7 @@ import CreateTagForm from '../CreateTagForm/CreateTagForm';
 import styles from './TagSubTabs.module.css';
 import AdminCard from '../AdminCard/AdminCard';
 import TagManager from '../TagManager/TagManager';
+import {API_BASE_URL} from "../../../../services/api.ts";
 
 /**
  * Компонент подвкладок для раздела "Теги" в админ-панели.
@@ -50,7 +51,7 @@ const TagSubTabs: React.FC<TagSubTabsProps> = ({ mode }) => {
           description="Создайте новый тег для категоризации рецептов. Теги помогают пользователям быстро находить нужные рецепты."
         >
           <CreateTagForm
-            apiUrl={`${import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1'}/tags`}
+            apiUrl={`${API_BASE_URL}/tags`}
             titleLabel="Название тега*"
             placeholder="Например: Десерт, Завтрак, Веганское..."
             submitLabel="Создать тег"

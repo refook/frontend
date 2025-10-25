@@ -4,6 +4,7 @@ import CreateTagForm from '../CreateTagForm/CreateTagForm';
 import CategoryManager from '../CategoryManager/CategoryManager';
 import styles from './CategorySubTabs.module.css';
 import { CategoriesService } from '../../../../services/categoriesService';
+import {API_BASE_URL} from "../../../../services/api.ts";
 
 interface CategorySubTabsProps {
   mode: 'create' | 'manage';
@@ -30,7 +31,7 @@ const CategorySubTabs: React.FC<CategorySubTabsProps> = ({ mode }) => {
           description="Создайте новую категорию продуктов. Категории помогают группировать продукты и ускоряют поиск."
         >
           <CreateTagForm
-            apiUrl={`${import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1'}/categories`}
+            apiUrl={`${API_BASE_URL}/categories`}
             titleLabel="Название категории*"
             placeholder="Например: Молочные продукты, Фрукты, Выпечка..."
             submitLabel="Создать категорию"

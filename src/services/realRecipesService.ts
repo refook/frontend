@@ -1,14 +1,14 @@
 import type { Recipe, RecipeFilters, RecipeSort, PaginatedResponse } from '../types';
-import type { CreateRecipeDto, UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
+import type { UpdateRecipeDto, RecipeResponseDto, UserInfoResponseDto, DifficultyLevel, ApiCreateRecipeDto } from '../types/recipe.types';
 import { mapRecipeResponseToRecipe, mapShortRecipeResponseToRecipe } from '../adapters/recipeAdapter';
 import { apiLogger } from '../utils/apiLogger';
 import { getAuthHeaders, authorizedFetch } from './auth';
+import {API_BASE_URL} from "./api.ts";
 
 // Функция для получения авторизационных заголовков
 // централизованные заголовки и fetch
 
 // API endpoint for recipes
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
 
 // Заглушка для отсутствующего пользователя
 const DEFAULT_USER: UserInfoResponseDto = {

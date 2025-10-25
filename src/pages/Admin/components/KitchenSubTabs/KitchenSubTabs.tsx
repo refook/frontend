@@ -5,6 +5,7 @@ import KitchensService, { type KitchenResponseDto } from '../../../../services/k
 import AdminCard from '../AdminCard/AdminCard';
 import CreateTagForm from '../CreateTagForm/CreateTagForm';
 import { useAdminNamedEntities } from '../../hooks/useAdminNamedEntities';
+import {API_BASE_URL} from "../../../../services/api.ts";
 
 interface KitchenSubTabsProps { mode: 'create' | 'manage' }
 
@@ -33,7 +34,7 @@ const KitchenSubTabs: React.FC<KitchenSubTabsProps> = ({ mode }) => {
             description="Создайте новую кухню. Кухни помогают фильтровать и категоризировать рецепты."
           >
             <CreateTagForm
-              apiUrl={`${import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1'}/kitchens`}
+              apiUrl={`${API_BASE_URL}}/kitchens`}
               titleLabel="Название кухни*"
               placeholder="Например: Русская, Итальянская, Японская..."
               submitLabel="Создать кухню"

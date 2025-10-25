@@ -125,7 +125,7 @@ export const KeycloakProvider: React.FC<ComponentWithChildren> = ({children}) =>
 
         const login = () => {
             keycloakInstance?.login({
-                // scope: 'offline_access',
+                scope: 'offline_access',
                 redirectUri: import.meta.env.DEV ? 'http://localhost:5173' : 'https://refook.ru', // Убедитесь, что URI разрешен в Keycloak
             });
 

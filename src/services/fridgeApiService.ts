@@ -8,12 +8,10 @@ import type {
 } from '../types/fridge.types';
 import { apiLogger } from '../utils/apiLogger';
 import { getAuthHeaders, authorizedFetch } from './auth';
+import {API_BASE_URL} from "./api.ts";
 
 // Функция для получения авторизационных заголовков
 // централизованные заголовки и fetch
-
-// API endpoint
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
 
 class FridgeApiService {
   // ---------------- Fridges (контейнеры) ----------------
@@ -57,7 +55,7 @@ class FridgeApiService {
   }
 
   // ---------------- Fridge products ----------------
-  
+
   /**
    * Получить все продукты из конкретного холодильника
    */
@@ -107,29 +105,29 @@ class FridgeApiService {
     try {
       console.log('Добавление продукта в холодильник:', productData);
       console.log('JSON данные для отправки:', JSON.stringify(productData, null, 2));
-      
+
       const headers = getAuthHeaders();
       const url = `${API_BASE_URL}/fridge/${fridgeId}/products`;
-      
+
       // Логируем запрос
       apiLogger.logRequest(url, 'POST', headers, productData);
-      
+
       const response = await authorizedFetch(url, {
         method: 'POST',
         headers,
         body: JSON.stringify(productData)
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('API Error Response:', errorText);
         console.error('Request data:', productData);
         throw new Error(`HTTP error! status: ${response.status}, response: ${errorText}`);
       }
-      
+
       const newProduct: FridgeProductResponseDto = await response.json();
       console.log('Продукт успешно добавлен в холодильник:', newProduct);
-      
+
       return this.transformApiProductToLocal(newProduct);
     } catch (error) {
       console.error('Ошибка при добавлении продукта в холодильник:', error);
@@ -207,27 +205,27 @@ class FridgeApiService {
   ): Promise<FridgeProduct> {
     try {
       console.log('Обновление продукта в холодильнике:', { fridgeId, fridgeProductId, updateData });
-      
+
       const headers = getAuthHeaders();
       const url = `${API_BASE_URL}/fridge/${fridgeId}/products/${fridgeProductId}`;
       const body = this.buildUpdateDto(current, updateData);
-      
+
       // Логируем запрос
       apiLogger.logRequest(url, 'PUT', headers, body);
-      
+
       const response = await authorizedFetch(url, {
         method: 'PUT',
         headers,
         body: JSON.stringify(body)
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const updatedProduct: FridgeProductResponseDto = await response.json();
       console.log('Продукт успешно обновлен:', updatedProduct);
-      
+
       return this.transformApiProductToLocal(updatedProduct);
     } catch (error) {
       console.error('Ошибка при обновлении продукта:', error);
@@ -241,22 +239,22 @@ class FridgeApiService {
   async deleteFridgeProduct(fridgeId: string, fridgeProductId: string): Promise<void> {
     try {
       console.log('Удаление продукта из холодильника:', { fridgeId, fridgeProductId });
-      
+
       const headers = getAuthHeaders();
       const url = `${API_BASE_URL}/fridge/${fridgeId}/products/${fridgeProductId}`;
-      
+
       // Логируем запрос
       apiLogger.logRequest(url, 'DELETE', headers);
-      
+
       const response = await authorizedFetch(url, {
         method: 'DELETE',
         headers
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       console.log('Продукт успешно удален из холодильника');
     } catch (error) {
       console.error('Ошибка при удалении продукта:', error);

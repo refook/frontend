@@ -1,8 +1,5 @@
 import type { FridgeItem, AddFridgeItemForm } from '../types';
 
-// API endpoint for fridge
-const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
-
 export class FridgeService {
   
   /**

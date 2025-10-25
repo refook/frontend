@@ -21,7 +21,7 @@ export async function authorizedFetch(input: RequestInfo | URL, init: RequestIni
     case 401:
       try {
         console.log("Попытка обновить токен автоматом на 401 ответ")
-        const refreshed = await keycloak.updateToken(0);
+        const refreshed = await keycloak.updateToken(3);
         console.log("Результат обновления", refreshed)
         if (refreshed && keycloak.token && keycloak.refreshToken && keycloak.idToken) {
           updateLocalStorageTokens(keycloak.token, keycloak.refreshToken, keycloak.idToken)
