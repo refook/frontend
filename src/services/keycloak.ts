@@ -1,8 +1,7 @@
 import Keycloak from 'keycloak-js';
 
 const keycloakConfig = {
-    url: 'https://keycloak.refook.ru', // Замените на URL вашего Keycloak сервера
-    // url: 'http://localhost:8888', // Замените на URL вашего Keycloak сервера
+    url: import.meta.env.MODE == "back" ? 'http://localhost:8888' : 'https://keycloak.refook.ru',
     realm: 'prod-realm',
     clientId: 'refook-front',
 };

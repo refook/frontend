@@ -4,7 +4,9 @@ import type {ApiResponse} from '../types';
 import keycloak from "./keycloak.ts";
 
 // Base API configuration
-export const API_BASE_URL = import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1';
+export const API_BASE_URL =
+    import.meta.env.MODE == "back" ? 'http://localhost:8080/v1'
+        : (import.meta.env.DEV ? '/api/v1' : 'https://api.refook.ru/v1');
 
 class ApiService {
     private api: AxiosInstance;
