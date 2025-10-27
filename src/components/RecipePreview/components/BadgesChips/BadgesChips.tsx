@@ -5,6 +5,10 @@ import styles from './BadgesChips.module.css';
 
 type BadgesChipsProps = Pick<RecipeMainSectionsProps, 'badges'>;
 
+/**
+ * Отображает бейджи рецепта в виде компактных чипов.
+ * Показывает иконку/инициал бейджа, название и описание, окрашивая фон по редкости.
+ */
 const BadgesChips: React.FC<BadgesChipsProps> = ({ badges }) => {
   if (!badges.length) return null;
 

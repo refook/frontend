@@ -10,6 +10,13 @@ type Params = {
   stats: RecipeStatsSnapshot;
 };
 
+/**
+ * Хук управляет социальными действиями пользователя над рецептом.
+ * @desc Локально хранит состояние лайка/избранного/оценки, выполняет запросы к API
+ * и автоматически синхронизируется при смене входящих данных.
+ * @note Использует KeycloakContext для проверки авторизации и централизует все
+ * side-effect'ы, чтобы UI оставался чистым.
+ */
 export const useRecipeSocialState = ({ recipeData, isFormData, stats }: Params): RecipeSocialState => {
   const keycloakCtx = useContext(KeycloakContext);
   const isAuthenticated = !!keycloakCtx?.authenticated;

@@ -5,6 +5,11 @@ import CommentCard, {
 import type { RecipeCommentsSectionProps } from '../../RecipePreview.types';
 import styles from './CommentsSection.module.css';
 
+/**
+ * Черновой блок комментариев в превью.
+ * Сейчас выводит статический список отзывов-заглушек, чтобы показать,
+ * как будет выглядеть интерфейс обсуждений.
+ */
 const CommentsSection: React.FC<RecipeCommentsSectionProps> = ({ recipe, title }) => (
   <div className={styles.section}>
     <h3 className={styles.title}>Комментарии</h3>

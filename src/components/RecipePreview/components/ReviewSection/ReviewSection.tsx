@@ -3,6 +3,11 @@ import RatingControl from '../../../RatingControl/RatingControl';
 import type { RecipeReviewSectionProps } from '../../RecipePreview.types';
 import styles from './ReviewSection.module.css';
 
+/**
+ * Секция отзывов в превью рецепта.
+ * Показывает рейтинг с возможностью проставить оценку и текстовую форму,
+ * пока недоступную для отправки (disabled).
+ */
 const ReviewSection: React.FC<RecipeReviewSectionProps> = ({
   rating,
   ratingLoading,

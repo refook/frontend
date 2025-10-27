@@ -3,6 +3,10 @@ import { CheckIcon, PencilIcon } from '@heroicons/react/24/outline';
 import type { RecipePreviewActionsProps } from '../../RecipePreview.types';
 import styles from './PreviewActions.module.css';
 
+/**
+ * Кнопки действий внизу модалки превью рецепта.
+ * Позволяет вернуться к редактированию или завершить создание рецепта.
+ */
 const PreviewActions: React.FC<RecipePreviewActionsProps> = ({ onEdit, onSubmit, isSubmitting }) => (
   <div className={styles.actions}>
     <button

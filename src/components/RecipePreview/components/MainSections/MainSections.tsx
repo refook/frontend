@@ -7,6 +7,11 @@ import BadgesChips from '../BadgesChips/BadgesChips';
 import type { RecipeMainSectionsProps } from '../../RecipePreview.types';
 import styles from './MainSections.module.css';
 
+/**
+ * Основной контент превью: ингредиенты, нутриенты, шаги приготовления,
+ * списки тегов/категорий и компактный список бейджей.
+ * Компонент выступает контейнером, собирающим все содержательные блоки рецепта.
+ */
 const MainSections: React.FC<RecipeMainSectionsProps> = ({
   title,
   servings,

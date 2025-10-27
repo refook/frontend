@@ -16,6 +16,13 @@ import CommentsSection from './components/CommentsSection/CommentsSection';
 import PreviewActions from './components/PreviewActions/PreviewActions';
 import styles from './RecipePreview.module.css';
 
+/**
+ * Основной компонент превью рецепта. Служит как модальный обзор перед публикацией
+ * или просмотр готового рецепта: собирает данные, отдаёт их подкомпонентам,
+ * отображает бейджи, шаги, социальные действия и итоговые кнопки.
+ * @note Все вычисления и запросы делегированы хукам `useRecipePreviewData` и
+ * `useRecipeSocialState`, сам компонент отвечает только за композицию UI.
+ */
 const RecipePreview: React.FC<RecipePreviewProps> = ({
   formData,
   recipe,

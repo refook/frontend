@@ -4,6 +4,10 @@ import InfoCard from '../../../InfoCard/InfoCard';
 import type { RecipePreviewInfoGridProps } from '../../RecipePreview.types';
 import styles from './InfoGrid.module.css';
 
+/**
+ * Блок с основными характеристиками рецепта (сложность, время, порции).
+ * Используется в верхней части превью и отображает данные в виде сетки карточек.
+ */
 const InfoGrid: React.FC<RecipePreviewInfoGridProps> = ({
   difficultyLabel,
   difficultyColor,

@@ -3,6 +3,10 @@ import ActionToggle from '../../../ActionToggle/ActionToggle';
 import type { RecipeSocialActionsProps } from '../../RecipePreview.types';
 import styles from './SocialActions.module.css';
 
+/**
+ * Набор действий пользователя над рецептом (лайк, избранное).
+ * Передаёт обработчики и состояние в пару ActionToggle-кнопок.
+ */
 const SocialActions: React.FC<RecipeSocialActionsProps> = ({
   liked,
   likesCount,
