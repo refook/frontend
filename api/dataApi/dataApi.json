@@ -37,6 +37,10 @@
       "description": "Запросы с продуктами"
     },
     {
+      "name": "Бейджи",
+      "description": "Запросы с бейджами"
+    },
+    {
       "name": "Меры продуктов",
       "description": "Запросы с мерами продукта"
     },
@@ -1000,6 +1004,98 @@
         }
       }
     },
+    "/v1/badges/{id}": {
+      "get": {
+        "tags": [
+          "Бейджи"
+        ],
+        "summary": "Получение badge по id",
+        "operationId": "getBadge",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Бейджи"
+        ],
+        "summary": "Обновление бейджа",
+        "operationId": "updateBadge",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBadgeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/tags": {
       "post": {
         "tags": [
@@ -1113,6 +1209,88 @@
         "responses": {
           "200": {
             "description": "Успешный ответ"
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/recipe/badge/{recipeId}": {
+      "post": {
+        "tags": [
+          "Рецепты"
+        ],
+        "summary": "Добавление информации о бейдже в рецепт",
+        "operationId": "addBadge",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Рецепты"
+        ],
+        "summary": "Удаление бейджа в рецепте",
+        "operationId": "deleteBadge",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IdDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeResponseDto"
+                }
+              }
+            }
           },
           "500": {
             "description": "Критический ответ",
@@ -1453,6 +1631,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CategoryResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/badges": {
+      "post": {
+        "tags": [
+          "Бейджи"
+        ],
+        "summary": "Сохранение бейджа",
+        "operationId": "createBadge",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBadgeDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadgeResponseDto"
                 }
               }
             }
@@ -2619,6 +2838,86 @@
         }
       }
     },
+    "/v1/badges/search": {
+      "get": {
+        "tags": [
+          "Бейджи"
+        ],
+        "summary": "Получение бейджов по совпадению",
+        "operationId": "getAllBadgesByTitle",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 2147483647,
+              "minLength": 3
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BadgeResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/badges/all": {
+      "get": {
+        "tags": [
+          "Бейджи"
+        ],
+        "summary": "Получение всего списка бейджов",
+        "operationId": "getAllBadges",
+        "responses": {
+          "200": {
+            "description": "Успешный ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BadgeResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Критический ответ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDtoRs"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/fridge/{fridgeId}/products/{productId}": {
       "delete": {
         "tags": [
@@ -2764,6 +3063,95 @@
         },
         "required": [
           "name"
+        ]
+      },
+      "BadgeConditionDto": {
+        "type": "object",
+        "description": "Условие",
+        "properties": {
+          "action": {
+            "type": "string",
+            "description": "Действие, которое триггерит",
+            "example": "RECIPE_LIKE"
+          },
+          "count": {
+            "type": "number",
+            "description": "Значение для достижения",
+            "example": 10
+          },
+          "description": {
+            "type": "string",
+            "description": "Описание действия, чтобы выводить дополнительную информацию",
+            "example": "Лайки рецепта"
+          }
+        },
+        "required": [
+          "action",
+          "count",
+          "description"
+        ]
+      },
+      "BadgeResponseDto": {
+        "type": "object",
+        "description": "Бейдж",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "id бейджа"
+          },
+          "title": {
+            "type": "string",
+            "description": "Название бейджа"
+          },
+          "code": {
+            "type": "string",
+            "description": "Уникальный код бейджа"
+          },
+          "description": {
+            "type": "string",
+            "description": "Условие получение бейджа"
+          },
+          "subjectType": {
+            "type": "string",
+            "description": "К кому относится бейдж",
+            "enum": [
+              "USER",
+              "RECIPE"
+            ]
+          },
+          "icon": {
+            "type": "string",
+            "description": "Иконка бейджа"
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Раритетность",
+            "enum": [
+              "UNCOMMON",
+              "COMMON",
+              "RARE",
+              "EPIC",
+              "LEGENDARY"
+            ]
+          },
+          "conditions": {
+            "type": "array",
+            "description": "Условия получения",
+            "items": {
+              "$ref": "#/components/schemas/BadgeConditionDto"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "conditions",
+          "description",
+          "icon",
+          "id",
+          "rarity",
+          "subjectType",
+          "title"
         ]
       },
       "CategoryResponseDto": {
@@ -3007,6 +3395,13 @@
             "description": "Список категорий рецепта",
             "items": {
               "$ref": "#/components/schemas/CategoryResponseDto"
+            }
+          },
+          "badges": {
+            "type": "array",
+            "description": "Список бейджей рецепта",
+            "items": {
+              "$ref": "#/components/schemas/BadgeResponseDto"
             }
           }
         }
@@ -3951,6 +4346,63 @@
           "name"
         ]
       },
+      "UpdateBadgeDto": {
+        "type": "object",
+        "description": "Обновление бейджа рецепта",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Название бейджа"
+          },
+          "code": {
+            "type": "string",
+            "description": "Уникальный код бейджа"
+          },
+          "description": {
+            "type": "string",
+            "description": "Условие получение бейджа"
+          },
+          "subjectType": {
+            "type": "string",
+            "description": "К кому относится бейдж",
+            "enum": [
+              "USER",
+              "RECIPE"
+            ]
+          },
+          "icon": {
+            "type": "string",
+            "description": "Иконка бейджа"
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Раритетность",
+            "enum": [
+              "UNCOMMON",
+              "COMMON",
+              "RARE",
+              "EPIC",
+              "LEGENDARY"
+            ]
+          },
+          "conditions": {
+            "type": "array",
+            "description": "Условия",
+            "items": {
+              "$ref": "#/components/schemas/BadgeConditionDto"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "conditions",
+          "description",
+          "icon",
+          "rarity",
+          "subjectType",
+          "title"
+        ]
+      },
       "CreateTagDto": {
         "type": "object",
         "description": "Создание тэга",
@@ -4106,6 +4558,20 @@
         "required": [
           "action",
           "value"
+        ]
+      },
+      "IdDto": {
+        "type": "object",
+        "description": "Дто с Id",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Id"
+          }
+        },
+        "required": [
+          "id"
         ]
       },
       "AddBaseProductMeasureDto": {
@@ -4308,6 +4774,63 @@
           "name"
         ]
       },
+      "CreateBadgeDto": {
+        "type": "object",
+        "description": "Создание бейджа",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Название бейджа"
+          },
+          "code": {
+            "type": "string",
+            "description": "Уникальный код бейджа"
+          },
+          "description": {
+            "type": "string",
+            "description": "Условие получение бейджа"
+          },
+          "subjectType": {
+            "type": "string",
+            "description": "К кому относится бейдж",
+            "enum": [
+              "USER",
+              "RECIPE"
+            ]
+          },
+          "icon": {
+            "type": "string",
+            "description": "Иконка бейджа"
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Раритетность",
+            "enum": [
+              "UNCOMMON",
+              "COMMON",
+              "RARE",
+              "EPIC",
+              "LEGENDARY"
+            ]
+          },
+          "conditions": {
+            "type": "array",
+            "description": "Условия",
+            "items": {
+              "$ref": "#/components/schemas/BadgeConditionDto"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "conditions",
+          "description",
+          "icon",
+          "rarity",
+          "subjectType",
+          "title"
+        ]
+      },
       "RecipeShortResponseDto": {
         "type": "object",
         "description": "Короткий рецепт (для карточек)",
@@ -4370,6 +4893,13 @@
             "description": "Список категорий рецепта",
             "items": {
               "$ref": "#/components/schemas/CategoryResponseDto"
+            }
+          },
+          "badges": {
+            "type": "array",
+            "description": "Список бейджей рецепта",
+            "items": {
+              "$ref": "#/components/schemas/BadgeResponseDto"
             }
           },
           "cookingTime": {

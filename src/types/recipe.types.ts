@@ -10,6 +10,26 @@ export interface TagResponseDto {
   name: string;
 }
 
+export type BadgeSubjectType = 'USER' | 'RECIPE';
+export type BadgeRarityType = 'UNCOMMON' | 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
+
+export interface BadgeConditionDto {
+  action: string;
+  count: number;
+  description: string;
+}
+
+export interface BadgeResponseDto {
+  id: string;
+  title: string;
+  code: string;
+  description: string;
+  subjectType: BadgeSubjectType;
+  icon?: string | null;
+  rarity: BadgeRarityType;
+  conditions: BadgeConditionDto[];
+}
+
 
 export interface RecipeIngredient {
   id: string;
@@ -97,6 +117,10 @@ export interface ApiCreateMetaInfoDto {
 
 export interface ApiUpdateMetaInfoDto extends ApiCreateMetaInfoDto {}
 
+export interface RecipeMetaInfoResponseDto extends ApiUpdateMetaInfoDto {
+  badges?: BadgeResponseDto[] | null;
+}
+
 export interface ApiCookingTimeDto {
   activeTime?: number; // секунды
   allTime?: number; // секунды
@@ -181,6 +205,7 @@ export interface RecipeResponseDto {
   createdAt: string;
   updatedAt: string;
   state: StateDto;
+  metaInfo?: RecipeMetaInfoResponseDto | null;
 }
 
 export interface StateDto {
