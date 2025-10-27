@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import type { Recipe } from '../../types';
+import type { Recipe, BadgeResponseDto } from '../../types';
 import type {
   CreateRecipeDto,
   CreateRecipeIngredientDto,
@@ -78,6 +78,48 @@ type RecipeStatsSnapshot = {
   favorites: number;
   rating: number;
   ratingsCount: number;
+};
+
+const rarityLabels: Record<BadgeResponseDto['rarity'], string> = {
+  UNCOMMON: 'Необычный',
+  COMMON: 'Обычный',
+  RARE: 'Редкий',
+  EPIC: 'Эпический',
+  LEGENDARY: 'Легендарный',
+};
+
+const subjectLabels: Record<BadgeResponseDto['subjectType'], string> = {
+  USER: 'Пользователь',
+  RECIPE: 'Рецепт',
+};
+
+const isBadgeResponse = (value: unknown): value is BadgeResponseDto => {
+  if (!value || typeof value !== 'object') return false;
+  const record = value as Record<string, unknown>;
+  return typeof record.id === 'string' && record.id.trim().length > 0 && typeof record.title === 'string';
+};
+
+const resolveBadgeIcon = (icon?: string | null): { url?: string; text?: string } => {
+  if (typeof icon !== 'string') return {};
+  const trimmed = icon.trim();
+  if (!trimmed) return {};
+  if (/^https?:\/\//i.test(trimmed) || /^data:/i.test(trimmed) || trimmed.startsWith('blob:')) {
+    return { url: trimmed };
+  }
+  if (trimmed.startsWith('/')) {
+    return { url: `${API_BASE_URL}${trimmed}` };
+  }
+  if (trimmed.includes('.')) {
+    return { url: `${API_BASE_URL}/photo/${trimmed}` };
+  }
+  return { text: trimmed };
+};
+
+const getBadgeInitial = (title?: string): string => {
+  if (!title || typeof title !== 'string') return '🏅';
+  const trimmed = title.trim();
+  if (!trimmed) return '🏅';
+  return trimmed.charAt(0).toUpperCase();
 };
 
 const pickNumber = (...values: unknown[]): number => {
@@ -374,6 +416,15 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   }, [stepsSource]);
 
   const recipeStats = useMemo(() => getRecipeStatsSnapshot(recipeData), [recipeData]);
+  const badges = useMemo<BadgeResponseDto[]>(() => {
+    if (isFormData) return [];
+    const primary = Array.isArray(recipeData?.badges) ? (recipeData?.badges as BadgeResponseDto[]) : [];
+    const fallback = !primary.length && Array.isArray((recipeData as any)?.metaInfo?.badges)
+      ? ((recipeData as any)?.metaInfo?.badges as unknown[])
+      : [];
+    const source = primary.length > 0 ? primary : fallback;
+    return source.filter(isBadgeResponse) as BadgeResponseDto[];
+  }, [isFormData, recipeData]);
 
   const socialState = useRecipeSocialState({ recipeData, isFormData, stats: recipeStats });
 
@@ -602,7 +653,8 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
           getIngredientName={getIngredientName}
           measureLabels={measureLabels}
           tags={tags}
-      categories={categories}
+          categories={categories}
+          badges={badges}
         />
 
         {!isFormData && (
@@ -626,6 +678,55 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
         />
       )}
     </div>
+  );
+};
+
+const rarityColors: Record<BadgeResponseDto['rarity'], string> = {
+  COMMON: '#9CA3AF',
+  UNCOMMON: '#10B981',
+  RARE: '#3B82F6',
+  EPIC: '#A855F7',
+  LEGENDARY: '#F59E0B',
+};
+
+const RecipeBadgesChips: React.FC<{ badges: BadgeResponseDto[] }> = ({ badges }) => {
+  if (!badges.length) return null;
+
+  return (
+    <section className={styles.badgesChipsSection}>
+      <h3 className={styles.sectionTitle}>Бейджи</h3>
+      <div className={styles.badgesChipsList}>
+        {badges.map((badge) => {
+          const icon = resolveBadgeIcon(badge.icon);
+          const rarityColor = rarityColors[badge.rarity] || 'var(--color-primary)';
+          return (
+            <div
+              key={badge.id}
+              className={styles.badgeChip}
+              style={{
+                borderColor: rarityColor,
+                background: `color-mix(in oklab, ${rarityColor} 14%, transparent)`,
+              }}
+            >
+              <span
+                className={styles.badgeChipIcon}
+                style={{ background: `color-mix(in oklab, ${rarityColor} 24%, transparent)` }}
+              >
+                {icon.url ? (
+                  <img src={icon.url} alt={badge.title} loading="lazy" />
+                ) : (
+                  icon.text || getBadgeInitial(badge.title)
+                )}
+              </span>
+              <span className={styles.badgeChipContent}>
+                <span className={styles.badgeChipTitle}>{badge.title}</span>
+                <span className={styles.badgeChipDescription}>{badge.description}</span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 };
 
@@ -712,6 +813,7 @@ const RecipePreviewMainSections: React.FC<{
   measureLabels: Record<string, string>;
   tags: string[];
   categories: string[];
+  badges: BadgeResponseDto[];
 }> = ({
   title,
   servings,
@@ -725,6 +827,7 @@ const RecipePreviewMainSections: React.FC<{
   measureLabels,
   tags,
   categories,
+  badges,
 }) => (
   <div className={styles.contentGrid}>
     <IngredientsSection
@@ -751,6 +854,7 @@ const RecipePreviewMainSections: React.FC<{
 
     <RecipeTags tags={tags} />
     <RecipeTags tags={categories} title="Категории" />
+    <RecipeBadgesChips badges={badges} />
   </div>
 );
 

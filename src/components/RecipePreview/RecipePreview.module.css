@@ -98,6 +98,73 @@
 }
 /* sectionHeader moved to subcomponents; keep if reused elsewhere */
 
+.badgesChipsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.badgesChipsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.badgeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  border: 1px solid transparent;
+  border-radius: var(--token-radius-full);
+  padding: 6px 12px;
+  min-height: 40px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--token-shadow-xs);
+}
+
+.badgeChip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--token-shadow-sm);
+}
+
+.badgeChipIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--token-radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  overflow: hidden;
+  color: var(--text-primary);
+}
+
+.badgeChipIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badgeChipContent {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 240px;
+}
+
+.badgeChipTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.badgeChipDescription {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+
 .tags {
   display: flex;
   flex-wrap: wrap;

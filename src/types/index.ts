@@ -1,4 +1,4 @@
-import type {DifficultyLevel, KitchenType, RecipeIngredientDto, StateDto, StepResponseDto} from "./recipe.types.ts";
+import type {DifficultyLevel, KitchenType, RecipeIngredientDto, StateDto, StepResponseDto, BadgeResponseDto} from "./recipe.types.ts";
 import type { CategoryResponseDto } from './category.types.ts';
 
 export * from './common.types.ts'
@@ -32,6 +32,7 @@ export interface Recipe extends BaseEntity {
   kitchenIds?: string[];
   categories?: string[];
   categoryObjects?: CategoryResponseDto[];
+  badges?: BadgeResponseDto[];
   // Доп. поля для режима редактирования (serving)
   servingBaseUnit?: 'ML' | 'GR';
   servingTotalWeight?: number;

@@ -1,9 +1,18 @@
-import type { Recipe, RecipeResponseDto, StepResponseDto, CategoryResponseDto } from '../types';
+import type {
+  Recipe,
+  RecipeResponseDto,
+  StepResponseDto,
+  CategoryResponseDto,
+  BadgeResponseDto,
+  BadgeConditionDto,
+} from '../types';
 import type { CreateRecipeDto, DifficultyLevel, TagResponseDto, UserInfoResponseDto } from '../types/recipe.types';
 import { normalizeIngredientFromApi } from '../utils/recipeIngredient';
 import { API_BASE_URL } from '../services/api';
 
 const DEFAULT_MACROS = { calories: 0, proteins: 0, fats: 0, carbs: 0 };
+const BADGE_SUBJECT_TYPES = new Set(['USER', 'RECIPE']);
+const BADGE_RARITY_TYPES = new Set(['UNCOMMON', 'COMMON', 'RARE', 'EPIC', 'LEGENDARY']);
 
 const toRecord = (value: unknown): Record<string, unknown> | null => {
   if (value && typeof value === 'object') {
@@ -198,6 +207,91 @@ const normalizeCategoryEntries = (apiRecipe: RecipeResponseDto): CategoryRespons
     .filter(Boolean) as CategoryResponseDto[];
 };
 
+const normalizeBadgeSubjectType = (value: unknown): BadgeResponseDto['subjectType'] => {
+  if (typeof value === 'string') {
+    const upper = value.toUpperCase();
+    if (BADGE_SUBJECT_TYPES.has(upper)) {
+      return upper as BadgeResponseDto['subjectType'];
+    }
+  }
+  return 'USER';
+};
+
+const normalizeBadgeRarity = (value: unknown): BadgeResponseDto['rarity'] => {
+  if (typeof value === 'string') {
+    const upper = value.toUpperCase();
+    if (BADGE_RARITY_TYPES.has(upper)) {
+      return upper as BadgeResponseDto['rarity'];
+    }
+  }
+  return 'COMMON';
+};
+
+const normalizeBadgeConditions = (rawConditions: unknown): BadgeConditionDto[] => {
+  if (!Array.isArray(rawConditions)) return [];
+
+  return rawConditions
+    .map((condition) => {
+      if (!condition || typeof condition !== 'object') return null;
+      const record = condition as Record<string, unknown>;
+      const action = typeof record.action === 'string' ? record.action.trim() : '';
+      const countValue = record.count;
+      const count =
+        typeof countValue === 'number'
+          ? countValue
+          : typeof countValue === 'string'
+            ? Number(countValue)
+            : NaN;
+      const description =
+        typeof record.description === 'string' ? record.description.trim() : '';
+      if (!action || !Number.isFinite(count)) return null;
+      return {
+        action,
+        count,
+        description: description || action,
+      };
+    })
+    .filter(Boolean) as BadgeConditionDto[];
+};
+
+const normalizeBadgeEntries = (apiRecipe: RecipeResponseDto): BadgeResponseDto[] => {
+  const sourceBadges =
+    (apiRecipe as any)?.metaInfo?.badges ?? (apiRecipe as any)?.badges ?? [];
+  if (!Array.isArray(sourceBadges)) return [];
+
+  return sourceBadges
+    .map((badge) => {
+      if (!badge || typeof badge !== 'object') return null;
+      const record = badge as Record<string, unknown>;
+      const id = typeof record.id === 'string' ? record.id.trim() : '';
+      const title = typeof record.title === 'string' ? record.title.trim() : '';
+      if (!id || !title) return null;
+      const code =
+        typeof record.code === 'string' && record.code.trim().length > 0
+          ? record.code.trim()
+          : id;
+      const description =
+        typeof record.description === 'string' ? record.description.trim() : title;
+      const subjectType = normalizeBadgeSubjectType(record.subjectType);
+      const rarity = normalizeBadgeRarity(record.rarity);
+      const rawIcon = record.icon;
+      const icon =
+        typeof rawIcon === 'string' && rawIcon.trim().length > 0 ? rawIcon.trim() : undefined;
+      const conditions = normalizeBadgeConditions(record.conditions);
+      return {
+        id,
+        title,
+        code,
+        description,
+        subjectType,
+        icon,
+        rarity,
+        conditions,
+      };
+    })
+    .filter(Boolean) as BadgeResponseDto[];
+};
+
 const resolveUserRate = (apiState: unknown): number | null => {
   const rate = (apiState as any)?.rate;
   if (typeof rate === 'number') return rate;
@@ -234,6 +328,7 @@ export const mapRecipeResponseToRecipe = (
   const categoryEntries = normalizeCategoryEntries(apiRecipe);
   const categories = categoryEntries.map((category) => category.name).filter(Boolean);
   const categoryObjects = categoryEntries.length > 0 ? categoryEntries : undefined;
+  const badgeEntries = normalizeBadgeEntries(apiRecipe);
 
   const apiState = (apiRecipe as any)?.state || {};
   const userRate = resolveUserRate(apiState);
@@ -268,6 +363,7 @@ export const mapRecipeResponseToRecipe = (
     ...apiMetaInfo,
     ...(tagObjects ? { tags: tagObjects } : {}),
     ...(categoryObjects ? { categories: categoryObjects } : {}),
+    ...(badgeEntries.length > 0 ? { badges: badgeEntries } : {}),
   };
 
   return {
@@ -286,6 +382,7 @@ export const mapRecipeResponseToRecipe = (
     ...(tagObjects ? { tagObjects } : {}),
     categories,
     ...(categoryObjects ? { categoryObjects } : {}),
+    ...(badgeEntries.length > 0 ? { badges: badgeEntries } : {}),
     ingredients,
     steps,
     servingBaseUnit: servingInfo?.baseUnit,
@@ -341,6 +438,7 @@ export const mapShortRecipeResponseToRecipe = (
   const categoryEntries = normalizeCategoryEntries(short as RecipeResponseDto);
   const categories = categoryEntries.map((category) => category.name).filter(Boolean);
   const categoryObjects = categoryEntries.length > 0 ? categoryEntries : undefined;
+  const badgeEntries = normalizeBadgeEntries(short as RecipeResponseDto);
 
   const authorSource = short?.ownerUser || fallbackAuthor;
   const author = authorSource
@@ -377,6 +475,7 @@ export const mapShortRecipeResponseToRecipe = (
     ...(tagObjects ? { tagObjects } : {}),
     categories,
     ...(categoryObjects ? { categoryObjects } : {}),
+    ...(badgeEntries.length > 0 ? { badges: badgeEntries } : {}),
     ingredients: [],
     steps: [],
     state: {
