@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import styles from './Tabs.module.css';
 
 /**
@@ -161,12 +161,17 @@ export interface TabsProps {
  * - Ошибки при работе с localStorage обрабатываются без прерывания работы компонента
  */
 const Tabs: React.FC<TabsProps> = ({ initial, onChange, tabs, ariaLabel = 'Tabs', storageKey }) => {
+  // Используем ref для отслеживания инициализации и предотвращения циклов
+  const isInitializing = useRef(true);
+
   // Загружаем сохраненную активную вкладку из localStorage если есть storageKey
-  const savedActive = useMemo(() => {
+  // Используем useMemo только для начального значения, без tabs в зависимостях
+  const initialActive = useMemo(() => {
     if (storageKey) {
       try {
         const saved = localStorage.getItem(`${storageKey}_active`);
-        if (saved && tabs.some(t => t.id === saved)) {
+        if (saved) {
+          // Проверяем валидность сохраненного значения позже в useEffect
           return saved;
         }
       } catch {
@@ -174,50 +179,90 @@ const Tabs: React.FC<TabsProps> = ({ initial, onChange, tabs, ariaLabel = 'Tabs'
       }
     }
     return initial ?? (tabs[0]?.id ?? '');
-  }, [storageKey, initial, tabs]);
+  }, [storageKey, initial]); // Убрали tabs из зависимостей
 
-  const [active, setActive] = useState<TabId>(savedActive);
+  const [active, setActive] = useState<TabId>(initialActive);
   const activeTab = tabs.find(t => t.id === active);
   const hasSubtabs = Boolean(activeTab?.subtabs && activeTab.subtabs.length > 0);
 
-  // Синхронизируем активную вкладку с изменением initial (если изменился savedActive)
-  // Также вызываем onChange при инициализации, если используется storageKey
+  // Инициализация: проверяем валидность сохраненного значения и синхронизируем состояние
   useEffect(() => {
-    if (savedActive !== active && tabs.some(t => t.id === savedActive)) {
-      setActive(savedActive);
-      onChange?.(savedActive);
+    if (isInitializing.current) {
+      isInitializing.current = false;
+      
+      if (storageKey) {
+        // Проверяем валидность сохраненного значения из localStorage
+        try {
+          const saved = localStorage.getItem(`${storageKey}_active`);
+          if (saved && tabs.some(t => t.id === saved)) {
+            // Сохраненное значение валидно, используем его
+            setActive(saved);
+            onChange?.(saved);
+            return;
+          }
+        } catch {
+          // Игнорируем ошибки
+        }
+      }
+      
+      // Если storageKey не указан или сохраненное значение невалидно, используем initial или первую вкладку
+      const fallback = initial ?? (tabs[0]?.id ?? '');
+      if (fallback && fallback !== active && tabs.some(t => t.id === fallback)) {
+        setActive(fallback);
+        onChange?.(fallback);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [savedActive]); // tabs и onChange не добавляем в зависимости, чтобы избежать лишних обновлений
+  }, []); // Выполняем только один раз при монтировании
 
-  // Вызываем onChange при первом рендере, если используется storageKey и значение загружено из localStorage
+  // Синхронизируем активную вкладку с изменением initial (только если storageKey не используется)
   useEffect(() => {
-    if (storageKey && onChange) {
-      // Синхронизируем внешнее состояние с загруженным значением из localStorage
-      onChange(active);
+    if (!storageKey && initial && initial !== active && tabs.some(t => t.id === initial)) {
+      setActive(initial);
+      onChange?.(initial);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Выполняем только при первом рендере
+  }, [initial]); // Только для initial, не для storageKey
 
-  // Загружаем сохраненную активную подвкладку
-  const savedActiveSub = useMemo(() => {
-    if (storageKey && activeTab?.subtabs) {
+  // Инициализируем состояние подвкладки
+  const getInitialSubtab = (tabId: TabId) => {
+    const tab = tabs.find(t => t.id === tabId);
+    if (storageKey && tab?.subtabs) {
       try {
-        const saved = localStorage.getItem(`${storageKey}_subtab_${active}`);
-        if (saved && activeTab.subtabs.some(s => s.id === saved)) {
+        const saved = localStorage.getItem(`${storageKey}_subtab_${tabId}`);
+        if (saved && tab.subtabs.some(s => s.id === saved)) {
           return saved;
         }
       } catch {
         // Игнорируем ошибки при чтении localStorage
       }
     }
-    return activeTab?.subtabs?.[0]?.id ?? '';
-  }, [storageKey, activeTab, active]);
+    return tab?.subtabs?.[0]?.id ?? '';
+  };
 
-  const [activeSub, setActiveSub] = useState<TabId>(savedActiveSub);
+  const [activeSub, setActiveSub] = useState<TabId>(() => getInitialSubtab(initialActive));
+  
+  // Используем ref для отслеживания предыдущей активной вкладки
+  const prevActiveRef = useRef<TabId>(initialActive);
+
+  // Инициализация подвкладки при первом рендере
+  useEffect(() => {
+    if (isInitializing.current) {
+      const initialSub = getInitialSubtab(active);
+      setActiveSub(initialSub);
+      prevActiveRef.current = active;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Выполняем только один раз при монтировании
 
   // Синхронизируем активную подвкладку при изменении активной вкладки
   useEffect(() => {
+    // Обновляем только если активная вкладка действительно изменилась
+    if (prevActiveRef.current === active || isInitializing.current) {
+      return;
+    }
+    
+    prevActiveRef.current = active;
     const currentTab = tabs.find(t => t.id === active);
     const currentHasSubtabs = Boolean(currentTab?.subtabs && currentTab.subtabs.length > 0);
     
@@ -237,19 +282,17 @@ const Tabs: React.FC<TabsProps> = ({ initial, onChange, tabs, ariaLabel = 'Tabs'
       
       // Устанавливаем сохраненную подвкладку или первую доступную
       const newSub = savedSub ?? currentTab.subtabs[0]?.id ?? '';
-      setActiveSub((prev) => {
-        // Обновляем только если значение изменилось
-        return newSub !== prev ? newSub : prev;
-      });
+      setActiveSub(newSub);
     } else {
       // Если нет подвкладок, сбрасываем состояние
       setActiveSub('');
     }
-  }, [active, storageKey, tabs]); // tabs в зависимостях, чтобы реагировать на изменения структуры
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, storageKey]); // Убрали tabs из зависимостей, чтобы избежать циклов
 
-  // Сохраняем активную вкладку при изменении
+  // Сохраняем активную вкладку при изменении (только если не идет инициализация)
   useEffect(() => {
-    if (storageKey) {
+    if (storageKey && !isInitializing.current) {
       try {
         localStorage.setItem(`${storageKey}_active`, active);
       } catch (err) {
@@ -258,9 +301,9 @@ const Tabs: React.FC<TabsProps> = ({ initial, onChange, tabs, ariaLabel = 'Tabs'
     }
   }, [active, storageKey]);
 
-  // Сохраняем активную подвкладку при изменении
+  // Сохраняем активную подвкладку при изменении (только если не идет инициализация)
   useEffect(() => {
-    if (storageKey && activeSub && hasSubtabs) {
+    if (storageKey && activeSub && hasSubtabs && !isInitializing.current) {
       try {
         localStorage.setItem(`${storageKey}_subtab_${active}`, activeSub);
       } catch (err) {
