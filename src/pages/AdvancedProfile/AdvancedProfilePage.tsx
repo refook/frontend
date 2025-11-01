@@ -88,24 +88,7 @@ const AdvancedProfilePage: React.FC = () => {
 
     const [activeTab, setActiveTab] = React.useState<TabId>('favorites');
     const [searchParams, setSearchParams] = useSearchParams();
-    const isCreateMode = searchParams.get('mode') === 'create' && (searchParams.get('tab') === 'recipes' || activeTab === 'recipes');
-
-    React.useEffect(() => {
-        const tabParam = searchParams.get('tab');
-        const allowed = ['favorites', 'history', 'following', 'recipes', 'comments', 'activity'] as const;
-        if (tabParam && (allowed as readonly string[]).includes(tabParam)) {
-            setActiveTab(tabParam as TabId);
-        }
-    }, [searchParams]);
-
-    React.useEffect(() => {
-        if (searchParams.get('tab') !== activeTab) {
-            const next = new URLSearchParams(searchParams);
-            next.set('tab', activeTab);
-            setSearchParams(next, {replace: true});
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [activeTab]);
+    const isCreateMode = searchParams.get('mode') === 'create' && activeTab === 'recipes';
 
     if (isCreateMode) {
         return (
@@ -116,8 +99,14 @@ const AdvancedProfilePage: React.FC = () => {
                         onClick={() => {
                             const next = new URLSearchParams(searchParams);
                             next.delete('mode');
-                            next.set('tab', 'recipes');
                             setSearchParams(next, {replace: true});
+                            setActiveTab('recipes');
+                            // Обновляем localStorage для синхронизации с компонентом Tabs
+                            try {
+                                localStorage.setItem('refook_profile_active', 'recipes');
+                            } catch {
+                                // Игнорируем ошибки при записи в localStorage
+                            }
                         }}
                     >
                         ← Назад к рецептам
@@ -136,6 +125,7 @@ const AdvancedProfilePage: React.FC = () => {
                 onChange={setActiveTab}
                 tabs={profileTabs}
                 ariaLabel="Разделы профиля"
+                storageKey="refook_profile"
             />
             {activeTab === 'favorites' && <FavoritesSection/>}
             {activeTab === 'history' && <HistorySection/>}

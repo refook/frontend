@@ -1,34 +1,37 @@
 import React, { useState } from 'react';
-import { API_BASE_URL } from '../../../../services/api';
-import styles from './CreateTagForm.module.css';
-import { getAuthHeaders, authorizedFetch } from '../../../../services/auth';
+import { API_BASE_URL } from '../../../../../services/api';
+import styles from './CreateEntityForm.module.css';
+import { getAuthHeaders, authorizedFetch } from '../../../../../services/auth';
 
 /**
- * Интерфейс формы создания тега
- * @interface CreateTagDtoForm
+ * Интерфейс формы создания сущности
+ * @interface CreateEntityDtoForm
  */
-interface CreateTagDtoForm {
-  /** Название тега */
+interface CreateEntityDtoForm {
+  /** Название сущности */
   name: string;
 }
 
 /**
- * Форма создания нового тега в админ-панели.
+ * Форма создания новой сущности (тег, категория, кухня) в админ-панели.
  * 
- * Компонент предоставляет простую форму для создания тега с валидацией,
+ * Компонент предоставляет простую форму для создания сущности с валидацией,
  * отправкой данных на сервер и отображением результата операции.
  * 
  * @component
  * @example
- * // Использование в TagSubTabs
- * <div className={styles.card}>
- *   <div className={styles.cardTitle}>Создать тег</div>
- *   <CreateTagForm />
- * </div>
+ * // Использование в NamedEntitySubTabs
+ * <CreateEntityForm
+ *   apiUrl={`${API_BASE_URL}/tags`}
+ *   titleLabel="Название тега*"
+ *   placeholder="Например: Десерт, Завтрак..."
+ *   submitLabel="Создать тег"
+ *   successMessage="Тег успешно создан"
+ * />
  * 
  * @features
  * - Валидация обязательных полей
- * - Отправка данных через API /v1/tags
+ * - Отправка данных через API
  * - Автосброс формы после успешного создания
  * - Отображение статуса операции
  * - Поддержка темной темы
@@ -45,7 +48,7 @@ interface CreateEntityFormProps {
   onCreated?: () => void;
 }
 
-const CreateTagForm: React.FC<CreateEntityFormProps> = ({
+const CreateEntityForm: React.FC<CreateEntityFormProps> = ({
   apiUrl,
   titleLabel,
   placeholder,
@@ -55,9 +58,9 @@ const CreateTagForm: React.FC<CreateEntityFormProps> = ({
 }) => {
   /**
    * Состояние данных формы
-   * @type {CreateTagDtoForm}
+   * @type {CreateEntityDtoForm}
    */
-  const [formData, setFormData] = useState<CreateTagDtoForm>({
+  const [formData, setFormData] = useState<CreateEntityDtoForm>({
     name: '',
   });
   
@@ -74,7 +77,7 @@ const CreateTagForm: React.FC<CreateEntityFormProps> = ({
   const [message, setMessage] = useState<string | null>(null);
 
   /**
-   * Обработчик отправки формы создания тега
+   * Обработчик отправки формы создания сущности
    * 
    * @async
    * @function handleSubmit
@@ -116,7 +119,7 @@ const CreateTagForm: React.FC<CreateEntityFormProps> = ({
       onCreated?.();
     } catch (err) {
       // Обработка ошибок
-      setMessage(`Ошибка: ${err instanceof Error ? err.message : 'Не удалось создать тег'}`);
+      setMessage(`Ошибка: ${err instanceof Error ? err.message : 'Не удалось создать сущность'}`);
     } finally {
       setSubmitting(false);
     }
@@ -124,7 +127,7 @@ const CreateTagForm: React.FC<CreateEntityFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className={styles.formGrid}>
-      {/* Основная информация о теге */}
+      {/* Основная информация о сущности */}
       <label className={styles.label}>
         {titleLabel}
         <input
@@ -157,4 +160,5 @@ const CreateTagForm: React.FC<CreateEntityFormProps> = ({
   );
 };
 
-export default CreateTagForm;
+export default CreateEntityForm;
+
