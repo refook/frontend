@@ -42,7 +42,7 @@ const ProductSubTabs: React.FC = () => {
   return (
     <div className={styles.wrapper}>
       {/* Компонент вкладок для переключения между подразделами */}
-      <Tabs initial={active} onChange={setActive} tabs={tabs} ariaLabel="Подразделы продуктов" />
+      <Tabs initial={active} onChange={setActive} tabs={tabs} ariaLabel="Подразделы продуктов" storageKey="refook_admin_products" />
       
       <div className={styles.content}>
         {/* Контент вкладки "Создать продукт" */}

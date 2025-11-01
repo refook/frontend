@@ -11,8 +11,8 @@ import AddBaseMeasureForm from '../AddBaseMeasureForm/AddBaseMeasureForm';
 import AddVariantMeasureForm from '../AddVariantMeasureForm/AddVariantMeasureForm';
 import SearchBar from '../SearchBar/SearchBar';
 import styles from './ProductListSubTab.module.css';
-import { useProductEditing } from './hooks/useProductEditing';
-import { useVariantEditing } from './hooks/useVariantEditing';
+import { useProductEditing } from '../../hooks/useProductEditing';
+import { useVariantEditing } from '../../hooks/useVariantEditing';
 import ListPaginationControls from '../../../../components/ListPaginationControls/ListPaginationControls';
 
 const PAGE_SIZE = 20;

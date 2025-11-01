@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { productsService } from '../../../../../services';
+import { productsService } from '../../../services';
 import type {
   UpdateProductDto,
   ProductMeasureResponseDto,
   UpdateBaseProductMeasureDto,
   AddBaseProductMeasureDto,
-} from '../../../../../types/api.types';
-import type { EditableRow } from '../../EditableTable/EditableTable';
+} from '../../../types/api.types';
+import type { EditableRow } from '../components/EditableTable/EditableTable';
 
 export function useProductEditing() {
   const [rows, setRows] = useState<EditableRow[]>([]);
@@ -153,5 +153,4 @@ export function useProductEditing() {
     addBaseMeasure,
   } as const;
 }
-
 

@@ -30,7 +30,7 @@ export const FridgePage: React.FC = () => {
       </div>
 
       <div className={styles.tabsBlock}>
-        <Tabs initial={activeTab as TabId} onChange={(t) => setActiveTab(t as TabType)} tabs={tabs} ariaLabel="Fridge sections"/>
+        <Tabs initial={activeTab as TabId} onChange={(t) => setActiveTab(t as TabType)} tabs={tabs} ariaLabel="Fridge sections" storageKey="refook_fridge"/>
         {activeTab === 'products' && fridgeItems.length > 0 && (
           <span className={styles.counter}>{fridgeItems.length}</span>
         )}

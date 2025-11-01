@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { productsService } from '../../../../../services';
+import { productsService } from '../../../services';
 import type {
   ChangeProductVariantDto,
   ProductMeasureResponseDto,
   UpdateBaseProductMeasureDto,
   AddProductVariantMeasureDto,
-} from '../../../../../types/api.types';
-import { PRODUCT_UNITS_ARRAY } from '../../../../../constants/measures';
+} from '../../../types/api.types';
+import { PRODUCT_UNITS_ARRAY } from '../../../constants/measures';
 
 export type VariantMode = 'base' | 'variant' | 'variant_update';
 
@@ -113,5 +113,4 @@ export function useVariantEditing() {
     addVariantMeasure,
   } as const;
 }
-
 

@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import styles from './AdminPage.module.css';
 import Tabs from '../../components/Tabs/Tabs';
-import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon, TagIcon, FolderIcon } from '@heroicons/react/24/outline';
-import ProductSubTabs from './components/ProductSubTabs/ProductSubTabs';
+import { Cog6ToothIcon, UserGroupIcon, BookOpenIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 import CreateProductForm from './components/CreateProductForm/CreateProductForm';
 import ProductListSubTab from './components/ProductListSubTab/ProductListSubTab';
-import TagSubTabs from './components/TagSubTabs/TagSubTabs';
-import KitchenSubTabs from './components/KitchenSubTabs/KitchenSubTabs';
-import CategorySubTabs from './components/CategorySubTabs/CategorySubTabs';
+import { createNamedEntityTab } from './config/adminTabsConfig';
+import type { EntityType } from './config/entityRegistry';
 
 /**
  * Тип ключей доступных вкладок админ-панели
- * @typedef {'products' | 'recipes' | 'tags' | 'users' | 'settings' | 'categories' | 'kitchens'} TabKey
+ * Автоматически включает все именованные сущности из реестра
  */
-type TabKey = 'products' | 'recipes' | 'tags' | 'users' | 'settings' | 'kitchens' | 'categories';
+type TabKey = 'products' | 'recipes' | 'users' | 'settings' | 'tags' | 'categories' | 'kitchens' | 'badges';
 
 /**
  * Главная страница админ-панели с управлением системными функциями.
@@ -52,6 +50,9 @@ const AdminPage: React.FC = () => {
    */
   const [activeTab, setActiveTab] = useState<TabKey>('products');
 
+  // Список именованных сущностей для автоматической генерации вкладок
+  const NAMED_ENTITIES: readonly EntityType[] = ['tag', 'category', 'kitchen', 'badge'] as const;
+
   return (
     <div className={styles.adminPage}>
       {/* Заголовок админ-панели */}
@@ -63,6 +64,7 @@ const AdminPage: React.FC = () => {
       <Tabs
         initial={activeTab}
         onChange={(t) => setActiveTab(t as TabKey)}
+        storageKey="refook_admin"
         tabs={[
           {
             id: 'products',
@@ -77,33 +79,8 @@ const AdminPage: React.FC = () => {
             ],
           },
           { id: 'recipes', label: 'Рецепты', Icon: BookOpenIcon, title: 'Рецепты (скоро)', content: <p>Здесь появится управление рецептами.</p> },
-          {
-            id: 'tags',
-            label: 'Теги',
-            Icon: TagIcon,
-            subtabs: [
-              { id: 'tags:create', label: 'Создать', title: 'Создать тег', content: <TagSubTabs mode="create" /> },
-              { id: 'tags:manage', label: 'Управление', title: 'Управление тегами', content: <TagSubTabs mode="manage" /> },
-            ],
-          },
-          {
-            id: 'categories',
-            label: 'Категории',
-            Icon: FolderIcon,
-            subtabs: [
-              { id: 'categories:create', label: 'Создать', title: 'Создать категорию', content: <CategorySubTabs mode="create" /> },
-              { id: 'categories:manage', label: 'Управление', title: 'Управление категориями', content: <CategorySubTabs mode="manage" /> },
-            ],
-          },
-          {
-            id: 'kitchens',
-            label: 'Кухни',
-            Icon: Squares2X2Icon,
-            subtabs: [
-              { id: 'kitchens:create', label: 'Создать', title: 'Создать кухню', content: <KitchenSubTabs mode="create" /> },
-              { id: 'kitchens:manage', label: 'Управление', title: 'Управление кухнями', content: <KitchenSubTabs mode="manage" /> },
-            ],
-          },
+          // Автоматически генерируемые вкладки для именованных сущностей
+          ...NAMED_ENTITIES.map((entityType) => createNamedEntityTab(entityType)),
           { id: 'users', label: 'Пользователи', Icon: UserGroupIcon, title: 'Пользователи (скоро)', content: <p>Здесь появится управление пользователями.</p> },
           { id: 'settings', label: 'Настройки', Icon: Cog6ToothIcon, title: 'Настройки (скоро)', content: <p>Общие настройки системы.</p> },
         ]}
