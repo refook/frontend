@@ -29,7 +29,7 @@ const NutritionInfo: React.FC<NutritionInfoProps> = ({ expanded, onToggle, calor
       </div>
 
       <div className={styles.grid}>
-        <div className={styles.card}>
+        <div className={`${styles.card} ${styles.cardCalories}`}>
           <span className={`${styles.iconWrap} ${styles.calories}`}><FireIcon className={styles.icon} /></span>
           <div className={styles.value}>{typeof calories === 'number' ? Math.round(calories) : 425}</div>
           <div className={styles.label}>Калории</div>
@@ -66,5 +66,4 @@ const NutritionInfo: React.FC<NutritionInfoProps> = ({ expanded, onToggle, calor
 };
 
 export default NutritionInfo;
-
 

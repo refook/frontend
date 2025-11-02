@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './InfoCard.module.css';
 
 interface InfoCardProps {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   label: string;
   value: React.ReactNode;
   tone?: 'accent' | 'success' | 'warning' | 'info';
@@ -17,11 +17,16 @@ interface InfoCardProps {
  * @param value Основное значение/контент показателя (число, строка или React-узел).
  */
 const InfoCard: React.FC<InfoCardProps> = ({ icon, label, value, tone }) => {
+  const hasIcon = Boolean(icon);
+  const iconToneClass = tone ? styles[`tone_${tone}`] : '';
+
   return (
-    <div className={styles.card}>
-      <div className={`${styles.iconWrap} ${tone ? styles[`tone_${tone}`] : ''}`}>
-        <span className={styles.icon}>{icon}</span>
-      </div>
+    <div className={`${styles.card} ${hasIcon ? '' : styles.cardCompact}`}>
+      {hasIcon && (
+        <div className={`${styles.iconWrap} ${iconToneClass}`}>
+          <span className={styles.icon}>{icon}</span>
+        </div>
+      )}
       <div className={styles.content}>
         <div className={styles.label}>{label}</div>
         <div className={styles.value}>{value}</div>
@@ -31,5 +36,4 @@ const InfoCard: React.FC<InfoCardProps> = ({ icon, label, value, tone }) => {
 };
 
 export default InfoCard;
-
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { API_BASE_URL } from '../../services/api';
 import {
   difficultyColor,
@@ -13,8 +13,20 @@ import MainSections from './components/MainSections/MainSections';
 import SocialActions from './components/SocialActions/SocialActions';
 import ReviewSection from './components/ReviewSection/ReviewSection';
 import CommentsSection from './components/CommentsSection/CommentsSection';
+import NutritionInfo from '../NutritionInfo/NutritionInfo';
+import BadgesChips from './components/BadgesChips/BadgesChips';
 import PreviewActions from './components/PreviewActions/PreviewActions';
 import styles from './RecipePreview.module.css';
+
+const formatKitchenLabel = (value: string): string => {
+  const normalized = value?.replace(/_/g, ' ').trim();
+  if (!normalized) return value;
+  return normalized
+    .split(' ')
+    .filter(Boolean)
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1).toLowerCase())
+    .join(' ');
+};
 
 /**
  * Основной компонент превью рецепта. Служит как модальный обзор перед публикацией
@@ -30,8 +42,29 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   onSubmit,
   isSubmitting = false,
   showActions = true,
+  fullHeight = false,
 }) => {
   const [showNutritionDetails, setShowNutritionDetails] = useState(false);
+  const [selectedMeta, setSelectedMeta] = useState<{ kitchens: string[]; tags: string[]; categories: string[] }>({
+    kitchens: [],
+    tags: [],
+    categories: [],
+  });
+
+  const toggleMetaChip = useCallback((type: 'kitchens' | 'tags' | 'categories', value: string) => {
+    setSelectedMeta((prev) => {
+      const list = prev[type];
+      const exists = list.includes(value);
+      const nextList = exists ? list.filter((item) => item !== value) : [...list, value];
+      return { ...prev, [type]: nextList };
+    });
+  }, []);
+
+  const clearMetaSelection = useCallback(() => {
+    setSelectedMeta({ kitchens: [], tags: [], categories: [] });
+  }, []);
+
+  const hasSelectedMeta = selectedMeta.kitchens.length > 0 || selectedMeta.tags.length > 0 || selectedMeta.categories.length > 0;
 
   const {
     sources,
@@ -41,6 +74,7 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
     getIngredientName,
     tags,
     categories,
+    kitchens,
     recipeStats,
     badges,
     macros,
@@ -131,59 +165,211 @@ const RecipePreview: React.FC<RecipePreviewProps> = ({
   ) : undefined;
 
   const heroRating = !isFormData ? recipeStats.rating : 4.8;
+  const hasMeta = kitchens.length > 0 || tags.length > 0 || categories.length > 0 || badges.length > 0;
+
+  const metaSectionContent = hasMeta ? (
+    <>
+      <h3 className={styles.metaTitle}>Подборки и кухня</h3>
+      <div className={styles.metaGroups}>
+        {kitchens.length > 0 && (
+          <div className={styles.metaGroup}>
+            <span className={styles.metaGroupLabel}>Кухня</span>
+            <div className={styles.metaChips}>
+              {kitchens.map((kitchen, index) => (
+                <button
+                  key={`${kitchen}-${index}`}
+                  type="button"
+                  className={`${styles.metaChip} ${styles.metaChipInteractive}`}
+                  aria-pressed={selectedMeta.kitchens.includes(kitchen)}
+                  data-chip-role="kitchens"
+                  onClick={() => toggleMetaChip('kitchens', kitchen)}
+                >
+                  {formatKitchenLabel(kitchen)}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tags.length > 0 && (
+          <div className={styles.metaGroup}>
+            <span className={styles.metaGroupLabel}>Теги</span>
+            <div className={styles.metaChips}>
+              {tags.map((tag, index) => (
+                <button
+                  key={`${tag}-${index}`}
+                  type="button"
+                  className={`${styles.metaChip} ${styles.metaChipInteractive}`}
+                  aria-pressed={selectedMeta.tags.includes(tag)}
+                  data-chip-role="tag"
+                  onClick={() => toggleMetaChip('tags', tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {categories.length > 0 && (
+          <div className={styles.metaGroup}>
+            <span className={styles.metaGroupLabel}>Категории</span>
+            <div className={styles.metaChips}>
+              {categories.map((category, index) => (
+                <button
+                  key={`${category}-${index}`}
+                  type="button"
+                  className={`${styles.metaChip} ${styles.metaChipInteractive}`}
+                  aria-pressed={selectedMeta.categories.includes(category)}
+                  data-chip-role="category"
+                  onClick={() => toggleMetaChip('categories', category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {badges.length > 0 && (
+          <div className={`${styles.metaGroup} ${styles.metaBadgesGroup}`}>
+            <span className={styles.metaGroupLabel}>Бейджи</span>
+            <BadgesChips badges={badges} title={null} wrapAs="div" className={styles.metaBadges} />
+          </div>
+        )}
+
+        {(kitchens.length || tags.length || categories.length) > 0 && (
+          <div className={styles.metaAssist}>
+            <div className={styles.metaAssistHeader}>
+              <span className={styles.metaAssistTitle}>
+                <span className={styles.metaAssistIcon}>🔍</span>
+                Подобрать похожие рецепты
+              </span>
+              <button
+                type="button"
+                className={styles.metaAssistReset}
+                onClick={clearMetaSelection}
+                disabled={!hasSelectedMeta}
+              >
+                Сбросить
+              </button>
+            </div>
+            <p className={styles.metaAssistHint}>
+              Отметьте интересующие чипы — так проще найти рецепты в похожих подборках.
+            </p>
+            {hasSelectedMeta && (
+              <div className={styles.metaAssistActions}>
+                <button type="button" className={styles.metaAssistApply}>
+                  Подобрать рецепты
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </>
+  ) : null;
 
   if (!hasData) {
     return null;
   }
 
   return (
-    <div className={styles.recipePreview}>
-      <div className={styles.previewContainer}>
-        <HeroSection
-          title={title || 'Название рецепта'}
-          description={description || 'Описание рецепта'}
-          imageUrl={heroImageUrl}
-          author={(!isFormData ? recipeData?.author?.name : 'Автор рецепта') || 'Автор'}
-          rating={heroRating}
-          views={!isFormData ? recipeStats.views : undefined}
-          actionsSlot={heroActions}
-        />
+    <div className={`${styles.recipePreview} ${fullHeight ? styles.recipePreviewFull : ''}`}>
+      <div className={`${styles.previewContainer} ${fullHeight ? styles.previewContainerFull : ''}`}>
+        <div className={styles.previewLayout}>
+          <div className={styles.heroColumn}>
+            <HeroSection
+              title={title || 'Название рецепта'}
+              description={description || 'Описание рецепта'}
+              imageUrl={heroImageUrl}
+              author={(!isFormData ? recipeData?.author?.name : 'Автор рецепта') || 'Автор'}
+              rating={heroRating}
+              views={!isFormData ? recipeStats.views : undefined}
+              actionsSlot={heroActions}
+            />
+          </div>
 
-        <InfoGrid
-          difficultyLabel={difficultyMap[normalizedDifficulty]}
-          difficultyColor={difficultyColor[normalizedDifficulty]}
-          totalMinutes={totalMinutes}
-          activeMinutes={activeMinutes}
-          servings={servings}
-        />
+          <div className={styles.mainColumn}>
+            <div className={styles.mobileInfoBlock}>
+              <InfoGrid
+                difficultyLabel={difficultyMap[normalizedDifficulty]}
+                difficultyColor={difficultyColor[normalizedDifficulty]}
+                totalMinutes={totalMinutes}
+                activeMinutes={activeMinutes}
+                servings={servings}
+              />
+            </div>
 
-        <MainSections
-          title={title}
-          servings={Number(servings) || 1}
-          ingredients={normalizedIngredients}
-          macros={macros}
-          showNutritionDetails={showNutritionDetails}
-          onToggleNutrition={() => setShowNutritionDetails((prev) => !prev)}
-          steps={steps}
-          isFormData={isFormData}
-          getIngredientName={getIngredientName}
-          measureLabels={measureLabels}
-          tags={tags}
-          categories={categories}
-          badges={badges}
-        />
+            <div className={styles.mobileNutritionBlock}>
+              <NutritionInfo
+                expanded={showNutritionDetails}
+                onToggle={() => setShowNutritionDetails((prev) => !prev)}
+                calories={macros?.calories}
+                proteins={macros?.proteins}
+                fats={macros?.fats}
+                carbs={macros?.carbs}
+              />
+            </div>
 
-        {!isFormData && (
-          <ReviewSection
-            rating={socialState.rating}
-            ratingLoading={socialState.ratingLoading}
-            isAuthenticated={socialState.isAuthenticated}
-            onSetRating={socialState.onSetRating}
-            ratingsCount={recipeStats.ratingsCount}
-          />
-        )}
+            <MainSections
+              title={title}
+              servings={Number(servings) || 1}
+              ingredients={normalizedIngredients}
+              steps={steps}
+              isFormData={isFormData}
+              getIngredientName={getIngredientName}
+              measureLabels={measureLabels}
+            />
 
-        {!isFormData && <CommentsSection recipe={recipeData} title={title} />}
+            {metaSectionContent && (
+              <section className={`${styles.metaSection} ${styles.metaSectionMobile}`}>
+                {metaSectionContent}
+              </section>
+            )}
+
+            {!isFormData && (
+              <ReviewSection
+                rating={socialState.rating}
+                ratingLoading={socialState.ratingLoading}
+                isAuthenticated={socialState.isAuthenticated}
+                onSetRating={socialState.onSetRating}
+                ratingsCount={recipeStats.ratingsCount}
+              />
+            )}
+
+            {!isFormData && <CommentsSection recipe={recipeData} title={title} />}
+          </div>
+
+          <aside className={styles.sideColumn}>
+            <div className={styles.infoGridBlock}>
+              <InfoGrid
+                difficultyLabel={difficultyMap[normalizedDifficulty]}
+                difficultyColor={difficultyColor[normalizedDifficulty]}
+                totalMinutes={totalMinutes}
+                activeMinutes={activeMinutes}
+                servings={servings}
+              />
+            </div>
+
+            <div className={styles.nutritionBlock}>
+              <NutritionInfo
+                expanded={showNutritionDetails}
+                onToggle={() => setShowNutritionDetails((prev) => !prev)}
+                calories={macros?.calories}
+                proteins={macros?.proteins}
+                fats={macros?.fats}
+                carbs={macros?.carbs}
+              />
+            </div>
+
+            {metaSectionContent && (
+              <section className={`${styles.metaSection} ${styles.metaSectionDesktop}`}>
+                {metaSectionContent}
+              </section>
+            )}
+          </aside>
+        </div>
       </div>
 
       {showActions && onEdit && onSubmit && (

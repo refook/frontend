@@ -1,8 +1,8 @@
 .card {
   display: grid;
-  grid-template-columns: 48px 1fr;
+  grid-template-columns: 44px 1fr;
   align-items: center;
-  gap: var(--token-space-4);
+  gap: var(--token-space-3);
   background: var(--token-surface);
   border: none;
   border-radius: var(--token-radius-lg);
@@ -10,9 +10,15 @@
   box-shadow: var(--token-shadow-sm);
 }
 
+.cardCompact {
+  grid-template-columns: 1fr;
+  padding: var(--token-space-4) var(--token-space-5);
+  gap: var(--token-space-2);
+}
+
 .iconWrap {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,8 +29,8 @@
 }
 
 .icon svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   color: var(--token-muted);
   display: block;
 }
@@ -49,18 +55,22 @@
 
 .content {
   display: grid;
-  gap: 6px;
+  gap: var(--token-space-2);
+  padding: var(--token-space-2) var(--token-space-3);
+  border-radius: var(--token-radius-md);
 }
 
 .label { color: var(--token-muted); font-size: var(--token-text-sm); }
 
 .value { color: var(--token-text); font-weight: 700; font-size: 20px; }
 
+.cardCompact .value { font-size: 18px; }
+.cardCompact .label { font-size: 13px; color: var(--token-muted); }
+
 @media (max-width: 700px) {
   .card { grid-template-columns: 1fr; padding: var(--token-space-4); gap: 6px; }
   .iconWrap { display: none; }
   .icon svg { width: 0; height: 0; }
-  .value { font-size: 18px; }
+  .value { font-size: 20px; }
+  .label { font-size: var(--token-text-base); }
 }
-
-

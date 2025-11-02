@@ -322,6 +322,14 @@ const Header: React.FC = () => {
                   <UserIcon className={styles.mobileProfileLinkIcon} />
                   Профиль
                 </Link>
+                <Link
+                  to="/admin"
+                  className={styles.mobileProfileLink}
+                  onClick={closeMobileMenu}
+                >
+                  <SparklesIcon className={styles.mobileProfileLinkIcon} />
+                  Админ-панель
+                </Link>
                 <button onClick={handleLogout} className={styles.mobileLogoutButton}>
                   <ArrowRightOnRectangleIcon className={styles.mobileProfileLinkIcon} />
                   Выйти
