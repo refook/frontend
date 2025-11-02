@@ -78,6 +78,7 @@ const RecipeDetailPage: React.FC = () => {
         <RecipePreview 
           recipe={currentRecipe}
           showActions={false}
+          fullHeight
         />
       </div>
     </div>

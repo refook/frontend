@@ -24,6 +24,8 @@ import type {
 import { getRecipeStatsSnapshot, isBadgeResponse } from '../RecipePreview.utils';
 import type { BadgeResponseDto } from '../../../types';
 
+const UUID_PATTERN = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
 const useRecipePreviewSources = (
   formData?: FormRecipeData,
   recipe?: Recipe,
@@ -56,6 +58,7 @@ type UseRecipePreviewDataResult = {
   getIngredientName: (id: string) => string | undefined;
   tags: string[];
   categories: string[];
+  kitchens: string[];
   recipeStats: ReturnType<typeof getRecipeStatsSnapshot>;
   badges: BadgeResponseDto[];
   macros:
@@ -247,6 +250,46 @@ export const useRecipePreviewData = (
     return recipeCategories.map((c: any) => (typeof c === 'string' ? c : c?.name ?? '')).filter(Boolean);
   }, [apiFormData, legacyFormData, recipeData]);
 
+  const kitchens = useMemo(() => {
+    const normalize = (value: unknown): string[] => {
+      if (!Array.isArray(value)) return [];
+      return value
+        .map((item) => {
+          if (typeof item === 'string') return item;
+          if (item && typeof item === 'object') {
+            const name = (item as Record<string, unknown>).name ?? (item as Record<string, unknown>).title;
+            if (typeof name === 'string') return name;
+          }
+          return '';
+        })
+        .map((name) => name.trim())
+        .filter((name) => Boolean(name) && !UUID_PATTERN.test(name));
+    };
+
+    if (apiFormData) {
+      const metaKitchens = normalize((apiFormData as any)?.metaInfo?.kitchens ?? []);
+      const rootKitchens = normalize((apiFormData as any)?.kitchens ?? []);
+      return Array.from(new Set([...rootKitchens, ...metaKitchens]));
+    }
+
+    if (legacyFormData) {
+      const legacyKitchens = normalize((legacyFormData as any)?.kitchens ?? []);
+      return Array.from(new Set(legacyKitchens));
+    }
+
+    const recipeKitchens = normalize((recipeData as any)?.kitchens ?? (recipeData as any)?.kitchenIds ?? []);
+    const metaKitchens = normalize((recipeData as any)?.metaInfo?.kitchens ?? []);
+    const cuisine = (recipeData as any)?.cuisine;
+    const combined = [...recipeKitchens, ...metaKitchens];
+    if (typeof cuisine === 'string') {
+      const trimmed = cuisine.trim();
+      if (trimmed && !UUID_PATTERN.test(trimmed)) {
+        combined.push(trimmed);
+      }
+    }
+    return Array.from(new Set(combined));
+  }, [apiFormData, legacyFormData, recipeData]);
+
   const recipeStats = useMemo(() => getRecipeStatsSnapshot(recipeData), [recipeData]);
 
   const badges = useMemo<BadgeResponseDto[]>(() => {
@@ -274,6 +317,7 @@ export const useRecipePreviewData = (
     getIngredientName,
     tags,
     categories,
+    kitchens,
     recipeStats,
     badges,
     macros,

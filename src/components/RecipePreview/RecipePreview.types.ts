@@ -11,7 +11,6 @@ import type {
   StepResponseDto,
 } from '../../types/recipe.types';
 import type { ApiIngredient } from '../../types/ingredient.types';
-import type { BadgeResponseDto } from '../../types';
 
 export type FormRecipeData = CreateRecipeDto | ApiCreateRecipeDto | ApiUpdateRecipeDto;
 
@@ -48,6 +47,7 @@ export type RecipePreviewProps = {
   onSubmit?: () => void;
   isSubmitting?: boolean;
   showActions?: boolean;
+  fullHeight?: boolean;
 };
 
 export type RecipePreviewHeroProps = {
@@ -72,21 +72,10 @@ export type RecipeMainSectionsProps = {
   title: string;
   servings: number;
   ingredients: NormalizedIngredient[];
-  macros?: {
-    calories?: number;
-    proteins?: number;
-    fats?: number;
-    carbs?: number;
-  } | null;
-  showNutritionDetails: boolean;
-  onToggleNutrition: () => void;
   steps: Array<ApiUpdateStepDto | CreateStepDto | StepResponseDto>;
   isFormData: boolean;
   getIngredientName: (id: string) => string | undefined;
   measureLabels: Record<string, string>;
-  tags: string[];
-  categories: string[];
-  badges: BadgeResponseDto[];
 };
 
 export type RecipeReviewSectionProps = {

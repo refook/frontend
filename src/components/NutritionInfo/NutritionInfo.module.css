@@ -23,38 +23,122 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--token-space-6);
-  align-items: center;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--token-space-4);
 }
 
 .card {
   display: grid;
-  place-items: center;
-  gap: var(--token-space-3);
+  grid-template-columns: 48px 1fr;
+  grid-template-areas:
+    'icon value'
+    'icon label';
+  align-items: center;
+  gap: var(--token-space-2) var(--token-space-3);
   background: var(--token-surface);
   border-radius: var(--token-radius-lg);
-  padding: var(--token-space-6);
+  padding: var(--token-space-4);
   box-shadow: var(--token-shadow-sm);
 }
 
 .iconWrap {
-  width: 84px;
-  height: 84px;
+  grid-area: icon;
+  width: 44px;
+  height: 44px;
   border-radius: var(--token-radius-full);
   display: grid;
   place-items: center;
 }
-.icon { width: 28px; height: 28px; color: var(--token-text); opacity: 0.8; }
+.icon {
+  width: 26px;
+  height: 26px;
+  color: var(--token-text);
+  opacity: 0.85;
+}
 .calories { background: color-mix(in oklab, #ffedd5 80%, transparent); }
 .proteins { background: color-mix(in oklab, #dbeafe 80%, transparent); }
 .carbs { background: color-mix(in oklab, #dcfce7 80%, transparent); }
 .fats { background: color-mix(in oklab, #fef9c3 80%, transparent); }
 
-[data-theme='dark'] .icon { color: var(--token-neutral-900); }
+[data-theme='dark'] .icon {
+  color: var(--token-neutral-0);
+  opacity: 0.95;
+}
 
-.value { font-size: 32px; font-weight: 700; color: var(--token-text); }
-.label { color: var(--token-muted); font-size: var(--token-text-base); }
+[data-theme='dark'] .calories {
+  background: linear-gradient(140deg, rgba(251, 146, 60, 0.55) 0%, rgba(249, 115, 22, 0.45) 100%);
+}
+
+[data-theme='dark'] .proteins {
+  background: linear-gradient(140deg, rgba(96, 165, 250, 0.5) 0%, rgba(37, 99, 235, 0.4) 100%);
+}
+
+[data-theme='dark'] .carbs {
+  background: linear-gradient(140deg, rgba(134, 239, 172, 0.5) 0%, rgba(34, 197, 94, 0.38) 100%);
+}
+
+[data-theme='dark'] .fats {
+  background: linear-gradient(140deg, rgba(253, 224, 71, 0.5) 0%, rgba(234, 179, 8, 0.35) 100%);
+}
+
+.value {
+  grid-area: value;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--token-text);
+}
+.label {
+  grid-area: label;
+  color: var(--token-muted);
+  font-size: var(--token-text-sm);
+}
+
+.cardCalories {
+  background: linear-gradient(
+      140deg,
+      color-mix(in oklab, #ffedd5 80%, transparent) 0%,
+      color-mix(in oklab, #fb923c 25%, transparent) 100%
+    );
+  box-shadow: 0 14px 28px -18px rgba(249, 115, 22, 0.55), var(--token-shadow-sm);
+  border: 1px solid color-mix(in oklab, #fb923c 24%, transparent);
+}
+
+.cardCalories .value {
+  color: #b45309;
+  font-size: 28px;
+}
+
+.cardCalories .label {
+  color: #92400e;
+  font-weight: 600;
+}
+
+.cardCalories .iconWrap {
+  background: color-mix(in oklab, #fb923c 35%, transparent);
+}
+
+[data-theme='dark'] .cardCalories {
+  background: linear-gradient(
+      135deg,
+      rgba(124, 45, 18, 0.22) 0%,
+      rgba(214, 105, 28, 0.179) 55%,
+      rgba(103, 54, 13, 0.12) 100%
+    );
+  border-color: rgba(253, 186, 116, 0.45);
+  box-shadow: 0 16px 32px -18px rgba(249, 115, 22, 0.45), var(--token-shadow-sm);
+}
+
+[data-theme='dark'] .cardCalories .value {
+  color: #ffe4c7;
+}
+
+[data-theme='dark'] .cardCalories .label {
+  color: #fcd4a2;
+}
+
+[data-theme='dark'] .cardCalories .iconWrap {
+  background: linear-gradient(140deg, rgba(249, 115, 22, 0.4) 0%, rgba(234, 88, 12, 0.55) 100%);
+}
 
 .details {
   margin-top: var(--token-space-6);
@@ -74,26 +158,13 @@
 }
 .row span:nth-child(2) { font-weight: 600; }
 
-@media (max-width: 900px) {
-  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--token-space-4); }
-  .card {
-    display: grid;
-    grid-template-columns: 64px 1fr;
-    grid-template-areas: 'icon value' 'icon label';
-    gap: 6px 12px;
-    justify-items: start;
-    align-items: center;
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--token-space-3);
   }
-  .iconWrap { grid-area: icon; justify-self: center; width: 64px; height: 64px; }
-  .value { grid-area: value; font-size: 24px; }
-  .label { grid-area: label; font-size: var(--token-text-sm); }
-}
-
-@media (max-width: 480px) {
-  .card { grid-template-columns: 48px 1fr; gap: 4px 10px; }
-  .iconWrap { width: 48px; height: 48px; }
+  .card { padding: var(--token-space-4); grid-template-columns: 44px 1fr; }
+  .iconWrap { width: 40px; height: 40px; }
   .icon { width: 22px; height: 22px; }
-  .value { font-size: 18px; }
+  .value { font-size: 20px; }
 }
-
-

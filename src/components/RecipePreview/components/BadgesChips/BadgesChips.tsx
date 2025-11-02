@@ -1,20 +1,34 @@
 import React from 'react';
-import type { RecipeMainSectionsProps } from '../../RecipePreview.types';
+import type { BadgeResponseDto } from '../../../../types';
 import { getBadgeInitial, rarityColors, resolveBadgeIcon } from '../../RecipePreview.utils';
 import styles from './BadgesChips.module.css';
 
-type BadgesChipsProps = Pick<RecipeMainSectionsProps, 'badges'>;
+type BadgesChipsProps = {
+  badges: BadgeResponseDto[];
+  title?: string | null;
+  wrapAs?: 'section' | 'div';
+  className?: string;
+};
 
 /**
  * Отображает бейджи рецепта в виде компактных чипов.
  * Показывает иконку/инициал бейджа, название и описание, окрашивая фон по редкости.
  */
-const BadgesChips: React.FC<BadgesChipsProps> = ({ badges }) => {
+const BadgesChips: React.FC<BadgesChipsProps> = ({
+  badges,
+  title = 'Бейджи',
+  wrapAs = 'section',
+  className,
+}) => {
   if (!badges.length) return null;
 
+  const Wrapper = wrapAs === 'div' ? 'div' : 'section';
+  const resolvedTitle = title ?? 'Бейджи';
+  const wrapperClassName = [styles.section, className].filter(Boolean).join(' ');
+
   return (
-    <section className={styles.section}>
-      <h3 className={styles.title}>Бейджи</h3>
+    <Wrapper className={wrapperClassName}>
+      {title !== null && <h3 className={styles.title}>{resolvedTitle}</h3>}
       <div className={styles.list}>
         {badges.map((badge) => {
           const icon = resolveBadgeIcon(badge.icon);
@@ -42,7 +56,7 @@ const BadgesChips: React.FC<BadgesChipsProps> = ({ badges }) => {
           );
         })}
       </div>
-    </section>
+    </Wrapper>
   );
 };
 
