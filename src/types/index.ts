@@ -1,4 +1,12 @@
-import type {DifficultyLevel, KitchenType, RecipeIngredientDto, StateDto, StepResponseDto, BadgeResponseDto} from "./recipe.types.ts";
+import type {
+  DifficultyLevel,
+  KitchenType,
+  RecipeIngredientDto,
+  StateDto,
+  StepResponseDto,
+  BadgeResponseDto,
+  ApiRecipeServingDto
+} from "./recipe.types.ts";
 import type { CategoryResponseDto } from './category.types.ts';
 
 export * from './common.types.ts'
@@ -65,11 +73,17 @@ export interface Recipe extends BaseEntity {
 export interface RecipeFilters {
   search?: string;
   cuisine?: KitchenType[];
+  kitchenIds?: string[];
+  productIds?: string[];
+  tagIds?: string[];
   difficulty?: DifficultyLevel[];
+  level?: DifficultyLevel;
   cookTime?: {
     min?: number;
     max?: number;
   };
+  minTime?: number;
+  maxTime?: number;
   prepTime?: {
     min?: number;
     max?: number;
@@ -83,10 +97,19 @@ export interface RecipeFilters {
     min?: number;
     max?: number;
   };
+  totalWeight?: {
+    min?: number;
+    max?: number;
+  };
+  minTotalWeight?: number;
+  maxTotalWeight?: number;
+  minUnitCount?: number;
+  maxUnitCount?: number;
+  recipeUnit?: ApiRecipeServingDto['recipeUnit'];
 }
 
 export interface RecipeSort {
-  field: 'createdAt' | 'prepTime' | 'cookTime' | 'rating';
+  field: 'createdAt' | 'prepTime' | 'cookTime' | 'rating' | 'likes' | 'views';
   order: 'asc' | 'desc';
 }
 

@@ -245,39 +245,151 @@ class RealRecipesService {
     sort?: RecipeSort
   ): Promise<PaginatedResponse<Recipe>> {
     try {
-      // Получаем все рецепты с полными данными
-      const allRecipes = await this.getAllRecipes();
-      console.log('Получены полные данные рецептов:', allRecipes);
-      
-      // Применяем фильтры
-      let filteredRecipes = filters ? this.filterRecipes(allRecipes, filters) : allRecipes;
-      
-      // Применяем сортировку
-      if (sort) {
-        filteredRecipes = this.sortRecipes(filteredRecipes, sort);
+      const params = this.buildRecipeSearchQuery(filters, sort);
+      const queryString = params.toString();
+      const url = `${API_BASE_URL}/recipe/search${queryString ? `?${queryString}` : ''}`;
+      const headers = getAuthHeaders();
+      apiLogger.logRequest(url, 'GET', headers, undefined);
+
+      const response = await authorizedFetch(url, {
+        method: 'GET',
+        headers
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      // Применяем пагинацию
+
+      const payload = await response.json();
+      if (!Array.isArray(payload)) {
+        throw new Error('Ожидался массив рецептов в ответе /recipe/search');
+      }
+
+      const mapped = payload.map((short: any) =>
+        mapShortRecipeResponseToRecipe(short, {
+          id: DEFAULT_USER.id,
+          name: DEFAULT_USER.name,
+          avatar: DEFAULT_USER.photo,
+        })
+      );
+
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
-      const paginatedRecipes = filteredRecipes.slice(startIndex, endIndex);
-      
+      const paginatedRecipes = mapped.slice(startIndex, endIndex);
+
       return {
         data: paginatedRecipes,
         pagination: {
           page,
           limit,
-          total: filteredRecipes.length,
-          totalPages: Math.ceil(filteredRecipes.length / limit)
-        }
+          total: mapped.length,
+          totalPages: Math.ceil(mapped.length / limit),
+        },
       };
     } catch (error) {
       console.error('Ошибка при получении рецептов:', error);
-      return {
-        data: [],
-        pagination: { page: 1, limit, total: 0, totalPages: 0 }
-      };
+      try {
+        const fallback = await this.getAllRecipes();
+        let filtered = filters ? this.filterRecipes(fallback, filters) : fallback;
+        if (sort) {
+          filtered = this.sortRecipes(filtered, sort);
+        }
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedRecipes = filtered.slice(startIndex, endIndex);
+        return {
+          data: paginatedRecipes,
+          pagination: {
+            page,
+            limit,
+            total: filtered.length,
+            totalPages: Math.ceil(filtered.length / limit),
+          },
+        };
+      } catch (fallbackError) {
+        console.error('Ошибка при fallback-загрузке рецептов:', fallbackError);
+        return {
+          data: [],
+          pagination: { page: 1, limit, total: 0, totalPages: 0 },
+        };
+      }
     }
+  }
+
+  private buildRecipeSearchQuery(filters?: RecipeFilters, sort?: RecipeSort): URLSearchParams {
+    const params = new URLSearchParams();
+    if (filters) {
+      const trim = (value?: string | null) => (typeof value === 'string' ? value.trim() : '');
+      const appendArray = (key: string, values?: string[]) => {
+        if (!values || values.length === 0) return;
+        values.forEach((val) => {
+          const normalized = trim(val);
+          if (normalized) params.append(key, normalized);
+        });
+      };
+      const toInt = (value?: number) => {
+        if (typeof value !== 'number' || Number.isNaN(value)) return undefined;
+        return Math.round(value);
+      };
+
+      const name = trim(filters.search);
+      if (name) params.set('name', name);
+
+      appendArray('tagIds', filters.tagIds);
+      appendArray('kitchenIds', filters.kitchenIds);
+      appendArray('productIds', filters.productIds);
+
+      if (filters.calories) {
+        const minCalories = toInt(filters.calories.min);
+        const maxCalories = toInt(filters.calories.max);
+        if (typeof minCalories === 'number') params.set('minCalories', String(minCalories));
+        if (typeof maxCalories === 'number') params.set('maxCalories', String(maxCalories));
+      }
+
+      const minWeight = toInt(filters.totalWeight?.min ?? filters.minTotalWeight);
+      const maxWeight = toInt(filters.totalWeight?.max ?? filters.maxTotalWeight);
+      if (typeof minWeight === 'number') params.set('minTotalWeight', String(minWeight));
+      if (typeof maxWeight === 'number') params.set('maxTotalWeight', String(maxWeight));
+
+      const minUnits = toInt(filters.servings?.min ?? filters.minUnitCount);
+      const maxUnits = toInt(filters.servings?.max ?? filters.maxUnitCount);
+      if (typeof minUnits === 'number') params.set('minUnitCount', String(minUnits));
+      if (typeof maxUnits === 'number') params.set('maxUnitCount', String(maxUnits));
+
+      if (filters.recipeUnit) {
+        params.set('recipeUnit', filters.recipeUnit);
+      }
+
+      const difficulty = filters.level || filters.difficulty?.[0];
+      if (difficulty) {
+        params.set('level', String(difficulty).toUpperCase());
+      }
+
+      const maxCookMinutes = filters.cookTime?.max;
+      const maxTimeSeconds = filters.maxTime ?? (typeof maxCookMinutes === 'number' ? Math.round(maxCookMinutes * 60) : undefined);
+      if (typeof maxTimeSeconds === 'number' && maxTimeSeconds > 0) {
+        params.set('maxTime', String(maxTimeSeconds));
+      }
+    }
+
+    if (sort) {
+      const fieldMap: Record<RecipeSort['field'], string | undefined> = {
+        createdAt: 'CREATED_AT',
+        prepTime: undefined,
+        cookTime: undefined,
+        rating: 'RATING',
+        likes: 'LIKES',
+        views: 'VIEWS',
+      };
+      const mappedField = fieldMap[sort.field];
+      if (mappedField) params.set('sortField', mappedField);
+      const direction = sort.order.toUpperCase();
+      if (direction === 'ASC' || direction === 'DESC') {
+        params.set('sortDirection', direction);
+      }
+    }
+
+    return params;
   }
 
   /**
@@ -395,6 +507,13 @@ class RealRecipesService {
           return false;
         }
       }
+      if (filters.level) {
+        const target = filters.level.toUpperCase() as DifficultyLevel;
+        const recipeDifficulty = recipe.difficulty.toUpperCase() as DifficultyLevel;
+        if (recipeDifficulty !== target) {
+          return false;
+        }
+      }
 
       // Время приготовления
       if (filters.cookTime) {
@@ -402,6 +521,18 @@ class RealRecipesService {
           return false;
         }
         if (filters.cookTime.max !== undefined && recipe.cookTime > filters.cookTime.max) {
+          return false;
+        }
+      }
+      if (typeof filters.maxTime === 'number' && filters.maxTime > 0) {
+        const cookSeconds = recipe.cookTime * 60;
+        if (cookSeconds > filters.maxTime) {
+          return false;
+        }
+      }
+      if (typeof filters.minTime === 'number' && filters.minTime > 0) {
+        const cookSeconds = recipe.cookTime * 60;
+        if (cookSeconds < filters.minTime) {
           return false;
         }
       }
@@ -425,6 +556,13 @@ class RealRecipesService {
           return false;
         }
       }
+      const unitCount = recipe.servingUnitCount ?? recipe.servings;
+      if (filters.minUnitCount !== undefined && unitCount < filters.minUnitCount) {
+        return false;
+      }
+      if (filters.maxUnitCount !== undefined && unitCount > filters.maxUnitCount) {
+        return false;
+      }
 
       // Теги
       if (filters.tags && filters.tags.length > 0 && recipe.tags) {
@@ -432,6 +570,57 @@ class RealRecipesService {
           recipe.tags.some(recipeTag => recipeTag.toLowerCase() === tag.toLowerCase())
         );
         if (!hasAllTags) return false;
+      }
+      if (filters.tagIds && filters.tagIds.length > 0 && (recipe as any).tagObjects) {
+        const tagObjects = ((recipe as any).tagObjects as Array<{ id?: string }>).filter(Boolean);
+        const tagIds = tagObjects.map((t) => t.id).filter(Boolean);
+        const hasAllTagIds = filters.tagIds.every((id) => tagIds.includes(id));
+        if (!hasAllTagIds) return false;
+      }
+
+      if (filters.kitchenIds && filters.kitchenIds.length > 0) {
+        const recipeKitchenIds = (recipe.kitchenIds || []).filter(Boolean);
+        if (recipeKitchenIds.length === 0) return false;
+        const hasKitchen = filters.kitchenIds.some((id) => recipeKitchenIds.includes(id));
+        if (!hasKitchen) return false;
+      }
+
+      if (filters.calories) {
+        const calories = recipe.macros?.calories;
+        if (filters.calories.min !== undefined && (typeof calories !== 'number' || calories < filters.calories.min)) {
+          return false;
+        }
+        if (filters.calories.max !== undefined && (typeof calories !== 'number' || calories > filters.calories.max)) {
+          return false;
+        }
+      }
+
+      if (filters.totalWeight) {
+        const weight = recipe.servingTotalWeight;
+        if (filters.totalWeight.min !== undefined && (typeof weight !== 'number' || weight < filters.totalWeight.min)) {
+          return false;
+        }
+        if (filters.totalWeight.max !== undefined && (typeof weight !== 'number' || weight > filters.totalWeight.max)) {
+          return false;
+        }
+      }
+      if (filters.minTotalWeight !== undefined) {
+        const weight = recipe.servingTotalWeight;
+        if (typeof weight !== 'number' || weight < filters.minTotalWeight) {
+          return false;
+        }
+      }
+      if (filters.maxTotalWeight !== undefined) {
+        const weight = recipe.servingTotalWeight;
+        if (typeof weight !== 'number' || weight > filters.maxTotalWeight) {
+          return false;
+        }
+      }
+
+      if (filters.recipeUnit && recipe.servingRecipeUnit) {
+        if (recipe.servingRecipeUnit !== filters.recipeUnit) {
+          return false;
+        }
       }
       
       return true;
@@ -454,9 +643,21 @@ class RealRecipesService {
           aValue = a.prepTime + a.cookTime;
           bValue = b.prepTime + b.cookTime;
           break;
+        case 'cookTime':
+          aValue = a.cookTime;
+          bValue = b.cookTime;
+          break;
         case 'rating':
           aValue = a.stats.rating;
           bValue = b.stats.rating;
+          break;
+        case 'likes':
+          aValue = a.stats.likes;
+          bValue = b.stats.likes;
+          break;
+        case 'views':
+          aValue = a.stats.views;
+          bValue = b.stats.views;
           break;
         default:
           aValue = a[sort.field as keyof Recipe];
