@@ -7,6 +7,10 @@
 .filterBtnRemoveMode { background: color-mix(in oklab, var(--color-danger-light) 18%, transparent) !important; border-color: color-mix(in oklab, var(--color-danger) 20%, var(--token-border)) !important; color: var(--token-neutral-700) !important; }
 .addBtn { border: 1px dashed var(--token-border) !important; }
 .addBtn:hover { background: color-mix(in oklab, var(--token-accent-weak) 20%, transparent) !important; }
+.quickFilters { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--token-space-2); margin: 0 auto var(--token-space-3); max-width: 64rem; }
+.quickFilterBtn { border: 1px solid var(--token-border); background: var(--token-neutral-50); color: var(--token-neutral-700); border-radius: var(--token-radius-full); padding: 4px 12px; font-size: var(--token-text-sm); cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+.quickFilterBtn:hover { background: color-mix(in oklab, var(--token-accent-weak) 18%, transparent); border-color: color-mix(in oklab, var(--token-accent) 25%, var(--token-border)); }
+.quickFilterBtnActive { background: color-mix(in oklab, var(--token-accent-weak) 55%, transparent); color: var(--token-accent-strong); border-color: var(--token-accent); }
 .menu { margin-top: var(--token-space-3); }
 .menuList { display: flex; flex-wrap: wrap; gap: var(--token-space-3); }
 .menuItem { height: 36px; }
@@ -41,6 +45,9 @@
 
 [data-theme='dark'] .addBtn { border-color: color-mix(in oklab, var(--token-accent) 30%, var(--token-border)) !important; }
 [data-theme='dark'] .addBtn:hover { background: color-mix(in oklab, var(--token-accent) 15%, transparent) !important; }
+[data-theme='dark'] .quickFilterBtn { background: color-mix(in oklab, var(--token-neutral-800) 70%, transparent); color: var(--token-neutral-200); border-color: color-mix(in oklab, var(--token-border) 80%, transparent); }
+[data-theme='dark'] .quickFilterBtn:hover { background: color-mix(in oklab, var(--token-accent) 20%, transparent); border-color: color-mix(in oklab, var(--token-accent) 40%, var(--token-border)); }
+[data-theme='dark'] .quickFilterBtnActive { background: color-mix(in oklab, var(--token-accent) 55%, transparent); color: var(--token-neutral-50); border-color: var(--token-accent); }
 
 .caloriesChip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border: 1px solid var(--token-border); border-radius: var(--token-radius-full); background: var(--token-neutral-50); }
 .caloriesInput { width: 80px; height: 28px; padding: 2px 8px; border: 1px solid var(--token-border); border-radius: 8px; font-size: var(--token-text-sm); }
@@ -48,3 +55,25 @@
 /* Wrapper button for SmartChip: reset styles to avoid double borders */
 .smartChipBtn { border: none; background: transparent; padding: 0; display: inline-flex; cursor: pointer; }
 
+@media (max-width: 768px) {
+  .quickFilters {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: var(--token-space-1);
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    padding-left: var(--token-space-2);
+    padding-right: var(--token-space-2);
+  }
+
+  .quickFilters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quickFilterBtn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+}
