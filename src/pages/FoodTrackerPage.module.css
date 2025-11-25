@@ -29,6 +29,13 @@
   min-width: 0;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .heroLabel {
   color: var(--token-muted);
   font-weight: 600;
@@ -49,6 +56,41 @@
 .heroActions {
   display: inline-flex;
   gap: 12px;
+  align-items: center;
+}
+
+.heroGoalButton {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  border: 1px solid var(--token-border);
+  background: color-mix(in srgb, var(--token-surface) 92%, var(--token-border) 8%);
+  border-radius: 999px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--token-text);
+  box-shadow: var(--token-shadow-sm);
+  transition: background var(--token-duration-fast) ease, transform var(--token-duration-fast) ease;
+}
+
+.heroGoalButton:hover {
+  background: color-mix(in srgb, var(--token-surface) 86%, var(--token-border) 14%);
+  transform: translateY(-1px);
+}
+
+.todayHint {
+  font-size: 13px;
+  color: var(--token-muted);
+  background: color-mix(in srgb, var(--token-accent-weak) 40%, var(--token-surface) 60%);
+  border: 1px solid var(--token-border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  line-height: 1;
 }
 
 .heroPill {
@@ -98,16 +140,26 @@
 }
 
 .legendRow {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-weight: 400;
 }
 
 .legendText {
   font-weight: 600;
   font-size: 14px;
+}
+
+.legendValues {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.legendGoal {
+  font-size: 12px;
+  color: var(--token-muted);
 }
 
 .goalCard {
@@ -219,8 +271,8 @@
   gap: 8px;
   padding: 8px 12px;
   border-radius: 9999px;
-  background: var(--token-accent);
-  color: #fff;
+  background: color-mix(in srgb, var(--token-accent-weak) 70%, var(--token-surface) 30%);
+  color: var(--token-accent);
   border: none;
   cursor: pointer;
   font-weight: 600;
@@ -229,7 +281,7 @@
 
 .addButton:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.18);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--token-accent) 18%, transparent 82%);
 }
 
 .items {
@@ -245,27 +297,43 @@
 
 .itemRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 12px;
-  background: var(--token-neutral-50);
-  border: none;
+  background: var(--token-bg);
   border-radius: 12px;
-  box-shadow: var(--token-shadow-sm);
+
+}
+
+[data-theme='dark'] .itemRow {
+  background: var(--token-bg);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
 }
 
 .itemMeta {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .itemTitleRow {
   display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.itemTitleGroup {
+  display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  flex: 1;
 }
 
 .itemTitle {
@@ -280,6 +348,10 @@
   font-size: 13px;
 }
 
+.itemDetailsWrapper {
+  width: 100%;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -291,13 +363,8 @@
   color: var(--token-accent);
 }
 
-.badgeRecipe {
-  background: rgba(16, 185, 129, 0.14);
-  color: #0f9f7f;
-}
-
 .badgeManual {
-  background: rgba(250, 204, 21, 0.18);
+  background: color-mix(in srgb, var(--token-accent-weak) 60%, #facc15 40%);
   color: #a86e00;
 }
 
@@ -309,6 +376,7 @@
   padding: 6px;
   border-radius: 10px;
   transition: background var(--token-duration-fast) ease;
+  margin-left: auto;
 }
 
 .removeButton:hover {
@@ -323,7 +391,7 @@
 
 .closeButton {
   border: none;
-  background: var(--token-neutral-50);
+  background: color-mix(in srgb, var(--token-surface) 86%, var(--token-border) 14%);
   border-radius: 10px;
   padding: 8px;
   cursor: pointer;
@@ -331,33 +399,7 @@
 }
 
 .closeButton:hover {
-  background: var(--token-neutral-100);
-}
-
-.tabs {
-  display: inline-flex;
-  align-items: center;
-  background: var(--token-neutral-50);
-  border: 1px solid var(--token-border);
-  border-radius: 12px;
-  padding: 4px;
-  gap: 4px;
-}
-
-.tab {
-  border: none;
-  background: transparent;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-weight: 600;
-  color: var(--token-muted);
-  cursor: pointer;
-}
-
-.tabActive {
-  background: var(--token-surface);
-  color: var(--token-text);
-  box-shadow: var(--token-shadow-sm);
+  background: color-mix(in srgb, var(--token-surface) 78%, var(--token-border) 22%);
 }
 
 .formSection {
@@ -367,7 +409,76 @@
   padding: 12px;
   border: 1px dashed var(--token-border);
   border-radius: 12px;
-  background: var(--token-neutral-50);
+  background: color-mix(in srgb, var(--token-surface) 90%, var(--token-border) 10%);
+}
+
+.goalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.goalGridMeasurements {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.goalGridSelectors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.macroGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  color: var(--token-muted);
+  font-weight: 600;
+}
+
+.goalHintRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.actionsRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.actionsSpacer {
+  flex: 1;
+}
+
+.secondaryButton {
+  border: 1px solid var(--token-border);
+  background: color-mix(in srgb, var(--token-surface) 92%, var(--token-border) 8%);
+  color: var(--token-text);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--token-duration-fast) ease, border-color var(--token-duration-fast) ease;
+}
+
+.secondaryButton:hover {
+  background: color-mix(in srgb, var(--token-surface) 86%, var(--token-border) 14%);
 }
 
 .inputRow {
@@ -408,9 +519,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--token-border) 60%, transparent 40%);
   border-radius: 12px;
-  background: var(--token-surface);
+  background: color-mix(in srgb, var(--token-surface) 70%, var(--token-accent-weak) 25%, var(--token-border) 5%);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--token-accent) 12%, transparent 88%);
+}
+
+[data-theme='dark'] .resultItem {
+  background: color-mix(in srgb, var(--token-surface) 78%, var(--token-border) 22%);
   box-shadow: var(--token-shadow-sm);
 }
 
@@ -435,8 +551,8 @@
   justify-content: center;
   padding: 6px 10px;
   border-radius: 999px;
-  background: var(--token-neutral-50);
-  border: 1px solid var(--token-border);
+  background: color-mix(in srgb, var(--token-surface) 90%, var(--token-border) 10%);
+  border: 1px solid color-mix(in srgb, var(--token-border) 80%, transparent 20%);
   font-weight: 600;
   color: var(--token-text);
 }
@@ -482,6 +598,7 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
+  backdrop-filter: blur(4px);
 }
 
 .sheetBackdrop {
@@ -497,18 +614,23 @@
   background: var(--token-surface);
   border-radius: 18px 18px 0 0;
   border: none;
-  box-shadow: var(--token-shadow-md);
-  padding: 16px 20px 88px;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.18);
+  padding: 16px 20px 32px;
   transform: translateY(0);
   transition: transform var(--token-duration-normal) ease;
   max-height: 90vh;
   overflow-y: auto;
 }
 
+[data-theme='dark'] .sheet {
+  background: color-mix(in srgb, var(--token-neutral-900) 90%, var(--token-surface) 10%);
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.35);
+}
+
 .sheetHandle {
   width: 60px;
   height: 6px;
-  background: var(--token-neutral-200);
+  background: var(--token-border);
   border-radius: 999px;
   margin: 0 auto 12px;
 }
@@ -524,6 +646,15 @@
 @media (max-width: 768px) {
   .page {
     padding: 28px 10px 48px;
+  }
+
+  .macroGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .heroGoalButton {
+    top: 10px;
+    right: 10px;
   }
 
   .inputRow {
