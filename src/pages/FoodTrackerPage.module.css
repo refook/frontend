@@ -112,8 +112,8 @@
 
 .goalCard {
   position: relative;
-  width: 210px;
-  height: 210px;
+  width: 180px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,8 +133,8 @@
 
 .goalCircleWrapper {
   position: relative;
-  width: 190px;
-  height: 190px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -142,8 +142,8 @@
 
 .goalProgress {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: 170px;
+  height: 170px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -152,8 +152,8 @@
 
 .goalCircle {
   position: relative;
-  width: 170px;
-  height: 170px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   background: var(--token-surface);
   box-shadow: none;
@@ -522,6 +522,10 @@
 }
 
 @media (max-width: 768px) {
+  .page {
+    padding: 28px 10px 48px;
+  }
+
   .inputRow {
     grid-template-columns: 1fr;
   }
@@ -551,26 +555,26 @@
   }
 
   .goalCard {
-    width: 190px;
-    height: 190px;
-  }
-
-  .goalCircleWrapper {
     width: 170px;
     height: 170px;
   }
 
+  .goalCircleWrapper {
+    width: 150px;
+    height: 150px;
+  }
+
   .goalProgress {
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
   }
 
   .goalCircle {
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
   }
 }
 
