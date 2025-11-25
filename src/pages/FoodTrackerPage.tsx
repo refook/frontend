@@ -642,7 +642,7 @@ const FoodTrackerPage: React.FC = () => {
                     <CircularProgressbar
                       value={100}
                       maxValue={100}
-                      strokeWidth={10}
+                      strokeWidth={2}
                       className={styles.goalProgress}
                       styles={buildStyles({
                         trailColor: 'rgba(99, 102, 241, 0.08)',
@@ -663,7 +663,7 @@ const FoodTrackerPage: React.FC = () => {
                       key={segment.key}
                       value={percent}
                       maxValue={100}
-                      strokeWidth={10}
+                      strokeWidth={6}
                       className={styles.goalProgress}
                       styles={buildStyles({
                         trailColor: 'transparent',
