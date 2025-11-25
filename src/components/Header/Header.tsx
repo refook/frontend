@@ -17,6 +17,7 @@ import {
   HomeModernIcon,
   Squares2X2Icon,
   BellIcon,
+  ClipboardDocumentListIcon,
 } from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 import {KeycloakContext} from "../../providers/KeycloakProvider.tsx";
@@ -243,6 +244,13 @@ const Header: React.FC = () => {
 
   const mobileNavItems = [
     {
+      to: '/tracker',
+      label: 'Трекер',
+      description: 'Планируйте приёмы пищи',
+      icon: ClipboardDocumentListIcon,
+      isActive: location.pathname.startsWith('/tracker'),
+    },
+    {
       to: '/recipes',
       label: 'Рецепты',
       description: 'Коллекция блюд и подборок',
@@ -459,6 +467,13 @@ const Header: React.FC = () => {
               aria-current={location.pathname.startsWith('/discover') ? 'page' : undefined}
             >
               Discover
+            </Link>
+            <Link
+              to="/tracker"
+              className={`${styles.navLink} ${location.pathname.startsWith('/tracker') ? styles.navLinkActive : ''}`}
+              aria-current={location.pathname.startsWith('/tracker') ? 'page' : undefined}
+            >
+              Трекер
             </Link>
             <Link
                 to="/roadmap"

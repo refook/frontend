@@ -6,3 +6,4 @@ export { FridgePage } from './FridgePage';
 export { default as ProfilePage } from './ProfilePage';
 // export { default as FavoritesPage } from './FavoritesPage';
 export { default as AdvancedProfilePage } from './AdvancedProfile/AdvancedProfilePage';
+export { default as FoodTrackerPage } from './FoodTrackerPage';
