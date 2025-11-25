@@ -2,7 +2,7 @@ import {Routes, Route} from 'react-router-dom';
 
 
 import Layout from './components/Layout/Layout';
-import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage, ProfilePage, AdvancedProfilePage} from './pages';
+import {HomePage, RecipesPage, CreateRecipePage, RecipeDetailPage, FridgePage, ProfilePage, AdvancedProfilePage, FoodTrackerPage} from './pages';
 import AdminPage from './pages/Admin/AdminPage';
 import EditRecipePage from './pages/EditRecipePage';
 import DiscoverPage from './pages/DiscoverPage';
@@ -23,6 +23,7 @@ function App() {
                     <Route path="/recipe/:id/edit" element={<EditRecipePage/>}/>
                     <Route path="/fridge" element={<FridgePage/>}/>
                     <Route path="/discover" element={<DiscoverPage/>}/>
+                    <Route path="/tracker" element={<FoodTrackerPage/>}/>
                     <Route path="/create-recipe" element={<CreateRecipePage/>}/>
                     <Route path="/profile" element={<ProfilePage/>}/>
                     {false && <Route path="/favorites" element={<div />}/>}
