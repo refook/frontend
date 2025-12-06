@@ -1,0 +1,5042 @@
+[
+  {
+    "name": "Жир свиной топленый",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 947,
+      "proteins": 0,
+      "fats": 100,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Масло из грецкого ореха",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 925,
+      "proteins": 0,
+      "fats": 100,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Льняное масло",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 898,
+      "proteins": 0,
+      "fats": 100,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свиные шкварки",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 895,
+      "proteins": 0,
+      "fats": 100,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Жир говяжий топленый",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 871,
+      "proteins": 0,
+      "fats": 100,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Жир свиной",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 871,
+      "proteins": 0,
+      "fats": 100,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сало",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 797,
+      "proteins": 2,
+      "fats": 89,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говяжий ливер",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 735,
+      "proteins": 15,
+      "fats": 4,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Шпик",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 658,
+      "proteins": 1,
+      "fats": 93,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Черный грецкий персидский орех",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 651,
+      "proteins": 28,
+      "fats": 47,
+      "carbs": 11,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Орехи грецкие",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 650,
+      "proteins": 15,
+      "fats": 65,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Черный грецкий английский орех",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 628,
+      "proteins": 28,
+      "fats": 46,
+      "carbs": 11,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Печень трески в масле",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 613,
+      "proteins": 4,
+      "fats": 66,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина - плечо",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 593,
+      "proteins": 15,
+      "fats": 29,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яичный порошок",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 542,
+      "proteins": 46,
+      "fats": 37,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина - отбивная на косточке",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 537,
+      "proteins": 21,
+      "fats": 10,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина - грудинка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 533,
+      "proteins": 14,
+      "fats": 26,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Чиа семена",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 512,
+      "proteins": 17,
+      "fats": 31,
+      "carbs": 42,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Корейка сырокопченая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 469,
+      "proteins": 11,
+      "fats": 47,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог 40",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 466,
+      "proteins": 28,
+      "fats": 40,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина - спинная часть",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 459,
+      "proteins": 17,
+      "fats": 21,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Бекон вареный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 447,
+      "proteins": 16,
+      "fats": 14,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Печень гусиная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 412,
+      "proteins": 15,
+      "fats": 39,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сухие дрожжи",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 410,
+      "proteins": 49,
+      "fats": 6,
+      "carbs": 40,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Печень утиная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 405,
+      "proteins": 16,
+      "fats": 38,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Утка i категории",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 405,
+      "proteins": 16,
+      "fats": 38,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Утка жареная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 401,
+      "proteins": 23,
+      "fats": 35,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - оковалок",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 380,
+      "proteins": 20,
+      "fats": 4,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина - отбивная на косточке",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 380,
+      "proteins": 14,
+      "fats": 25,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лосось соте",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 379,
+      "proteins": 21,
+      "fats": 31,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис мгновенного приготовления сухой",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 374,
+      "proteins": 8,
+      "fats": 3,
+      "carbs": 73,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Вермишель",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 371,
+      "proteins": 13,
+      "fats": 2,
+      "carbs": 75,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис белый, обваренный паром, с длинными зернами",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 369,
+      "proteins": 8,
+      "fats": 1,
+      "carbs": 76,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Нут",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 364,
+      "proteins": 19,
+      "fats": 1,
+      "carbs": 61,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис белый витаминизированный сырой",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 363,
+      "proteins": 8,
+      "fats": 1,
+      "carbs": 76,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис коричневый сырой",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 360,
+      "proteins": 8,
+      "fats": 3,
+      "carbs": 73,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина мясная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 357,
+      "proteins": 14,
+      "fats": 33,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Желатин",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 355,
+      "proteins": 87,
+      "fats": 0,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Плавленый сыр 60",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 354,
+      "proteins": 18,
+      "fats": 60,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Дикий рис сырой",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 353,
+      "proteins": 59,
+      "fats": 10,
+      "carbs": 275,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина - шницель",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 352,
+      "proteins": 15,
+      "fats": 29,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яичный желток",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 352,
+      "proteins": 16,
+      "fats": 31,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Белая фасоль",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 352,
+      "proteins": 24,
+      "fats": 2,
+      "carbs": 47,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Смешанный мясной фарш",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 351,
+      "proteins": 12,
+      "fats": 32,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Стеклянная лапша",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 351,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 86,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сливочный сыр 50",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 349,
+      "proteins": 18,
+      "fats": 50,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Светлая гречневая мука",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 347,
+      "proteins": 13,
+      "fats": 1,
+      "carbs": 72,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Имбирь сухой",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 347,
+      "proteins": 2,
+      "fats": 1,
+      "carbs": 16,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 344,
+      "proteins": 7,
+      "fats": 1,
+      "carbs": 79,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Макаронные изделия,, яичные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 342,
+      "proteins": 11,
+      "fats": 2,
+      "carbs": 70,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Булгур",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 342,
+      "proteins": 12,
+      "fats": 1,
+      "carbs": 58,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сметана 30",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 340,
+      "proteins": 2,
+      "fats": 30,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Крупа манная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 340,
+      "proteins": 10,
+      "fats": 1,
+      "carbs": 73,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Крупа перловая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 340,
+      "proteins": 9,
+      "fats": 1,
+      "carbs": 74,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Чечевица",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 340,
+      "proteins": 26,
+      "fats": 2,
+      "carbs": 46,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Чечевица сушеная невареная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 340,
+      "proteins": 26,
+      "fats": 2,
+      "carbs": 46,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Макароны",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 338,
+      "proteins": 11,
+      "fats": 1,
+      "carbs": 71,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Макароны из муки",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 338,
+      "proteins": 11,
+      "fats": 1,
+      "carbs": 71,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Макаронные изделия,, витаминизированные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 337,
+      "proteins": 10,
+      "fats": 1,
+      "carbs": 70,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Гречка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 335,
+      "proteins": 50,
+      "fats": 28,
+      "carbs": 242,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Крупа пшенная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 335,
+      "proteins": 12,
+      "fats": 3,
+      "carbs": 69,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина жирная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 333,
+      "proteins": 15,
+      "fats": 30,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Темная гречневая мука",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 333,
+      "proteins": 13,
+      "fats": 1,
+      "carbs": 71,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Фасоль",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 328,
+      "proteins": 21,
+      "fats": 2,
+      "carbs": 45,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Молоко сгущенное с сахаром",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 324,
+      "proteins": 7,
+      "fats": 9,
+      "carbs": 56,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сосиски свиные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 324,
+      "proteins": 12,
+      "fats": 31,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Ребрышки свиные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 321,
+      "proteins": 15,
+      "fats": 29,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Макаронные изделия,, молочные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 309,
+      "proteins": 12,
+      "fats": 3,
+      "carbs": 67,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь в растительном масле",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 301,
+      "proteins": 16,
+      "fats": 27,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Язык свиной",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 300,
+      "proteins": 16,
+      "fats": 16,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Камамбер",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 299,
+      "proteins": 20,
+      "fats": 24,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина - рулька",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 294,
+      "proteins": 19,
+      "fats": 25,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Утка ii категории",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 287,
+      "proteins": 17,
+      "fats": 24,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сметана 25",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 284,
+      "proteins": 3,
+      "fats": 25,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина - лопатка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 284,
+      "proteins": 16,
+      "fats": 25,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лосось с гриля",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 283,
+      "proteins": 21,
+      "fats": 22,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Моцарелла",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 280,
+      "proteins": 28,
+      "fats": 24,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Изюм",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 280,
+      "proteins": 3,
+      "fats": 1,
+      "carbs": 66,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кишмиш",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 279,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 71,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сушеная свекла",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 278,
+      "proteins": 9,
+      "fats": 1,
+      "carbs": 57,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лаваш",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 277,
+      "proteins": 9,
+      "fats": 1,
+      "carbs": 56,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сушеная морковь",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 275,
+      "proteins": 8,
+      "fats": 1,
+      "carbs": 49,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Варенье любое",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 271,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 71,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Окорок вареный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 269,
+      "proteins": 14,
+      "fats": 26,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лосось солёный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 269,
+      "proteins": 21,
+      "fats": 21,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сосиски «молочные»",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 266,
+      "proteins": 11,
+      "fats": 24,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог со сметаной",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 260,
+      "proteins": 18,
+      "fats": 14,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 259,
+      "proteins": 16,
+      "fats": 22,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сосиски «русские»",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 243,
+      "proteins": 11,
+      "fats": 22,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Корейка свиная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 242,
+      "proteins": 27,
+      "fats": 14,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Курица, мякоть без кожи",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 241,
+      "proteins": 18,
+      "fats": 18,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Курица i категории",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 238,
+      "proteins": 18,
+      "fats": 18,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лаваш армянский",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 236,
+      "proteins": 8,
+      "fats": 1,
+      "carbs": 48,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Блины на раст.масле",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 235,
+      "proteins": 6,
+      "fats": 12,
+      "carbs": 26,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина - ножка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 234,
+      "proteins": 24,
+      "fats": 16,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - ребра",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 233,
+      "proteins": 16,
+      "fats": 19,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог 20",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 233,
+      "proteins": 14,
+      "fats": 20,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина - окорок",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 232,
+      "proteins": 18,
+      "fats": 18,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сосиски консервированные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 228,
+      "proteins": 42,
+      "fats": 175,
+      "carbs": 10,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Чернослив",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 227,
+      "proteins": 2,
+      "fats": 1,
+      "carbs": 58,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог 18",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 226,
+      "proteins": 14,
+      "fats": 18,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина жирная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 225,
+      "proteins": 18,
+      "fats": 30,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Скумбрия копченая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 221,
+      "proteins": 21,
+      "fats": 16,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - грудинка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 217,
+      "proteins": 19,
+      "fats": 16,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь соленая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 217,
+      "proteins": 20,
+      "fats": 15,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говяжья солонина",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 216,
+      "proteins": 19,
+      "fats": 25,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Палтус отварной",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 216,
+      "proteins": 14,
+      "fats": 18,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь горячего копчения",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 215,
+      "proteins": 22,
+      "fats": 14,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Языковая колбаса",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 215,
+      "proteins": 16,
+      "fats": 10,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Скумбрия отварная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 211,
+      "proteins": 20,
+      "fats": 15,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сметана",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 210,
+      "proteins": 3,
+      "fats": 20,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сметана 20",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 210,
+      "proteins": 3,
+      "fats": 20,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яблоки сушеные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 210,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 59,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лосось свежий",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 201,
+      "proteins": 20,
+      "fats": 6,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - нежирное жаркое",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 200,
+      "proteins": 20,
+      "fats": 6,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Блины на олив.масле",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 200,
+      "proteins": 6,
+      "fats": 7,
+      "carbs": 26,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сёмга на пару",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 197,
+      "proteins": 19,
+      "fats": 14,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Индейка ii категории",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 194,
+      "proteins": 86,
+      "fats": 108,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь маринованная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 192,
+      "proteins": 17,
+      "fats": 13,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Тунец в растительном масле",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 190,
+      "proteins": 27,
+      "fats": 9,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сёмга отварная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 189,
+      "proteins": 23,
+      "fats": 13,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Форель слабосолёная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 186,
+      "proteins": 18,
+      "fats": 19,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свинина - нежирное жаркое",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 184,
+      "proteins": 16,
+      "fats": 28,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - хвост",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 184,
+      "proteins": 20,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Скумбрия свежая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 181,
+      "proteins": 19,
+      "fats": 12,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кальмары жареные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 175,
+      "proteins": 10,
+      "fats": 14,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина жирная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 171,
+      "proteins": 20,
+      "fats": 23,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог мягкий диетический",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 170,
+      "proteins": 16,
+      "fats": 11,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Горбуша солёная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 169,
+      "proteins": 22,
+      "fats": 9,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Баранина постная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 169,
+      "proteins": 18,
+      "fats": 11,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Нерка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 169,
+      "proteins": 25,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Горбуша отварная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 168,
+      "proteins": 23,
+      "fats": 8,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яйцо перепелиное",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 168,
+      "proteins": 12,
+      "fats": 13,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свиной язык",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 165,
+      "proteins": 17,
+      "fats": 11,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Гречка вареная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 163,
+      "proteins": 6,
+      "fats": 2,
+      "carbs": 31,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лосось копчёный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 162,
+      "proteins": 22,
+      "fats": 8,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Белые жареные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 162,
+      "proteins": 15,
+      "fats": 7,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь свежая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 161,
+      "proteins": 16,
+      "fats": 11,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Индейка тушка без кожи",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 161,
+      "proteins": 20,
+      "fats": 8,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Язык телячий",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 160,
+      "proteins": 14,
+      "fats": 12,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь в томатном соусе",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 159,
+      "proteins": 14,
+      "fats": 10,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Курица ii категории",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 159,
+      "proteins": 21,
+      "fats": 8,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сердце куриное",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 159,
+      "proteins": 16,
+      "fats": 10,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина постная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 158,
+      "proteins": 22,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Куриные ножки",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 158,
+      "proteins": 17,
+      "fats": 10,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яйцо куриное",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 157,
+      "proteins": 13,
+      "fats": 11,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 156,
+      "proteins": 16,
+      "fats": 10,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог 10",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 156,
+      "proteins": 16,
+      "fats": 10,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Грудинка свиная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 155,
+      "proteins": 21,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог фруктовый",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 147,
+      "proteins": 18,
+      "fats": 1,
+      "carbs": 14,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Язык говяжий",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 146,
+      "proteins": 12,
+      "fats": 11,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Чеснок",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 143,
+      "proteins": 7,
+      "fats": 1,
+      "carbs": 30,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Куриный фарш",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 143,
+      "proteins": 17,
+      "fats": 8,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Горбуша свежая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 142,
+      "proteins": 21,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сёмга свежая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 140,
+      "proteins": 22,
+      "fats": 6,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Печень куриная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 140,
+      "proteins": 20,
+      "fats": 6,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Цыплята",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 140,
+      "proteins": 19,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кижуч",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 140,
+      "proteins": 26,
+      "fats": 6,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - лопатка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 137,
+      "proteins": 19,
+      "fats": 7,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Макароны отварные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 135,
+      "proteins": 3,
+      "fats": 5,
+      "carbs": 19,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Корейская морковь",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 134,
+      "proteins": 0,
+      "fats": 9,
+      "carbs": 13,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Форель копчёная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 132,
+      "proteins": 26,
+      "fats": 3,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говяжья печень",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 130,
+      "proteins": 18,
+      "fats": 4,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Печень говяжья",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 130,
+      "proteins": 18,
+      "fats": 4,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лососевый фарш",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 130,
+      "proteins": 19,
+      "fats": 6,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис коричневый вареный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 119,
+      "proteins": 3,
+      "fats": 1,
+      "carbs": 30,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яйцо страуса",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 118,
+      "proteins": 12,
+      "fats": 12,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Копченая курица",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 117,
+      "proteins": 18,
+      "fats": 5,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сметана 10",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 115,
+      "proteins": 3,
+      "fats": 10,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Окорок кабана",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 113,
+      "proteins": 18,
+      "fats": 18,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Куриная грудка",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 113,
+      "proteins": 24,
+      "fats": 2,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кальмары отварные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 110,
+      "proteins": 18,
+      "fats": 4,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис белый витаминизированный вареный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 109,
+      "proteins": 9,
+      "fats": 1,
+      "carbs": 85,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Рис мгновенного приготовления, готовый к употреблению",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 109,
+      "proteins": 2,
+      "fats": 1,
+      "carbs": 28,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Чечевица сушеная вареная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 106,
+      "proteins": 7,
+      "fats": 0,
+      "carbs": 15,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Говядина - окорок",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 104,
+      "proteins": 20,
+      "fats": 3,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Палтус свежий",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 102,
+      "proteins": 19,
+      "fats": 3,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Фасоль свежезамороженная в упаковке",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 102,
+      "proteins": 19,
+      "fats": 0,
+      "carbs": 13,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Тунец свежий",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 101,
+      "proteins": 23,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Печень баранья",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 101,
+      "proteins": 19,
+      "fats": 3,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Форель",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 97,
+      "proteins": 19,
+      "fats": 2,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Сельдь в сметане",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 97,
+      "proteins": 6,
+      "fats": 6,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Креветки свежие",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 97,
+      "proteins": 22,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Тунец в собственном соке",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 96,
+      "proteins": 21,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Креветки отварные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 95,
+      "proteins": 19,
+      "fats": 2,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Фасоль красная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 93,
+      "proteins": 8,
+      "fats": 0,
+      "carbs": 14,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Форель отварная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 89,
+      "proteins": 16,
+      "fats": 3,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Батат",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 86,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 20,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Креветки консервированные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 81,
+      "proteins": 18,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Имбирь",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 80,
+      "proteins": 2,
+      "fats": 1,
+      "carbs": 16,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Минтай отварной",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 79,
+      "proteins": 18,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог обезжиренный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 75,
+      "proteins": 16,
+      "fats": 1,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кальмары свежие",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 74,
+      "proteins": 18,
+      "fats": 0,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Крабовые палочки",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 73,
+      "proteins": 6,
+      "fats": 1,
+      "carbs": 10,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Минтай свежий",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 72,
+      "proteins": 16,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Творог «виталиния»",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 64,
+      "proteins": 7,
+      "fats": 0,
+      "carbs": 9,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кефир жирный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 62,
+      "proteins": 3,
+      "fats": 3,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яблочный мусс консервированный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 61,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 19,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Креветки очищенные замороженные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 60,
+      "proteins": 14,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Мидии жареные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 59,
+      "proteins": 11,
+      "fats": 2,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Ананасы консервированные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 57,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 14,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Черника свежезамороженная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 56,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 23,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кефир 2,5% жирности",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 53,
+      "proteins": 3,
+      "fats": 3,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Хурма",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 53,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 17,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Имбирь маринованный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 51,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 13,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Соевый соус",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 51,
+      "proteins": 6,
+      "fats": 0,
+      "carbs": 67,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Мидии отварные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 50,
+      "proteins": 9,
+      "fats": 2,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свекла отварная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 49,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 11,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Ананасы",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 49,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 11,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Инжир",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 49,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 14,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яблоки",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 47,
+      "proteins": 0,
+      "fats": 0,
+      "carbs": 10,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Зеленая капуста",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 46,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Зеленая капуста свежезамороженная в упаковке",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 45,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 6,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Яичный белок",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 45,
+      "proteins": 11,
+      "fats": 0,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Черника",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 44,
+      "proteins": 1,
+      "fats": 1,
+      "carbs": 11,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Смородина черная свежезамороженная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 44,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 13,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Клубника свежезамороженная сладкая",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 44,
+      "proteins": 1,
+      "fats": 1,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Псиллиум",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 42,
+      "proteins": 3,
+      "fats": 0,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Свекла",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 40,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 9,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кефир 1",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 38,
+      "proteins": 3,
+      "fats": 1,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Смородина черная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 38,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 12,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Белые грибы свежие",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 34,
+      "proteins": 4,
+      "fats": 2,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Морковь",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 33,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кефир обезжиренный",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 30,
+      "proteins": 3,
+      "fats": 0,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Клубника",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 30,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Тыква",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 29,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 8,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Грейпфрут",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 29,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 7,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Цветная капуста",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 28,
+      "proteins": 3,
+      "fats": 0,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Морковь отварная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 25,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Шампиньоны",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 24,
+      "proteins": 4,
+      "fats": 1,
+      "carbs": 0,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Белые маринованные",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 24,
+      "proteins": 3,
+      "fats": 1,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Кабачки",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 23,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Помидоры",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 23,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 4,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Фасоль огненно-красная",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 23,
+      "proteins": 4,
+      "fats": 0,
+      "carbs": 5,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Шпинат",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 22,
+      "proteins": 3,
+      "fats": 0,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Лесные грибы",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 21,
+      "proteins": 3,
+      "fats": 1,
+      "carbs": 1,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Спаржа",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 20,
+      "proteins": 2,
+      "fats": 0,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Китайская капуста",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 16,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Огурцы свежие",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 15,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 3,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  },
+  {
+    "name": "Соленые огурцы",
+    "description": "",
+    "categories": [],
+    "photo": null,
+    "macros": {
+      "calories": 11,
+      "proteins": 1,
+      "fats": 0,
+      "carbs": 2,
+      "isEmpty": false
+    },
+    "measures": [
+      {
+        "name": "Грамм",
+        "weight": 100,
+        "isDefault": true,
+        "density": 1
+      }
+    ]
+  }
+]
