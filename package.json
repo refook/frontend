@@ -11,8 +11,6 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "parse-products": "node scripts_parsing/products/parse-1000menu-node.js",
-    "parse-products:calorizator": "node scripts_parsing/products_variant/parse-calorizator.js",
-    "parse-products:calorizator-file": "node scripts_parsing/products_variant/parse-calorizator-from-file.js",
     "parse-products:calorizator-html": "node scripts_parsing/products_variant/parse-calorizator-html.js",
     "fetch-tbody:calorizator": "node scripts_parsing/products_variant/fetch-tbody-from-calorizator.js",
     "fetch-descriptions:calorizator": "node scripts_parsing/products_variant/fetch-descriptions-from-calorizator.js",
