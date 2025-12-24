@@ -24,3 +24,9 @@ notes
 *.njsproj
 *.sln
 *.sw?
+
+# Парсинг продуктов - большие файлы данных
+scripts_parsing/products_variant/*.json
+scripts_parsing/products_variant/*.html
+scripts_parsing/products_variant/*.html
+!scripts_parsing/products_variant/*.js
